@@ -10,11 +10,13 @@
 
 @implementation XBPageCurlAppDelegate
 
-@synthesize window = _window;
+@synthesize window=_window, rootViewController=_rootViewController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController" bundle:nil];
+    
+    [self.window setRootViewController:self.rootViewController];
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -60,7 +62,8 @@
 
 - (void)dealloc
 {
-    [_window release];
+    self.rootViewController = nil;
+    self.window = nil;
     [super dealloc];
 }
 

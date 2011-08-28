@@ -17,6 +17,15 @@
 		1B8816BD1401E4F000D579EF /* MainWindow_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8816BB1401E4F000D579EF /* MainWindow_iPhone.xib */; };
 		1B8816C11401E4F000D579EF /* XBPageCurlAppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8816C01401E4F000D579EF /* XBPageCurlAppDelegate_iPad.m */; };
 		1B8816C41401E4F000D579EF /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8816C21401E4F000D579EF /* MainWindow_iPad.xib */; };
+		1B8816CC1401E51F00D579EF /* XBPageCurlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8816CB1401E51F00D579EF /* XBPageCurlView.m */; };
+		1B8816CE1401E55600D579EF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816CD1401E55600D579EF /* OpenGLES.framework */; };
+		1B8816D01401E5CF00D579EF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816CF1401E5CF00D579EF /* QuartzCore.framework */; };
+		1B8816D61401F9B800D579EF /* VertexProgram.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8816D51401F9B800D579EF /* VertexProgram.glsl */; };
+		1B8816D81401F9F200D579EF /* FragmentProgram.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8816D71401F9F200D579EF /* FragmentProgram.glsl */; };
+		1B88DC9E140937EC001E1417 /* appleStore.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9C140937EC001E1417 /* appleStore.png */; };
+		1B88DC9F140937EC001E1417 /* appleStore@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9D140937EC001E1417 /* appleStore@2x.png */; };
+		1B8C00E01408B76A008B53DF /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C00DE1408B76A008B53DF /* RootViewController.m */; };
+		1B8C00E11408B76A008B53DF /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8C00DF1408B76A008B53DF /* RootViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,18 +33,29 @@
 		1B8816A51401E4F000D579EF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1B8816A71401E4F000D579EF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1B8816A91401E4F000D579EF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		1B8816AD1401E4F000D579EF /* XBPageCurl-Info.plist */ = {isa = PBXFileReference; path = "XBPageCurl-Info.plist"; sourceTree = "<group>"; };
+		1B8816AD1401E4F000D579EF /* XBPageCurl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "XBPageCurl-Info.plist"; sourceTree = "<group>"; };
 		1B8816AF1401E4F000D579EF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1B8816B11401E4F000D579EF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		1B8816B31401E4F000D579EF /* XBPageCurl-Prefix.pch */ = {isa = PBXFileReference; path = "XBPageCurl-Prefix.pch"; sourceTree = "<group>"; };
-		1B8816B41401E4F000D579EF /* XBPageCurlAppDelegate.h */ = {isa = PBXFileReference; path = XBPageCurlAppDelegate.h; sourceTree = "<group>"; };
+		1B8816B31401E4F000D579EF /* XBPageCurl-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XBPageCurl-Prefix.pch"; sourceTree = "<group>"; };
+		1B8816B41401E4F000D579EF /* XBPageCurlAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XBPageCurlAppDelegate.h; sourceTree = "<group>"; };
 		1B8816B51401E4F000D579EF /* XBPageCurlAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlAppDelegate.m; sourceTree = "<group>"; };
-		1B8816B81401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.h */ = {isa = PBXFileReference; name = XBPageCurlAppDelegate_iPhone.h; path = iPhone/XBPageCurlAppDelegate_iPhone.h; sourceTree = "<group>"; };
+		1B8816B81401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = XBPageCurlAppDelegate_iPhone.h; path = iPhone/XBPageCurlAppDelegate_iPhone.h; sourceTree = "<group>"; };
 		1B8816B91401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XBPageCurlAppDelegate_iPhone.m; path = iPhone/XBPageCurlAppDelegate_iPhone.m; sourceTree = "<group>"; };
 		1B8816BC1401E4F000D579EF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPhone/en.lproj/MainWindow_iPhone.xib; sourceTree = "<group>"; };
-		1B8816BF1401E4F000D579EF /* XBPageCurlAppDelegate_iPad.h */ = {isa = PBXFileReference; name = XBPageCurlAppDelegate_iPad.h; path = iPad/XBPageCurlAppDelegate_iPad.h; sourceTree = "<group>"; };
+		1B8816BF1401E4F000D579EF /* XBPageCurlAppDelegate_iPad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = XBPageCurlAppDelegate_iPad.h; path = iPad/XBPageCurlAppDelegate_iPad.h; sourceTree = "<group>"; };
 		1B8816C01401E4F000D579EF /* XBPageCurlAppDelegate_iPad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XBPageCurlAppDelegate_iPad.m; path = iPad/XBPageCurlAppDelegate_iPad.m; sourceTree = "<group>"; };
 		1B8816C31401E4F000D579EF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPad/en.lproj/MainWindow_iPad.xib; sourceTree = "<group>"; };
+		1B8816CA1401E51F00D579EF /* XBPageCurlView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageCurlView.h; sourceTree = "<group>"; };
+		1B8816CB1401E51F00D579EF /* XBPageCurlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlView.m; sourceTree = "<group>"; };
+		1B8816CD1401E55600D579EF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		1B8816CF1401E5CF00D579EF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		1B8816D51401F9B800D579EF /* VertexProgram.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VertexProgram.glsl; sourceTree = "<group>"; };
+		1B8816D71401F9F200D579EF /* FragmentProgram.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FragmentProgram.glsl; sourceTree = "<group>"; };
+		1B88DC9C140937EC001E1417 /* appleStore.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = appleStore.png; path = Resources/appleStore.png; sourceTree = SOURCE_ROOT; };
+		1B88DC9D140937EC001E1417 /* appleStore@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "appleStore@2x.png"; path = "Resources/appleStore@2x.png"; sourceTree = SOURCE_ROOT; };
+		1B8C00DD1408B769008B53DF /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		1B8C00DE1408B76A008B53DF /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		1B8C00DF1408B76A008B53DF /* RootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +63,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B8816D01401E5CF00D579EF /* QuartzCore.framework in Frameworks */,
+				1B8816CE1401E55600D579EF /* OpenGLES.framework in Frameworks */,
 				1B8816A61401E4F000D579EF /* UIKit.framework in Frameworks */,
 				1B8816A81401E4F000D579EF /* Foundation.framework in Frameworks */,
 				1B8816AA1401E4F000D579EF /* CoreGraphics.framework in Frameworks */,
@@ -56,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				1B8816AB1401E4F000D579EF /* XBPageCurl */,
+				1B8816D91401FBA600D579EF /* Resources */,
 				1B8816A41401E4F000D579EF /* Frameworks */,
 				1B8816A21401E4F000D579EF /* Products */,
 			);
@@ -72,6 +95,8 @@
 		1B8816A41401E4F000D579EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1B8816CF1401E5CF00D579EF /* QuartzCore.framework */,
+				1B8816CD1401E55600D579EF /* OpenGLES.framework */,
 				1B8816A51401E4F000D579EF /* UIKit.framework */,
 				1B8816A71401E4F000D579EF /* Foundation.framework */,
 				1B8816A91401E4F000D579EF /* CoreGraphics.framework */,
@@ -84,9 +109,14 @@
 			children = (
 				1B8816B41401E4F000D579EF /* XBPageCurlAppDelegate.h */,
 				1B8816B51401E4F000D579EF /* XBPageCurlAppDelegate.m */,
+				1B8C00DD1408B769008B53DF /* RootViewController.h */,
+				1B8C00DE1408B76A008B53DF /* RootViewController.m */,
+				1B8C00DF1408B76A008B53DF /* RootViewController.xib */,
 				1B8816B71401E4F000D579EF /* iPhone */,
 				1B8816BE1401E4F000D579EF /* iPad */,
 				1B8816AC1401E4F000D579EF /* Supporting Files */,
+				1B8816CA1401E51F00D579EF /* XBPageCurlView.h */,
+				1B8816CB1401E51F00D579EF /* XBPageCurlView.m */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
@@ -120,6 +150,18 @@
 				1B8816C21401E4F000D579EF /* MainWindow_iPad.xib */,
 			);
 			name = iPad;
+			sourceTree = "<group>";
+		};
+		1B8816D91401FBA600D579EF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1B88DC9C140937EC001E1417 /* appleStore.png */,
+				1B88DC9D140937EC001E1417 /* appleStore@2x.png */,
+				1B8816D71401F9F200D579EF /* FragmentProgram.glsl */,
+				1B8816D51401F9B800D579EF /* VertexProgram.glsl */,
+			);
+			name = Resources;
+			path = XBPageCurl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -172,6 +214,11 @@
 				1B8816B01401E4F000D579EF /* InfoPlist.strings in Resources */,
 				1B8816BD1401E4F000D579EF /* MainWindow_iPhone.xib in Resources */,
 				1B8816C41401E4F000D579EF /* MainWindow_iPad.xib in Resources */,
+				1B8816D61401F9B800D579EF /* VertexProgram.glsl in Resources */,
+				1B8816D81401F9F200D579EF /* FragmentProgram.glsl in Resources */,
+				1B8C00E11408B76A008B53DF /* RootViewController.xib in Resources */,
+				1B88DC9E140937EC001E1417 /* appleStore.png in Resources */,
+				1B88DC9F140937EC001E1417 /* appleStore@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,6 +233,8 @@
 				1B8816B61401E4F000D579EF /* XBPageCurlAppDelegate.m in Sources */,
 				1B8816BA1401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.m in Sources */,
 				1B8816C11401E4F000D579EF /* XBPageCurlAppDelegate_iPad.m in Sources */,
+				1B8816CC1401E51F00D579EF /* XBPageCurlView.m in Sources */,
+				1B8C00E01408B76A008B53DF /* RootViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +354,7 @@
 				1B8816C91401E4F000D579EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
