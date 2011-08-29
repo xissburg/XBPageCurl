@@ -32,6 +32,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (void)createBuffersWithXRes:(GLuint)xRes yRes:(GLuint)yRes;
 - (void)destroyBuffers;
 - (BOOL)setupShaders;
+- (void)destroyShaders;
 - (void)setupMVP;
 - (void)createTextureFromView:(UIView *)view;
 - (void)startAnimating;
@@ -43,7 +44,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 @implementation XBPageCurlView
 
-@synthesize context=_context, displayLink=_displayLink;
+@synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
 
 - (BOOL)initialize
 {
@@ -75,9 +76,16 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (id)initWithView:(UIView *)view
 {
+    return [self initWithView:view antialiasing:NO];
+}
+
+- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing
+{
     CGRect frame = CGRectMake(0, 0, view.bounds.size.width, view.bounds.size.height);
     self = [super initWithFrame:frame];
     if (self) {
+        _antialiasing = antialiasing;
+        
         if (![self initialize]) {
             [self release];
             return nil;
@@ -91,8 +99,11 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (void)dealloc
 {
     self.context = nil;
+    [self.displayLink invalidate];
     self.displayLink = nil;
     [self destroyBuffers];
+    [self destroyShaders];
+    [self destroyFramebuffer];
     [super dealloc];
 }
 
@@ -139,27 +150,29 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     }
     
     //Create multisampling buffers
-    glGenFramebuffers(1, &sampleFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, sampleFramebuffer);
-    
-    glGenRenderbuffers(1, &sampleColorRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, sampleColorRenderbuffer);
-    glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_RGBA8_OES, viewportWidth, viewportHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sampleColorRenderbuffer);
-    
-    glGenRenderbuffers(1, &sampleDepthRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, sampleDepthRenderbuffer);
-    glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT16, viewportWidth, viewportHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sampleDepthRenderbuffer);
-    
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        NSLog(@"Failed to create multisamping framebuffer: %x", status);
+    if (self.antialiasing) {
+        glGenFramebuffers(1, &sampleFramebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, sampleFramebuffer);
+        
+        glGenRenderbuffers(1, &sampleColorRenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, sampleColorRenderbuffer);
+        glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_RGBA8_OES, viewportWidth, viewportHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sampleColorRenderbuffer);
+        
+        glGenRenderbuffers(1, &sampleDepthRenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, sampleDepthRenderbuffer);
+        glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT16, viewportWidth, viewportHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sampleDepthRenderbuffer);
+        
+        status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            NSLog(@"Failed to create multisamping framebuffer: %x", status);
+        }
     }
     
     [self setupMVP];
-    [self createBuffersWithXRes:80 yRes:120];
+    [self createBuffersWithXRes:64 yRes:96];
     [self startAnimating];
 }
 
@@ -173,6 +186,15 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     
     glDeleteRenderbuffers(1, &depthRenderbuffer);
     depthRenderbuffer = 0;
+    
+    glDeleteFramebuffers(1, &sampleFramebuffer);
+    sampleFramebuffer = 0;
+    
+    glDeleteRenderbuffers(1, &sampleColorRenderbuffer);
+    sampleColorRenderbuffer = 0;
+    
+    glDeleteRenderbuffers(1, &sampleDepthRenderbuffer);
+    sampleDepthRenderbuffer = 0;
 }
 
 - (void)createBuffersWithXRes:(GLuint)xRes yRes:(GLuint)yRes
@@ -303,23 +325,17 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     return YES;
 }
 
+- (void)destroyShaders
+{
+    glDeleteProgram(program);
+    program = 0;
+}
+
 - (void)createTextureFromView:(UIView *)view
 {
-    /*
-    NSString *imagePath = [[NSBundle mainBundle] pathForResource:@"appleStore" ofType:@"png"];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
-    CGImageRef imageRef = image.CGImage;
-    
-    size_t imageWidth = CGImageGetWidth(imageRef);
-    size_t imageHeight = CGImageGetHeight(imageRef);
-     */
-    
     //Compute the actual view size in the current screen scale
-    CGSize actualViewSize = view.bounds.size;
-    
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2) {
-        actualViewSize = CGSizeMake(view.bounds.size.width*2, view.bounds.size.height*2);
-    }
+    CGFloat scale = [[UIScreen mainScreen] scale];
+    CGSize actualViewSize = actualViewSize = CGSizeMake(view.bounds.size.width*scale, view.bounds.size.height*scale);
     
     //Compute the closest, greater power of two
     CGFloat textureWidth = 1<<((int)floorf(log2f(actualViewSize.width)) + 1);
@@ -380,7 +396,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 {    
     [EAGLContext setCurrentContext:self.context];
     
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, _antialiasing? sampleFramebuffer: framebuffer);
     glViewport(0, 0, viewportWidth, viewportHeight);
     
     glClearColor(0.4, 0.4, 0.4, 1);
@@ -413,11 +429,16 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
-    /*
-    glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
-    glResolveMultisampleFramebufferAPPLE();
-    */
+    
+    if (_antialiasing) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
+        glResolveMultisampleFramebufferAPPLE();
+        
+        GLenum attachments[] = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
+        glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
+    }
+    
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
@@ -449,7 +470,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     dir.x /= length, dir.y /= length;
     cylinderDirection = dir;
     
-    cylinderRadius = 6 + length/4;
+    cylinderRadius = 16 + length/4;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event

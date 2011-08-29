@@ -40,8 +40,13 @@
     CGPoint cylinderDirection;
     CGFloat cylinderRadius;
     CGPoint startPickingPosition;
+    
+    BOOL _antialiasing;
 }
 
+@property (nonatomic, readonly) BOOL antialiasing;
+
 - (id)initWithView:(UIView *)view;
+- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing;
 
 @end
