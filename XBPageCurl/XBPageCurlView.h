@@ -2,51 +2,36 @@
 //  XBPageCurlView.h
 //  XBPageCurl
 //
-//  Created by xiss burg on 8/21/11.
+//  Created by xiss burg on 8/29/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/ES2/glext.h>
+#import "XBCurlView.h"
 
 
-@interface XBPageCurlView : UIView {
-    EAGLContext *_context;
-    CADisplayLink *_displayLink;
-    
-    GLuint framebuffer;
-    GLuint colorRenderbuffer;
-    GLuint depthRenderbuffer;
-    GLuint sampleFramebuffer;
-    GLuint sampleColorRenderbuffer;
-    GLuint sampleDepthRenderbuffer;
-    GLuint program;
-    GLuint texture;
-    
-    GLuint vertexBuffer;
-    GLuint indexBuffer;
-    GLuint elementCount;
-    
-    GLint viewportWidth, viewportHeight;
-    GLfloat mvp[16];
-    
-    int positionHandle, texCoordHandle, colorHandle, mvpHandle, samplerHandle;
-    int texSizeHandle;
-    int cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
-    
-    CGPoint cylinderPosition;
-    CGPoint cylinderDirection;
-    CGFloat cylinderRadius;
+@class XBPageCurlView;
+
+typedef enum {
+    XBNone,
+    XBNext,
+    XBPrevious
+} XBDirection;
+
+
+@protocol XBPageCurlViewDelegate <NSObject>
+
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView willFlipToDirection:(XBDirection)direction;
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView didFlipToDirection:(XBDirection)direction;
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView didCancelFlipToDirection:(XBDirection)direction;
+
+@end
+
+
+@interface XBPageCurlView : XBCurlView {
     CGPoint startPickingPosition;
-    
-    BOOL _antialiasing;
 }
 
-@property (nonatomic, readonly) BOOL antialiasing;
-
-- (id)initWithView:(UIView *)view;
-- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing;
+@property (nonatomic, assign) id<XBPageCurlViewDelegate> delegate;
 
 @end
