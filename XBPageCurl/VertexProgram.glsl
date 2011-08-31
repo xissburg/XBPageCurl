@@ -23,18 +23,21 @@ void main()
     float d = dot(w, n);
     v_normal = vec3(0.0, 0.0, 1.0);
 
+    //vertices after the cylinder
     if (d > 0.0) {
+        //vertices that should pass over the cylinder
         if (d > M_PI*u_cylinderRadius) {
             vec2 dv = n * (2.0*d - M_PI*u_cylinderRadius);
             v.xy -=  dv;
             v.z = 2.0*u_cylinderRadius;
             v_normal = vec3(0.0, 0.0, 1.0);
         }
+        //vertices that should be projected on the half of the cylinder
         else {
-            float dr = d/u_cylinderRadius;
+            float dr = d/u_cylinderRadius;//projection angle
             float s = sin(dr);
             float c = cos(dr);
-            vec2 proj = v.xy - n*d;
+            vec2 proj = v.xy - n*d;//projection of vertex on the cylinder axis projected on the xy plane
             v.xyz = vec3(s*n.x, s*n.y, 1.0 - c)*u_cylinderRadius;
             v.xy += proj;
             vec3 center = vec3(proj, u_cylinderRadius);
