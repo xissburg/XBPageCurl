@@ -9,5 +9,5 @@ varying lowp vec3 v_normal;
 void main()
 {
     vec3 n = normalize(v_normal);
-    gl_FragColor = texture2D(s_tex, v_texCoord/u_texSize) * n.z;
+    gl_FragColor = vec4(texture2D(s_tex, v_texCoord/u_texSize).rgb * n.z, 1.0);
 }
