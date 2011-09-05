@@ -8,6 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
-@interface XBAnimationManager : NSObject
+
+@class XBAnimation;
+
+
+@interface XBAnimationManager : NSObject {
+    NSMutableDictionary *_animations;
+}
+
++ (id)animationManager;
+
+- (void)runAnimation:(XBAnimation *)animation;
+- (void)stopAnimation:(XBAnimation *)animation;
+- (void)stopAnimationNamed:(NSString *)name;
+
+- (void)update:(NSTimeInterval)dt;
 
 @end

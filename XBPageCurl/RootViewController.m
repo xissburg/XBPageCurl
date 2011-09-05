@@ -42,7 +42,6 @@
     [super viewDidLoad];
     XBPageCurlView *pageCurlView = [[[XBPageCurlView alloc] initWithView:self.messyView] autorelease];
     [self.view addSubview:pageCurlView];
-    self.messyView.hidden = YES;
 }
 
 - (void)viewDidUnload

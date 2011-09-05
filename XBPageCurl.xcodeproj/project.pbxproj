@@ -25,6 +25,8 @@
 		1B88C4D3140C706D005C8824 /* XBPageCurlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B88C4D2140C706D005C8824 /* XBPageCurlView.m */; };
 		1B88DC9E140937EC001E1417 /* appleStore.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9C140937EC001E1417 /* appleStore.png */; };
 		1B88DC9F140937EC001E1417 /* appleStore@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9D140937EC001E1417 /* appleStore@2x.png */; };
+		1B8B1EAA14146D760024FC93 /* XBAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8B1EA914146D760024FC93 /* XBAnimation.m */; };
+		1B8B1EAE14146DC90024FC93 /* XBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8B1EAD14146DC90024FC93 /* XBAnimationManager.m */; };
 		1B8C00E01408B76A008B53DF /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C00DE1408B76A008B53DF /* RootViewController.m */; };
 		1B8C00E11408B76A008B53DF /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8C00DF1408B76A008B53DF /* RootViewController.xib */; };
 /* End PBXBuildFile section */
@@ -56,6 +58,10 @@
 		1B88C4D2140C706D005C8824 /* XBPageCurlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlView.m; sourceTree = "<group>"; };
 		1B88DC9C140937EC001E1417 /* appleStore.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = appleStore.png; path = Resources/appleStore.png; sourceTree = SOURCE_ROOT; };
 		1B88DC9D140937EC001E1417 /* appleStore@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "appleStore@2x.png"; path = "Resources/appleStore@2x.png"; sourceTree = SOURCE_ROOT; };
+		1B8B1EA814146D760024FC93 /* XBAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimation.h; sourceTree = "<group>"; };
+		1B8B1EA914146D760024FC93 /* XBAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimation.m; sourceTree = "<group>"; };
+		1B8B1EAC14146DC90024FC93 /* XBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimationManager.h; sourceTree = "<group>"; };
+		1B8B1EAD14146DC90024FC93 /* XBAnimationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimationManager.m; sourceTree = "<group>"; };
 		1B8C00DD1408B769008B53DF /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1B8C00DE1408B76A008B53DF /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		1B8C00DF1408B76A008B53DF /* RootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
@@ -122,6 +128,10 @@
 				1B8816CB1401E51F00D579EF /* XBCurlView.m */,
 				1B88C4D1140C706D005C8824 /* XBPageCurlView.h */,
 				1B88C4D2140C706D005C8824 /* XBPageCurlView.m */,
+				1B8B1EA814146D760024FC93 /* XBAnimation.h */,
+				1B8B1EA914146D760024FC93 /* XBAnimation.m */,
+				1B8B1EAC14146DC90024FC93 /* XBAnimationManager.h */,
+				1B8B1EAD14146DC90024FC93 /* XBAnimationManager.m */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
@@ -241,6 +251,8 @@
 				1B8816CC1401E51F00D579EF /* XBCurlView.m in Sources */,
 				1B8C00E01408B76A008B53DF /* RootViewController.m in Sources */,
 				1B88C4D3140C706D005C8824 /* XBPageCurlView.m in Sources */,
+				1B8B1EAA14146D760024FC93 /* XBAnimation.m in Sources */,
+				1B8B1EAE14146DC90024FC93 /* XBAnimationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

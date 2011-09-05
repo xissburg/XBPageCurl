@@ -7,6 +7,8 @@
 //
 
 #import "XBCurlView.h"
+#import "XBAnimation.h"
+#import "XBAnimationManager.h"
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -21,11 +23,14 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
-
+/**
+ * A view that renders a curled version of an image or a UIView instance using OpenGL.
+ */
 @interface XBCurlView ()
 
 @property (nonatomic, retain) EAGLContext *context;
 @property (nonatomic, retain) CADisplayLink *displayLink;
+@property (nonatomic, retain) XBAnimationManager *animationManager;
 
 - (void)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -37,7 +42,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (void)createTextureFromView:(UIView *)view;
 - (void)startAnimating;
 - (void)stopAnimating;
-- (void)update:(double)dt;
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -49,11 +53,13 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 @synthesize cylinderPosition=_cylinderPosition, cylinderDirection=_cylinderDirection, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
 @synthesize backingView=_backingView;
+@synthesize animationManager;
 
 - (BOOL)initialize
 {
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
     layer.opaque = YES;
+    layer.backgroundColor = [UIColor clearColor].CGColor;
     layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
     
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -70,6 +76,8 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
         [self setContentScaleFactor:[[UIScreen mainScreen] scale]];
     }
     
+    self.animationManager = [XBAnimationManager animationManager];
+
     self.cylinderPosition = CGPointMake(0, 0);
     self.cylinderDirection = CGPointMake(0, 1);
     self.cylinderRadius = 32;
@@ -118,10 +126,12 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     self.context = nil;
     [self.displayLink invalidate];
     self.displayLink = nil;
+    self.animationManager = nil;
     [self destroyVertexBuffer];
     [self destroyShaders];
     [self destroyFramebuffer];
     [_backingView release];
+    
     [super dealloc];
 }
 
@@ -422,8 +432,10 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)draw:(CADisplayLink *)sender
 {
-    [self update:sender.duration];
+    //Update all animations
+    [self.animationManager update:sender.duration];
     
+    //Render
     [EAGLContext setCurrentContext:self.context];
     
     glBindFramebuffer(GL_FRAMEBUFFER, _antialiasing? sampleFramebuffer: framebuffer);
@@ -476,11 +488,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     if (error != GL_NO_ERROR) {
         NSLog(@"%d", error);
     }
-}
-
-- (void)update:(double)dt
-{
-    //NSLog(@"dt:%f", dt);
 }
 
 @end

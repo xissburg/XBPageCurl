@@ -68,10 +68,11 @@
 @property (nonatomic, assign) CGPoint cylinderDirection;
 @property (nonatomic, assign) CGFloat cylinderRadius;
 
-
+/*
 - (id)initWithImage:(UIImage *)image;
 - (id)initWithImage:(UIImage *)image antialiasing:(BOOL)antialiasing;
 - (id)initWithImage:(UIImage *)image antialiasing:(BOOL)antialiasing horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution;
+ */
 - (id)initWithView:(UIView *)view;
 - (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing;
 - (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution;
