@@ -25,7 +25,7 @@
 {
     self = [super init];
     if (self) {
-        // Initialization code here.
+        _animations = [[NSMutableDictionary alloc] init];
     }
     
     return self;
