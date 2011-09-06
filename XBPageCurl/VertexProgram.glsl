@@ -5,6 +5,7 @@ attribute vec4 a_position;
 attribute vec2 a_texCoord;
 attribute vec4 a_color;
 
+uniform vec2 u_texSize;
 uniform vec2 u_cylinderPosition;
 uniform vec2 u_cylinderDirection;
 uniform float u_cylinderRadius;
@@ -51,7 +52,7 @@ void main()
     }
 
     gl_Position = u_mvpMatrix * v;
-    v_texCoord = a_texCoord;
+    v_texCoord = a_texCoord/u_texSize;
     v_color = a_color;
 }
 
