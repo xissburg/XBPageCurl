@@ -22,7 +22,7 @@
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self animationWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorLinear];
+    return [self animationWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorEaseInOut];
 }
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double))interpolator
@@ -32,7 +32,7 @@
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self initWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorLinear];
+    return [self initWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorEaseInOut];
 }
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double))interpolator
@@ -73,7 +73,29 @@
 
 @end
 
+
+/*
+ * Default interpolators implementation.
+ */
+
 double (^XBAnimationInterpolatorLinear)(double t) = ^(double t)
 {
     return t;
 };
+
+double (^XBAnimationInterpolatorEaseInOut)(double t) = ^(double t)
+{    
+    return 0.5 * (1 - cos(t*M_PI));
+};
+
+double (^XBAnimationInterpolatorEaseIn)(double t) = ^(double t)
+{    
+    return t*t;
+};
+
+double (^XBAnimationInterpolatorEaseOut)(double t) = ^(double t)
+{    
+    double t1 = t - 1;
+    return 1 - t1*t1;
+};
+

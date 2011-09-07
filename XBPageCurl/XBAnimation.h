@@ -36,3 +36,6 @@
  * Default interpolators.
  */
 double (^XBAnimationInterpolatorLinear)(double t);
+double (^XBAnimationInterpolatorEaseInOut)(double t);
+double (^XBAnimationInterpolatorEaseIn)(double t);
+double (^XBAnimationInterpolatorEaseOut)(double t);
