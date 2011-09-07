@@ -182,10 +182,12 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration
 {
-    CGPoint d0 = self.cylinderDirection;
+    double a0 = atan2(_cylinderDirection.y, _cylinderDirection.x);
+    double a1 = atan2(cylinderDirection.y, cylinderDirection.x);
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
-        _cylinderDirection = CGPointMake((1 - t)*d0.x + t*cylinderDirection.x, (1 - t)*d0.y + t*cylinderDirection.y);
+        double a = (1 - t)*a0 + t*a1;
+        _cylinderDirection = CGPointMake(cos(a), sin(a));
     }];
     
     [self.animationManager runAnimation:animation];
