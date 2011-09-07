@@ -33,9 +33,12 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesBegan:touches withEvent:event];
-    startPickingPosition = [[touches anyObject] locationInView:self];
+    CGPoint p = [[touches anyObject] locationInView:self];
+    p.y = self.bounds.size.height - p.y;
     startPickingPosition.x = self.bounds.size.width;
-    startPickingPosition.y = self.bounds.size.height - startPickingPosition.y;
+    startPickingPosition.y = p.y;
+    
+    [self setCylinderPosition:p animatedWithDuration:0.3];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event

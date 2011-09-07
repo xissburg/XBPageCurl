@@ -79,4 +79,8 @@
 
 //- (id)initWithFrontView:(UIView *)frontView backView:(UIView *)backView flipDirection:(XBDirection)direction delegate:(id<XBPageCurlViewDelegate>)delegate;
 
+- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration;
+- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration;
+- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
+
 @end

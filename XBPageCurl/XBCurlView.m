@@ -46,6 +46,10 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 @end
 
+#define kCylinderPositionAnimationName @"cylinderPosition"
+#define kCylinderDirectionAnimationName @"cylinderDirection"
+#define kCylinderRadiusAnimationName @"cylinderRadius"
+
 
 @implementation XBCurlView
 
@@ -160,6 +164,30 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     if (self.displayLink == nil) {
         [self startAnimating];
     }
+}
+
+
+#pragma mark - Properties
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
+{
+    CGPoint p0 = self.cylinderPosition;
+    
+    XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
+        _cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
+    }];
+    
+    [self.animationManager runAnimation:animation];
+}
+
+- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration
+{
+    
+}
+
+- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
+{
+    
 }
 
 
