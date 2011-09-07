@@ -8,6 +8,8 @@
 
 #import "XBPageCurlView.h"
 
+#define kDuration 1
+
 
 @implementation XBPageCurlView
 
@@ -38,7 +40,15 @@
     startPickingPosition.x = self.bounds.size.width;
     startPickingPosition.y = p.y;
     
-    [self setCylinderPosition:p animatedWithDuration:0.3];
+    [self setCylinderPosition:p animatedWithDuration:kDuration];
+    
+    CGPoint dir = CGPointMake(startPickingPosition.x-p.x, startPickingPosition.y-p.y);
+    dir = CGPointMake(-dir.y, dir.x);
+    CGFloat length = sqrtf(dir.x*dir.x + dir.y*dir.y);
+    dir.x /= length, dir.y /= length;
+    
+    [self setCylinderDirection:dir animatedWithDuration:kDuration];
+    [self setCylinderRadius:16+length/4 animatedWithDuration:kDuration];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event

@@ -182,12 +182,24 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration
 {
+    CGPoint d0 = self.cylinderDirection;
     
+    XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
+        _cylinderDirection = CGPointMake((1 - t)*d0.x + t*cylinderDirection.x, (1 - t)*d0.y + t*cylinderDirection.y);
+    }];
+    
+    [self.animationManager runAnimation:animation];
 }
 
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
+    CGFloat r = self.cylinderRadius;
     
+    XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
+        _cylinderRadius = (1 - t)*r + t*cylinderRadius;
+    }];
+    
+    [self.animationManager runAnimation:animation];
 }
 
 
