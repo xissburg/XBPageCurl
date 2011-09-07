@@ -18,22 +18,27 @@
 @implementation XBAnimationTest
 
 
-- (void)testAnimation
+- (void)testAnimationStepping
 {
-    double duration = 1;
+    double duration = 3;
     __block double et = 0;
     XBAnimation *animation = [XBAnimation animationWithName:@"animation" duration:duration update:^(double t) {
         et = t;
     }];
     
     [animation step:0];
-    GHAssertEqualsWithAccuracy(et, 0, 0.0001, @"Value should still be zero");
+    GHAssertEqualsWithAccuracy(et, 0.0, DBL_EPSILON, @"Value should still be zero");
     
     [animation step:duration/2];
-    GHAssertEqualsWithAccuracy(et, 0.5, 0.0001, @"Value should be 1.0/2");
+    GHAssertEqualsWithAccuracy(et, 0.5, DBL_EPSILON, @"Value should be 1.0/2");
     
     [animation step:duration/2];
-    GHAssertEqualsWithAccuracy(et, 1, 0.0001, @"Value should be 1.0, final");
+    GHAssertEqualsWithAccuracy(et, 1.0, DBL_EPSILON, @"Value should be 1.0, final");
+}
+
+- (void)testAnimationInterpolator
+{
+    
 }
 
 @end
