@@ -30,6 +30,7 @@
     
     //Texture projected onto the curling mesh.
     GLuint texture;
+    GLuint textureWidth, textureHeight;
     
     //Mesh stuff.
     GLuint vertexBuffer;

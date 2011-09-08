@@ -39,7 +39,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
-- (void)createTextureFromView:(UIView *)view;
+- (void)createTextureForView:(UIView *)view;
 - (void)startAnimating;
 - (void)stopAnimating;
 - (void)draw:(CADisplayLink *)sender;
@@ -61,6 +61,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (BOOL)initialize
 {
+    self.opaque = YES;
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
     layer.opaque = YES;
     layer.backgroundColor = [UIColor clearColor].CGColor;
@@ -120,7 +121,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
         
         _backingView = [view retain];
         
-        [self createTextureFromView:_backingView];
+        [self createTextureForView:_backingView];
     }
     return self;
 }
@@ -409,15 +410,15 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     program = 0;
 }
 
-- (void)createTextureFromView:(UIView *)view
+- (void)createTextureForView:(UIView *)view
 {
     //Compute the actual view size in the current screen scale
     CGFloat scale = [[UIScreen mainScreen] scale];
     CGSize actualViewSize = actualViewSize = CGSizeMake(view.bounds.size.width*scale, view.bounds.size.height*scale);
     
     //Compute the closest, greater power of two
-    CGFloat textureWidth = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
-    CGFloat textureHeight = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
+    textureWidth = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
+    textureHeight = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
     
     if (textureWidth < 64) {
         textureWidth = 64;
@@ -432,31 +433,13 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glUniform2f(texSizeHandle, textureWidth, textureHeight);
     glUseProgram(0);
     
-    NSLog(@"Texture size %dx%d", (int)textureWidth, (int)textureHeight);
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    NSUInteger bytesPerPixel = 4;
-    NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
-    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
-    int pattern = 0xff7f7f7f;
-    memset_pattern4(textureData, &pattern, textureWidth * textureHeight * bytesPerPixel);
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGContextTranslateCTM(bitmapContext, 0, textureHeight-view.layer.bounds.size.height);
-    [view.layer renderInContext:bitmapContext];
-    
-    CGContextRelease(bitmapContext);
-    
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
-  
-    free(textureData);
 }
 
 - (void)startAnimating
@@ -477,13 +460,31 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     //Update all animations
     [self.animationManager update:sender.duration];
     
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    NSUInteger bytesPerPixel = 4;
+    NSUInteger bitsPerChannel = 8;
+    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
+    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
+    int pattern = 0xff7f7f7f;
+    memset_pattern4(textureData, &pattern, textureWidth * textureHeight * bytesPerPixel);
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGContextTranslateCTM(bitmapContext, 0, textureHeight-self.backingView.layer.bounds.size.height);
+    [self.backingView.layer renderInContext:bitmapContext];
+    
+    CGContextRelease(bitmapContext);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    
+    free(textureData);
+    
     //Render
     [EAGLContext setCurrentContext:self.context];
     
     glBindFramebuffer(GL_FRAMEBUFFER, _antialiasing? sampleFramebuffer: framebuffer);
     glViewport(0, 0, viewportWidth, viewportHeight);
     
-    glClearColor(0.4, 0.4, 0.4, 1);
+    const CGFloat *color = CGColorGetComponents(self.backgroundColor.CGColor);
+    glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     //glEnable(GL_BLEND);
