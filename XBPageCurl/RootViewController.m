@@ -7,11 +7,12 @@
 //
 
 #import "RootViewController.h"
-#import "XBPageCurlView.h"
+
+#define kDuration 0.4
 
 @implementation RootViewController
 
-@synthesize messyView;
+@synthesize messyView, pickerView, curlView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -24,6 +25,8 @@
 
 - (void)dealloc {
     self.messyView = nil;
+    self.pickerView = nil;
+    self.curlView = nil;
     [super dealloc];
 }
 
@@ -40,19 +43,46 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    XBPageCurlView *pageCurlView = [[[XBPageCurlView alloc] initWithView:self.messyView] autorelease];
-    [self.view addSubview:pageCurlView];
+    self.curlView = [[[XBCurlView alloc] initWithView:self.messyView] autorelease];
+    self.curlView.opaque = NO;
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
     self.messyView = nil;
+    self.pickerView = nil;
+    self.curlView = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
+}
+
+
+- (IBAction)hehButtonAction:(id)sender 
+{
+    double angle = M_PI/2.5;
+    [self.curlView startAnimating];
+    self.curlView.cylinderPosition = CGPointMake(320, 240);
+    [self.curlView setCylinderPosition:CGPointMake(30, 240) animatedWithDuration:kDuration];
+    [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
+    [self.curlView setCylinderRadius:70 animatedWithDuration:kDuration];
+    self.curlView.userInteractionEnabled = NO; //Allow interaction with back view
+    [self.view addSubview:self.curlView];
+    [self.messyView removeFromSuperview];
+}
+
+- (IBAction)backButtonAction:(id)sender 
+{
+    [self.curlView setCylinderPosition:CGPointMake(320, 240) animatedWithDuration:kDuration];
+    [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
+    [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
+        [self.view addSubview:self.messyView];
+        [self.curlView removeFromSuperview];
+        [self.curlView stopAnimating];
+    }];
 }
 
 @end

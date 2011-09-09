@@ -7,9 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XBCurlView.h"
 
-@interface RootViewController : UIViewController
 
+@interface RootViewController : UIViewController {
+    UIDatePicker *pickerView;
+}
+
+@property (nonatomic, retain) XBCurlView *curlView;
 @property (nonatomic, retain) IBOutlet UIView *messyView;
+@property (nonatomic, retain) IBOutlet UIDatePicker *pickerView;
+
+- (IBAction)hehButtonAction:(id)sender;
+- (IBAction)backButtonAction:(id)sender;
 
 @end
