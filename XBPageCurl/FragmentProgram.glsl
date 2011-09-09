@@ -8,5 +8,6 @@ varying vec3 v_normal;
 void main()
 {
     vec3 n = normalize(v_normal);
-    gl_FragColor = vec4(texture2D(s_tex, v_texCoord).rgb * n.z, 1.0);
+    
+    gl_FragColor = vec4(texture2D(s_tex, v_texCoord).rgb * (n.z * (float(gl_FrontFacing)-0.5)*2.0), 1.0);
 }

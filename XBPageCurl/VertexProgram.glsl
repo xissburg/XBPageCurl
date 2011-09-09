@@ -31,7 +31,7 @@ void main()
             vec2 dv = n * (2.0*d - M_PI*u_cylinderRadius);
             v.xy -=  dv;
             v.z = 2.0*u_cylinderRadius;
-            v_normal = vec3(0.0, 0.0, 1.0);
+            v_normal = vec3(0.0, 0.0, -1.0);
         }
         //vertices that should be projected on the half of the cylinder
         else {
@@ -42,11 +42,11 @@ void main()
             v.xyz = vec3(s*n.x, s*n.y, 1.0 - c)*u_cylinderRadius;
             v.xy += proj;
             vec3 center = vec3(proj, u_cylinderRadius);
-            v_normal = (v.xyz - center)/u_cylinderRadius;
-
+            v_normal = (center - v.xyz)/u_cylinderRadius;
+            /*
             if (dr < M_PI/2.0) { //lower part of curl
                 v_normal = -v_normal;
-            }
+            }*/
         }
 
     }
