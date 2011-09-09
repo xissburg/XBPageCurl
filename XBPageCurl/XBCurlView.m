@@ -40,8 +40,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (void)destroyShaders;
 - (void)setupMVP;
 - (void)createTextureForView:(UIView *)view;
-- (void)startAnimating;
-- (void)stopAnimating;
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -122,6 +120,10 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
         _backingView = [view retain];
         
         [self createTextureForView:_backingView];
+        [self createFramebuffer];
+        [self setupMVP];
+        [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
+        [self draw:self.displayLink];
     }
     return self;
 }
@@ -153,18 +155,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     [EAGLContext setCurrentContext:self.context];
     [self destroyFramebuffer];
     [self createFramebuffer];
-    
     [self setupMVP];
-    
-    /* Vertex buffer is initialized here because it needs to know the viewport size, 
-     * which is only available after creating the framebuffer for the first time. */
-    if (vertexBuffer == 0) {
-        [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
-    }
-    
-    if (self.displayLink == nil) {
-        [self startAnimating];
-    }
 }
 
 
@@ -196,11 +187,16 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^(void) {}];
+}
+
+- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
     CGFloat r = self.cylinderRadius;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
         _cylinderRadius = (1 - t)*r + t*cylinderRadius;
-    }];
+    } completion:completion];
     
     [self.animationManager runAnimation:animation];
 }
@@ -472,6 +468,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     [self.backingView.layer renderInContext:bitmapContext];
     
     CGContextRelease(bitmapContext);
+    CGColorSpaceRelease(colorSpace);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     

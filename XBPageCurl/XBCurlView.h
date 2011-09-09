@@ -78,10 +78,12 @@
 - (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing;
 - (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution;
 
-//- (id)initWithFrontView:(UIView *)frontView backView:(UIView *)backView flipDirection:(XBDirection)direction delegate:(id<XBPageCurlViewDelegate>)delegate;
-
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
+- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
+
+- (void)startAnimating;
+- (void)stopAnimating;
 
 @end
