@@ -12,30 +12,41 @@
 @interface XBAnimation ()
 
 @property (nonatomic, copy) void (^update)(double t);
+@property (nonatomic, copy) void (^completion)(void);
 
 @end
 
 
 @implementation XBAnimation
 
-@synthesize name=_name, duration=_duration, update=_update, interpolator=_interpolator;
+@synthesize name=_name, duration=_duration, update=_update, interpolator=_interpolator, completion=_completion;
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self animationWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorEaseInOut];
+    return [self animationWithName:name duration:duration update:update completion:^(void) {}];
 }
 
-+ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double))interpolator
++ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion
 {
-    return [[[self alloc] initWithName:name duration:duration update:update interpolator:interpolator] autorelease];
+    return [[[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:XBAnimationInterpolatorEaseInOut] autorelease];
+}
+
++ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update completion:(void (^)(void))completion interpolator:(double (^)(double))interpolator
+{
+    return [[[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:interpolator] autorelease];
 }
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self initWithName:name duration:duration update:update interpolator:XBAnimationInterpolatorEaseInOut];
+    return [self initWithName:name duration:duration update:update completion:^(void) {}];
 }
 
-- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double))interpolator
+- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion
+{
+    return [self initWithName:name duration:duration update:update completion:completion interpolator:XBAnimationInterpolatorEaseInOut];
+}
+
+- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update completion:(void (^)(void))completion interpolator:(double (^)(double))interpolator
 {
     self = [super init];
     if (self) {
@@ -43,6 +54,7 @@
         _duration = duration;
         _update = [update copy];
         _interpolator = [interpolator copy];
+        _completion = [completion copy];
         _elapsedTime = 0;
     }
     return self;
@@ -53,6 +65,7 @@
     self.name = nil;
     self.update = nil;
     self.interpolator = nil;
+    self.completion = nil;
     [super dealloc];
 }
 
@@ -61,7 +74,8 @@
     _elapsedTime += dt;
     
     if (_elapsedTime > _duration) {
-        _update(1.0);
+        self.update(1.0);
+        self.completion();
         return NO;
     }
     

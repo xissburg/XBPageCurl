@@ -17,6 +17,7 @@
     NSTimeInterval _elapsedTime;
     void (^_update)(double t);
     double (^_interpolator)(double t);
+    void (^_completion)(void);
 }
 
 @property (nonatomic, copy) NSString *name;
@@ -24,9 +25,12 @@
 @property (nonatomic, copy) double (^interpolator)(double t);
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update;
-+ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double t))interpolator;
++ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion;
++ (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion interpolator:(double (^)(double t))interpolator;
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update;
-- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update interpolator:(double (^)(double t))interpolator;
+- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion;
+- (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion interpolator:(double (^)(double t))interpolator;
+
 - (BOOL)step:(NSTimeInterval)dt;
 
 @end
