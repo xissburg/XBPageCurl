@@ -456,7 +456,9 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     CGContextRelease(bitmapContext);
     CGColorSpaceRelease(colorSpace);
     
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     free(textureData);
 }
