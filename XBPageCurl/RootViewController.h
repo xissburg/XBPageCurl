@@ -18,7 +18,7 @@
 @property (nonatomic, retain) IBOutlet UIView *messyView;
 @property (nonatomic, retain) IBOutlet UIDatePicker *pickerView;
 
-- (IBAction)hehButtonAction:(id)sender;
-- (IBAction)backButtonAction:(id)sender;
+- (IBAction)curlButtonAction:(id)sender;
+- (IBAction)uncurlButtonAction:(id)sender;
 
 @end

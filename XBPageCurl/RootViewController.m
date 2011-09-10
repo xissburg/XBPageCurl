@@ -63,13 +63,14 @@
     return YES;
 }
 
-- (IBAction)hehButtonAction:(id)sender
+- (IBAction)curlButtonAction:(id)sender
 {
+    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
     double angle = M_PI/2.5;
     [self.curlView drawViewOnTexture:self.messyView];
     [self.curlView startAnimating];
-    self.curlView.cylinderPosition = CGPointMake(320, 240);
-    [self.curlView setCylinderPosition:CGPointMake(30, 240) animatedWithDuration:kDuration];
+    self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
+    [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:70 animatedWithDuration:kDuration];
     self.curlView.userInteractionEnabled = NO; //Allow interaction with back view
@@ -77,9 +78,10 @@
     [self.messyView removeFromSuperview];
 }
 
-- (IBAction)backButtonAction:(id)sender
+- (IBAction)uncurlButtonAction:(id)sender
 {
-    [self.curlView setCylinderPosition:CGPointMake(320, 240) animatedWithDuration:kDuration];
+    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+    [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width, appFrame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
         [self.view addSubview:self.messyView];

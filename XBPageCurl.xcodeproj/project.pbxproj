@@ -25,10 +25,11 @@
 		1B88C4D3140C706D005C8824 /* XBPageCurlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B88C4D2140C706D005C8824 /* XBPageCurlView.m */; };
 		1B88DC9E140937EC001E1417 /* appleStore.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9C140937EC001E1417 /* appleStore.png */; };
 		1B88DC9F140937EC001E1417 /* appleStore@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B88DC9D140937EC001E1417 /* appleStore@2x.png */; };
+		1B896DBF141BE88F00AF89DB /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B896DBD141BE88F00AF89DB /* RootViewController_iPad.xib */; };
 		1B8B1EAA14146D760024FC93 /* XBAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8B1EA914146D760024FC93 /* XBAnimation.m */; };
 		1B8B1EAE14146DC90024FC93 /* XBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8B1EAD14146DC90024FC93 /* XBAnimationManager.m */; };
 		1B8C00E01408B76A008B53DF /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C00DE1408B76A008B53DF /* RootViewController.m */; };
-		1B8C00E11408B76A008B53DF /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8C00DF1408B76A008B53DF /* RootViewController.xib */; };
+		1B8C00E11408B76A008B53DF /* RootViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8C00DF1408B76A008B53DF /* RootViewController_iPhone.xib */; };
 		1B8C271D1415C6510081F180 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A51401E4F000D579EF /* UIKit.framework */; };
 		1B8C271E1415C6510081F180 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A71401E4F000D579EF /* Foundation.framework */; };
 		1B8C271F1415C6510081F180 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A91401E4F000D579EF /* CoreGraphics.framework */; };
@@ -67,13 +68,14 @@
 		1B88C4D2140C706D005C8824 /* XBPageCurlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlView.m; sourceTree = "<group>"; };
 		1B88DC9C140937EC001E1417 /* appleStore.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = appleStore.png; path = Resources/appleStore.png; sourceTree = SOURCE_ROOT; };
 		1B88DC9D140937EC001E1417 /* appleStore@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "appleStore@2x.png"; path = "Resources/appleStore@2x.png"; sourceTree = SOURCE_ROOT; };
+		1B896DBD141BE88F00AF89DB /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1B8B1EA814146D760024FC93 /* XBAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimation.h; sourceTree = "<group>"; };
 		1B8B1EA914146D760024FC93 /* XBAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimation.m; sourceTree = "<group>"; };
 		1B8B1EAC14146DC90024FC93 /* XBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimationManager.h; sourceTree = "<group>"; };
 		1B8B1EAD14146DC90024FC93 /* XBAnimationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimationManager.m; sourceTree = "<group>"; };
 		1B8C00DD1408B769008B53DF /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1B8C00DE1408B76A008B53DF /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		1B8C00DF1408B76A008B53DF /* RootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		1B8C00DF1408B76A008B53DF /* RootViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPhone.xib; sourceTree = "<group>"; };
 		1B8C271B1415C6510081F180 /* Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B8C27221415C6510081F180 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		1B8C27241415C6510081F180 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -150,7 +152,6 @@
 				1B8816B51401E4F000D579EF /* XBPageCurlAppDelegate.m */,
 				1B8C00DD1408B769008B53DF /* RootViewController.h */,
 				1B8C00DE1408B76A008B53DF /* RootViewController.m */,
-				1B8C00DF1408B76A008B53DF /* RootViewController.xib */,
 				1B8816B71401E4F000D579EF /* iPhone */,
 				1B8816BE1401E4F000D579EF /* iPad */,
 				1B8816AC1401E4F000D579EF /* Supporting Files */,
@@ -182,6 +183,7 @@
 			children = (
 				1B8816B81401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.h */,
 				1B8816B91401E4F000D579EF /* XBPageCurlAppDelegate_iPhone.m */,
+				1B8C00DF1408B76A008B53DF /* RootViewController_iPhone.xib */,
 				1B8816BB1401E4F000D579EF /* MainWindow_iPhone.xib */,
 			);
 			name = iPhone;
@@ -193,6 +195,7 @@
 				1B8816BF1401E4F000D579EF /* XBPageCurlAppDelegate_iPad.h */,
 				1B8816C01401E4F000D579EF /* XBPageCurlAppDelegate_iPad.m */,
 				1B8816C21401E4F000D579EF /* MainWindow_iPad.xib */,
+				1B896DBD141BE88F00AF89DB /* RootViewController_iPad.xib */,
 			);
 			name = iPad;
 			sourceTree = "<group>";
@@ -299,9 +302,10 @@
 				1B8816C41401E4F000D579EF /* MainWindow_iPad.xib in Resources */,
 				1B8816D61401F9B800D579EF /* VertexProgram.glsl in Resources */,
 				1B8816D81401F9F200D579EF /* FragmentProgram.glsl in Resources */,
-				1B8C00E11408B76A008B53DF /* RootViewController.xib in Resources */,
+				1B8C00E11408B76A008B53DF /* RootViewController_iPhone.xib in Resources */,
 				1B88DC9E140937EC001E1417 /* appleStore.png in Resources */,
 				1B88DC9F140937EC001E1417 /* appleStore@2x.png in Resources */,
+				1B896DBF141BE88F00AF89DB /* RootViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
