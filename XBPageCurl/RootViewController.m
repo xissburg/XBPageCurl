@@ -60,8 +60,7 @@
     return YES;
 }
 
-
-- (IBAction)hehButtonAction:(id)sender 
+- (IBAction)hehButtonAction:(id)sender
 {
     double angle = M_PI/2.5;
     [self.curlView startAnimating];
@@ -74,7 +73,7 @@
     [self.messyView removeFromSuperview];
 }
 
-- (IBAction)backButtonAction:(id)sender 
+- (IBAction)backButtonAction:(id)sender
 {
     [self.curlView setCylinderPosition:CGPointMake(320, 240) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];

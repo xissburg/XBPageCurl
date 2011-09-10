@@ -164,16 +164,26 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
 {
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration completion:^(void) {}];
+}
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
     CGPoint p0 = self.cylinderPosition;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
         _cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
-    }];
+    } completion:completion];
     
     [self.animationManager runAnimation:animation];
 }
 
 - (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration
+{
+    [self setCylinderDirection:cylinderDirection animatedWithDuration:duration completion:^(void) {}];
+}
+
+- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
 {
     double a0 = atan2(_cylinderDirection.y, _cylinderDirection.x);
     double a1 = atan2(cylinderDirection.y, cylinderDirection.x);
@@ -181,7 +191,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
         double a = (1 - t)*a0 + t*a1;
         _cylinderDirection = CGPointMake(cos(a), sin(a));
-    }];
+    } completion:completion];
     
     [self.animationManager runAnimation:animation];
 }
