@@ -40,6 +40,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 - (void)destroyShaders;
 - (void)setupMVP;
 - (void)createTextureForView:(UIView *)view;
+- (void)drawBackingViewOnTexture;
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -119,10 +120,11 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
         
         _backingView = [view retain];
         
-        [self createTextureForView:_backingView];
         [self createFramebuffer];
         [self setupMVP];
         [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
+        [self createTextureForView:_backingView];
+        [self drawBackingViewOnTexture];
         [self draw:self.displayLink];
     }
     return self;
@@ -438,24 +440,8 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-- (void)startAnimating
+- (void)drawBackingViewOnTexture
 {
-    [self.displayLink invalidate];
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-}
-
-- (void)stopAnimating
-{
-    [self.displayLink invalidate];
-    self.displayLink = nil;
-}
-
-- (void)draw:(CADisplayLink *)sender
-{
-    //Update all animations
-    [self.animationManager update:sender.duration];
-    
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSUInteger bytesPerPixel = 4;
     NSUInteger bitsPerChannel = 8;
@@ -473,6 +459,26 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     
     free(textureData);
+}
+
+- (void)startAnimating
+{
+    [self.displayLink invalidate];
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [self drawBackingViewOnTexture];
+}
+
+- (void)stopAnimating
+{
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+}
+
+- (void)draw:(CADisplayLink *)sender
+{
+    //Update all animations
+    [self.animationManager update:sender.duration];
     
     //Render
     [EAGLContext setCurrentContext:self.context];

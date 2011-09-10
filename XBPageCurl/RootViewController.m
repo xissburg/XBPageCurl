@@ -8,7 +8,7 @@
 
 #import "RootViewController.h"
 
-#define kDuration 0.4
+#define kDuration 0.6
 
 @implementation RootViewController
 
