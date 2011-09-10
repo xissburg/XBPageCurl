@@ -43,7 +43,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.curlView = [[[XBCurlView alloc] initWithView:self.messyView] autorelease];
+    CGRect r = CGRectZero;
+    r.size = self.view.bounds.size;
+    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    [self.curlView drawViewOnTexture:self.messyView];
     self.curlView.opaque = NO;
 }
 
@@ -63,6 +66,7 @@
 - (IBAction)hehButtonAction:(id)sender
 {
     double angle = M_PI/2.5;
+    [self.curlView drawViewOnTexture:self.messyView];
     [self.curlView startAnimating];
     self.curlView.cylinderPosition = CGPointMake(320, 240);
     [self.curlView setCylinderPosition:CGPointMake(30, 240) animatedWithDuration:kDuration];

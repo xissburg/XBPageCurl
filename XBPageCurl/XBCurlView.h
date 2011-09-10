@@ -12,10 +12,12 @@
 #import <OpenGLES/ES2/glext.h>
 
 
+/**
+ * A view that renders a curled version of an image or a UIView instance using OpenGL.
+ */
 @interface XBCurlView : UIView {
     EAGLContext *_context;
     CADisplayLink *_displayLink;
-    UIView *_backingView;
     
     //OpenGL buffers.
     GLuint framebuffer;
@@ -35,7 +37,7 @@
     //Mesh stuff.
     GLuint vertexBuffer;
     GLuint indexBuffer;
-    GLuint elementCount;
+    GLuint elementCount; //Number of entries in the index buffer
     
     //Viewport/view/screen size.
     GLint viewportWidth, viewportHeight;
@@ -54,14 +56,13 @@
     CGPoint _cylinderDirection;
     CGFloat _cylinderRadius;
     
-    //Multisampling anti-aliasing flag. It can only be set at creation time.
+    //Multisampling anti-aliasing flag. It can only be set at init time.
     BOOL _antialiasing;
     
     //Resolution of the grid mesh
     NSUInteger _horizontalResolution, _verticalResolution;
 }
 
-@property (nonatomic, readonly) UIView *backingView;
 @property (nonatomic, readonly) BOOL antialiasing;
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
@@ -69,9 +70,9 @@
 @property (nonatomic, assign) CGPoint cylinderDirection;
 @property (nonatomic, assign) CGFloat cylinderRadius;
 
-- (id)initWithView:(UIView *)view;
-- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing;
-- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution;
+- (id)initWithFrame:(CGRect)frame;
+- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
+- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing;
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
@@ -80,7 +81,16 @@
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
 
+/**
+ * Starts/stops the CADisplayLink that updates and redraws everything in this view.
+ * This should be called manually whenever you are going to present this view and change its properties 
+ * (for example, before adding it as subview). stopAnimating should be called whenever you don't need 
+ * to animate this anymor (for example, after removing it from superview).
+ */
 - (void)startAnimating;
 - (void)stopAnimating;
+
+- (void)drawImageOnTexture:(UIImage *)image;
+- (void)drawViewOnTexture:(UIView *)view;
 
 @end

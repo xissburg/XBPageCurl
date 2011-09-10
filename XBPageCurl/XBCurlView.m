@@ -20,26 +20,21 @@ typedef struct _Vertex
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
 void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
-CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
-/**
- * A view that renders a curled version of an image or a UIView instance using OpenGL.
- */
 @interface XBCurlView ()
 
 @property (nonatomic, retain) EAGLContext *context;
 @property (nonatomic, retain) CADisplayLink *displayLink;
 @property (nonatomic, retain) XBAnimationManager *animationManager;
 
-- (void)createFramebuffer;
+- (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes;
 - (void)destroyVertexBuffer;
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
-- (void)createTextureForView:(UIView *)view;
-- (void)drawBackingViewOnTexture;
+- (GLuint)generateFullSizedTextureOutWidth:(GLuint *)width outHeight:(GLuint *)height;
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -54,7 +49,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 @synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
 @synthesize cylinderPosition=_cylinderPosition, cylinderDirection=_cylinderDirection, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
-@synthesize backingView=_backingView;
 @synthesize animationManager;
 
 - (BOOL)initialize
@@ -90,22 +84,34 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     vertexBuffer = indexBuffer = elementCount = 0;
     texture = 0;
     
+    if (![self createFramebuffer]) {
+        return NO;
+    }
+    
+    [self setupMVP];
+    
+    texture = [self generateFullSizedTextureOutWidth:&textureWidth outHeight:&textureHeight];
+    
+    //Set shader texture scale
+    glUseProgram(program);
+    glUniform2f(texSizeHandle, textureWidth, textureHeight);
+    glUseProgram(0);
+    
     return YES;
 }
 
-- (id)initWithView:(UIView *)view
+- (id)initWithFrame:(CGRect)frame
 {
-    return [self initWithView:view antialiasing:NO];
+    return [self initWithFrame:frame antialiasing:NO];
 }
 
-- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing
+- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
 {
-    return [self initWithView:view antialiasing:antialiasing horizontalResolution:32 verticalResolution:48];
+    return [self initWithFrame:frame horizontalResolution:32 verticalResolution:48 antialiasing:antialiasing];
 }
 
-- (id)initWithView:(UIView *)view antialiasing:(BOOL)antialiasing horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution
+- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing
 {
-    CGRect frame = CGRectMake(0, 0, view.bounds.size.width, view.bounds.size.height);
     self = [super initWithFrame:frame];
     if (self) {
         _antialiasing = antialiasing;
@@ -117,14 +123,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
             return nil;
         }
         
-        _backingView = [view retain];
-        
-        [self createFramebuffer];
-        [self setupMVP];
         [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
-        [self createTextureForView:_backingView];
-        [self drawBackingViewOnTexture];
-        [self draw:self.displayLink];
     }
     return self;
 }
@@ -138,8 +137,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     [self destroyVertexBuffer];
     [self destroyShaders];
     [self destroyFramebuffer];
-    [_backingView release];
-    
+
     [super dealloc];
 }
 
@@ -215,7 +213,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 #pragma mark - Methods
 
-- (void)createFramebuffer
+- (BOOL)createFramebuffer
 {
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -237,6 +235,7 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         NSLog(@"Failed to create framebuffer: %x", status);
+        return NO;
     }
     
     //Create multisampling buffers
@@ -258,8 +257,11 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
         
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             NSLog(@"Failed to create multisamping framebuffer: %x", status);
+            return NO;
         }
     }    
+    
+    return YES;
 }
 
 - (void)destroyFramebuffer
@@ -285,6 +287,8 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
 
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes
 {
+    [self destroyVertexBuffer];
+    
     GLsizeiptr verticesSize = (xRes+1)*(yRes+1)*sizeof(Vertex);
     Vertex *vertices = malloc(verticesSize);
     
@@ -408,50 +412,50 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     program = 0;
 }
 
-- (void)createTextureForView:(UIView *)view
+- (GLuint)generateFullSizedTextureOutWidth:(GLuint *)width outHeight:(GLuint *)height
 {
     //Compute the actual view size in the current screen scale
     CGFloat scale = [[UIScreen mainScreen] scale];
-    CGSize actualViewSize = actualViewSize = CGSizeMake(view.bounds.size.width*scale, view.bounds.size.height*scale);
+    CGSize actualViewSize = CGSizeMake(self.bounds.size.width*scale, self.bounds.size.height*scale);
     
     //Compute the closest, greater power of two
-    textureWidth = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
-    textureHeight = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
+    *width = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
+    *height = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
     
-    if (textureWidth < 64) {
-        textureWidth = 64;
+    if (*width < 64) {
+        *width = 64;
     }
     
-    if (textureHeight < 64) {
-        textureHeight = 64;
+    if (*height < 64) {
+        *height = 64;
     }
     
-    //Set shader texture scale
-    glUseProgram(program);
-    glUniform2f(texSizeHandle, textureWidth, textureHeight);
-    glUseProgram(0);
-    
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glBindTexture(GL_TEXTURE_2D, 0);
+    
+    return tex;
 }
 
-- (void)drawBackingViewOnTexture
+- (void)drawImageOnTexture:(UIImage *)image
 {
+    GLuint width = CGImageGetWidth(image.CGImage);
+    GLuint height = CGImageGetHeight(image.CGImage);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSUInteger bytesPerPixel = 4;
     NSUInteger bitsPerChannel = 8;
     NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
     GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
-    int pattern = 0xff7f7f7f;
-    memset_pattern4(textureData, &pattern, textureWidth * textureHeight * bytesPerPixel);
     CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGContextTranslateCTM(bitmapContext, 0, textureHeight-self.backingView.layer.bounds.size.height);
-    [self.backingView.layer renderInContext:bitmapContext];
+    CGRect r = CGRectMake(0, 0, width, height);
+    CGContextClearRect(bitmapContext, r);
+    CGContextTranslateCTM(bitmapContext, 0, textureHeight-height);
+    CGContextDrawImage(bitmapContext, r, image.CGImage);
     
     CGContextRelease(bitmapContext);
     CGColorSpaceRelease(colorSpace);
@@ -461,6 +465,33 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     free(textureData);
+    
+    //Force a redraw to avoid glitches
+    [self draw:self.displayLink];
+}
+
+- (void)drawViewOnTexture:(UIView *)view
+{
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    NSUInteger bytesPerPixel = 4;
+    NSUInteger bitsPerChannel = 8;
+    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
+    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGContextTranslateCTM(bitmapContext, 0, textureHeight-view.layer.bounds.size.height);
+    [view.layer renderInContext:bitmapContext];
+    
+    CGContextRelease(bitmapContext);
+    CGColorSpaceRelease(colorSpace);
+    
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    free(textureData);
+    
+    //Force a redraw to avoid glitches
+    [self draw:self.displayLink];
 }
 
 - (void)startAnimating
@@ -468,7 +499,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     [self.displayLink invalidate];
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self drawBackingViewOnTexture];
 }
 
 - (void)stopAnimating
@@ -530,10 +560,12 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
+#ifdef DEBUG
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         NSLog(@"%d", error);
     }
+#endif
 }
 
 @end
