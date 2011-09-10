@@ -44,7 +44,7 @@
     GLfloat mvp[16];
     
     //Handles for the shader variables.
-    int positionHandle, texCoordHandle, colorHandle, mvpHandle, samplerHandle;
+    int positionHandle, texCoordHandle, mvpHandle, samplerHandle;
     int texSizeHandle;
     int cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
     

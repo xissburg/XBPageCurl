@@ -16,7 +16,6 @@ typedef struct _Vertex
 {
     GLfloat x, y, z;
     GLfloat u, v;
-    GLubyte color[4];
 } Vertex;
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
@@ -279,10 +278,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     GLsizeiptr verticesSize = (xRes+1)*(yRes+1)*sizeof(Vertex);
     Vertex *vertices = malloc(verticesSize);
     
-    GLubyte (^RandomByte)(void) = ^(void) {
-        return (GLubyte)(((double)arc4random()/((1LL<<32)-1))*255);
-    };
-    
     for (int y=0; y<yRes+1; ++y) {
         GLfloat vy = ((GLfloat)y/yRes)*viewportHeight;
         GLfloat tv = vy;///viewportHeight;
@@ -293,10 +288,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
             v->z = 0;
             v->u = v->x;///viewportWidth;
             v->v = tv;
-            v->color[0] = RandomByte();
-            v->color[1] = RandomByte();
-            v->color[2] = RandomByte();
-            v->color[3] = 255;
         }
     }
     
@@ -391,7 +382,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     
     positionHandle          = glGetAttribLocation(program, "a_position");
     texCoordHandle          = glGetAttribLocation(program, "a_texCoord");
-    colorHandle             = glGetAttribLocation(program, "a_color");
     mvpHandle               = glGetUniformLocation(program, "u_mvpMatrix");
     samplerHandle           = glGetUniformLocation(program, "s_tex");
     texSizeHandle           = glGetUniformLocation(program, "u_texSize");
@@ -509,8 +499,6 @@ CGContextRef CreateARGBBitmapContext (size_t pixelsWide, size_t pixelsHigh);
     glEnableVertexAttribArray(positionHandle);
     glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
     glEnableVertexAttribArray(texCoordHandle);
-    glVertexAttribPointer(colorHandle, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void *)offsetof(Vertex, color));
-    glEnableVertexAttribArray(colorHandle);
     glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, mvp);
     
     glActiveTexture(GL_TEXTURE0);

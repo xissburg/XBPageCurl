@@ -3,14 +3,12 @@ uniform mat4 u_mvpMatrix;
 
 attribute vec4 a_position;
 attribute vec2 a_texCoord;
-attribute vec4 a_color;
 
 uniform vec2 u_texSize;
 uniform vec2 u_cylinderPosition;
 uniform vec2 u_cylinderDirection;
 uniform float u_cylinderRadius;
 
-varying vec4 v_color;
 varying vec2 v_texCoord;
 varying vec3 v_normal;
 
@@ -53,6 +51,5 @@ void main()
 
     gl_Position = u_mvpMatrix * v;
     v_texCoord = a_texCoord/u_texSize;
-    v_color = a_color;
 }
 
