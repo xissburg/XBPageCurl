@@ -43,11 +43,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    if (self.curlView == nil) {
     CGRect r = CGRectZero;
     r.size = self.view.bounds.size;
-    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    self.curlView = [[[XBCurlView alloc] initWithFrame:r horizontalResolution:(NSUInteger)(r.size.width/10) verticalResolution:(NSUInteger)(r.size.height/10) antialiasing:NO] autorelease];
     [self.curlView drawViewOnTexture:self.messyView];
     self.curlView.opaque = NO;
+    }
 }
 
 - (void)viewDidUnload
@@ -72,7 +75,7 @@
     self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
     [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
-    [self.curlView setCylinderRadius:70 animatedWithDuration:kDuration];
+    [self.curlView setCylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
     self.curlView.userInteractionEnabled = NO; //Allow interaction with back view
     [self.view addSubview:self.curlView];
     [self.messyView removeFromSuperview];
