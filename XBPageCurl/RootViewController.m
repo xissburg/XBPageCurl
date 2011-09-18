@@ -44,13 +44,11 @@
 {
     [super viewDidLoad];
     
-    if (self.curlView == nil) {
     CGRect r = CGRectZero;
     r.size = self.view.bounds.size;
     self.curlView = [[[XBCurlView alloc] initWithFrame:r horizontalResolution:(NSUInteger)(r.size.width/10) verticalResolution:(NSUInteger)(r.size.height/10) antialiasing:NO] autorelease];
     [self.curlView drawViewOnTexture:self.messyView];
     self.curlView.opaque = NO;
-    }
 }
 
 - (void)viewDidUnload

@@ -14,9 +14,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    //_rootViewController = [[RootViewController alloc] initWithNibName: UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? @"RootViewController_iPad": @"RootViewController_iPhone" bundle:nil];
+    _rootViewController = [[RootViewController alloc] initWithNibName: UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? @"RootViewController_iPad": @"RootViewController_iPhone" bundle:nil];
     
-    //[self.window setRootViewController:self.rootViewController];
+    [self.window setRootViewController:self.rootViewController];
     [self.window makeKeyAndVisible];
     return YES;
 }
