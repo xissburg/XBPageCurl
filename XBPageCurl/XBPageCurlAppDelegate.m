@@ -7,6 +7,7 @@
 //
 
 #import "XBPageCurlAppDelegate.h"
+#import "RootViewController_iPad.h"
 
 @implementation XBPageCurlAppDelegate
 
@@ -14,7 +15,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    _rootViewController = [[RootViewController alloc] initWithNibName: UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? @"RootViewController_iPad": @"RootViewController_iPhone" bundle:nil];
+    if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad) {
+        _rootViewController = [[RootViewController_iPad alloc] initWithNibName:@"RootViewController_iPad" bundle:nil];
+    }
+    else {
+        _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPhone" bundle:nil];
+    }
     
     [self.window setRootViewController:self.rootViewController];
     [self.window makeKeyAndVisible];
