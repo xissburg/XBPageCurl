@@ -27,17 +27,32 @@
     GLuint sampleColorRenderbuffer;
     GLuint sampleDepthRenderbuffer;
     
-    //GPU program.
+    //Texture projected onto the front of the curling mesh.
+    GLuint frontTexture;
+    GLuint frontTextureWidth, frontTextureHeight;
+    
+    //Texture projected onto the back of the curling mesh.
+    GLuint backTexture;
+    GLuint backTextureWidth, backTextureHeight;
+    
+    //GPU program for the curling mesh.
     GLuint program;
     
-    //Texture projected onto the curling mesh.
-    GLuint texture;
-    GLuint textureWidth, textureHeight;
-    
-    //Mesh stuff.
+    //Vertex and index buffer for the curling mesh.
     GLuint vertexBuffer;
     GLuint indexBuffer;
     GLuint elementCount; //Number of entries in the index buffer
+    
+    //Texture projected onto the two-triangle rectangle of the nextPage.
+    GLuint nextPageTexture;
+    GLuint nextPageTextureWidth, nextPageTextureHeight;
+    
+    //Very simple GPU program for the nextPage.
+    GLuint nextPageProgram;
+    
+    //Vertex buffer for the two-triangle rectangle of the nextPage.
+    //No need for an index buffer. It is drawn as a triangle-strip.
+    GLuint nextPageVertexBuffer;
     
     //Viewport/view/screen size.
     GLint viewportWidth, viewportHeight;
@@ -84,13 +99,16 @@
 /**
  * Starts/stops the CADisplayLink that updates and redraws everything in this view.
  * This should be called manually whenever you are going to present this view and change its properties 
- * (for example, before adding it as subview). stopAnimating should be called whenever you don't need 
- * to animate this anymor (for example, after removing it from superview).
+ * (for example, before adding it as subview and changing the cylinder properties). stopAnimating should
+ * be called whenever you don't need to animate this anymore (for example, after removing it from superview).
  */
 - (void)startAnimating;
 - (void)stopAnimating;
 
-- (void)drawImageOnTexture:(UIImage *)image;
-- (void)drawViewOnTexture:(UIView *)view;
+- (void)drawImageOnFrontOfPage:(UIImage *)image;
+- (void)drawViewOnFrontOfPage:(UIView *)view;
+
+- (void)drawImageOnNextPage:(UIImage *)image;
+- (void)drawViewOnNextPage:(UIView *)view;
 
 @end
