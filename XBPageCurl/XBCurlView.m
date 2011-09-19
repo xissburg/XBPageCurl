@@ -31,6 +31,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)destroyFramebuffer;
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes;
 - (void)destroyVertexBuffer;
+- (void)createNextPageVertexBuffer;
+- (void)destroyNextPageVertexBuffer;
+- (void)destroyNextPageTexture;
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
@@ -82,7 +85,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     framebuffer = colorRenderbuffer = depthRenderbuffer = 0;
     sampleFramebuffer = sampleColorRenderbuffer = sampleDepthRenderbuffer = 0;
     vertexBuffer = indexBuffer = elementCount = 0;
-    texture = 0;
+    frontTexture = 0;
     
     if (![self createFramebuffer]) {
         return NO;
@@ -90,11 +93,11 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     [self setupMVP];
     
-    texture = [self generateFullSizedTextureOutWidth:&textureWidth outHeight:&textureHeight];
+    frontTexture = [self generateFullSizedTextureOutWidth:&frontTextureWidth outHeight:&frontTextureHeight];
     
     //Set shader texture scale
     glUseProgram(program);
-    glUniform2f(texSizeHandle, textureWidth, textureHeight);
+    glUniform2f(texSizeHandle, frontTextureWidth, frontTextureHeight);
     glUseProgram(0);
     
     return YES;
@@ -124,6 +127,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         }
         
         [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
+        [self createNextPageVertexBuffer];
     }
     return self;
 }
@@ -135,6 +139,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     self.displayLink = nil;
     self.animationManager = nil;
     [self destroyVertexBuffer];
+    [self destroyNextPageVertexBuffer];
     [self destroyShaders];
     [self destroyFramebuffer];
 
@@ -211,7 +216,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 }
 
 
-#pragma mark - Methods
+#pragma mark - Framebuffer
 
 - (BOOL)createFramebuffer
 {
@@ -285,6 +290,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     sampleDepthRenderbuffer = 0;
 }
 
+
+#pragma mark - Vertexbuffers
+
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes
 {
     [self destroyVertexBuffer];
@@ -342,10 +350,56 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     vertexBuffer = indexBuffer = 0;
 }
 
+- (void)createNextPageVertexBuffer
+{
+    [self destroyNextPageVertexBuffer];
+    
+    GLsizeiptr verticesSize = 4*sizeof(Vertex);
+    Vertex *vertices = malloc(verticesSize);
+    
+    vertices[0].x = 0;
+    vertices[0].y = 0;
+    vertices[0].z = 0;
+    vertices[0].u = 0;
+    vertices[0].v = 0;
+    
+    vertices[1].x = viewportWidth;
+    vertices[1].y = 0;
+    vertices[1].z = 0;
+    vertices[1].u = 1;
+    vertices[1].v = 0;
+    
+    vertices[2].x = 0;
+    vertices[2].y = viewportHeight;
+    vertices[2].z = 0;
+    vertices[2].u = 0;
+    vertices[2].v = 1;
+    
+    vertices[3].x = viewportWidth;
+    vertices[3].y = viewportHeight;
+    vertices[3].z = 0;
+    vertices[3].u = 1;
+    vertices[3].v = 1;
+    
+    glGenBuffers(1, &nextPageVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
+    
+    free(vertices);
+}
+
+- (void)destroyNextPageVertexBuffer
+{
+    glDeleteBuffers(1, &nextPageVertexBuffer);
+}
+
 - (void)setupMVP
 {
     OrthoM4x4(mvp, 0.f, viewportWidth, 0.f, viewportHeight, -1000.f, 1000.f);
 }
+
+
+#pragma mark - Shaders
 
 - (GLuint)loadShader:(NSString *)filename type:(GLenum)type 
 {
@@ -412,6 +466,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     program = 0;
 }
 
+
+#pragma mark - Textures
+
 - (GLuint)generateFullSizedTextureOutWidth:(GLuint *)width outHeight:(GLuint *)height
 {
     //Compute the actual view size in the current screen scale
@@ -442,26 +499,26 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return tex;
 }
 
-- (void)drawImageOnTexture:(UIImage *)image
+- (void)drawImageOnFrontOfPage:(UIImage *)image
 {
     GLuint width = CGImageGetWidth(image.CGImage);
     GLuint height = CGImageGetHeight(image.CGImage);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSUInteger bytesPerPixel = 4;
     NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
-    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    NSUInteger bytesPerRow = bytesPerPixel * frontTextureWidth;
+    GLubyte *textureData = malloc(frontTextureWidth * frontTextureHeight * bytesPerPixel * sizeof(GLubyte));
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, frontTextureWidth, frontTextureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     CGRect r = CGRectMake(0, 0, width, height);
     CGContextClearRect(bitmapContext, r);
-    CGContextTranslateCTM(bitmapContext, 0, textureHeight-height);
+    CGContextTranslateCTM(bitmapContext, 0, frontTextureHeight-height);
     CGContextDrawImage(bitmapContext, r, image.CGImage);
     
     CGContextRelease(bitmapContext);
     CGColorSpaceRelease(colorSpace);
     
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frontTextureWidth, frontTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     free(textureData);
@@ -470,22 +527,22 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self draw:self.displayLink];
 }
 
-- (void)drawViewOnTexture:(UIView *)view
+- (void)drawViewOnFrontOfPage:(UIView *)view
 {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSUInteger bytesPerPixel = 4;
     NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
-    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGContextTranslateCTM(bitmapContext, 0, textureHeight-view.layer.bounds.size.height);
+    NSUInteger bytesPerRow = bytesPerPixel * frontTextureWidth;
+    GLubyte *textureData = malloc(frontTextureWidth * frontTextureHeight * bytesPerPixel * sizeof(GLubyte));
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, frontTextureWidth, frontTextureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGContextTranslateCTM(bitmapContext, 0, frontTextureHeight-view.layer.bounds.size.height);
     [view.layer renderInContext:bitmapContext];
     
     CGContextRelease(bitmapContext);
     CGColorSpaceRelease(colorSpace);
     
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frontTextureWidth, frontTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     free(textureData);
@@ -493,6 +550,31 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     //Force a redraw to avoid glitches
     [self draw:self.displayLink];
 }
+
+- (void)drawImageOnNextPage:(UIImage *)image
+{
+    if (image == nil) {
+        [self destroyNextPageTexture];
+        return;
+    }
+}
+
+- (void)drawViewOnNextPage:(UIView *)view
+{
+    if (view == nil) {
+        [self destroyNextPageTexture];
+        return;
+    }
+}
+         
+- (void)destroyNextPageTexture
+{
+    glDeleteTextures(1, &nextPageTexture);
+    nextPageTexture = 0;
+}
+
+
+#pragma mark - Animation and updating
 
 - (void)startAnimating
 {
@@ -542,11 +624,20 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, mvp);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
     glUniform1i(samplerHandle, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+    
+    //Draw the nextPage if the nextPageTexture is not 0
+    if (nextPageTexture != 0) {
+        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
+        glUniform1i(nextPageSampleHandle, 0);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
     
     if (_antialiasing) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);

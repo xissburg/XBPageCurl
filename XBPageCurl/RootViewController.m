@@ -47,7 +47,7 @@
     CGRect r = CGRectZero;
     r.size = self.view.bounds.size;
     self.curlView = [[[XBCurlView alloc] initWithFrame:r horizontalResolution:(NSUInteger)(r.size.width/10) verticalResolution:(NSUInteger)(r.size.height/10) antialiasing:NO] autorelease];
-    [self.curlView drawViewOnTexture:self.messyView];
+    [self.curlView drawViewOnFrontOfPage:self.messyView];
     self.curlView.opaque = NO;
 }
 
@@ -68,7 +68,7 @@
 {
     CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
     double angle = M_PI/2.5;
-    [self.curlView drawViewOnTexture:self.messyView];
+    [self.curlView drawViewOnFrontOfPage:self.messyView];
     [self.curlView startAnimating];
     self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
     [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
