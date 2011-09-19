@@ -16,6 +16,7 @@
 
 @property (nonatomic, retain) XBCurlView *curlView;
 @property (nonatomic, retain) IBOutlet UIView *messyView;
+@property (nonatomic, retain) IBOutlet UIView *backView;
 @property (nonatomic, retain) IBOutlet UIDatePicker *pickerView;
 
 - (IBAction)curlButtonAction:(id)sender;

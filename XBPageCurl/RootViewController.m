@@ -12,7 +12,7 @@
 
 @implementation RootViewController
 
-@synthesize messyView, pickerView, curlView;
+@synthesize messyView, pickerView, curlView, backView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,6 +27,7 @@
     self.messyView = nil;
     self.pickerView = nil;
     self.curlView = nil;
+    self.backView = nil;
     [super dealloc];
 }
 
@@ -48,7 +49,8 @@
     r.size = self.view.bounds.size;
     self.curlView = [[[XBCurlView alloc] initWithFrame:r horizontalResolution:(NSUInteger)(r.size.width/10) verticalResolution:(NSUInteger)(r.size.height/10) antialiasing:NO] autorelease];
     [self.curlView drawViewOnFrontOfPage:self.messyView];
-    self.curlView.opaque = NO;
+    [self.curlView drawViewOnNextPage:self.backView];
+    //self.curlView.opaque = NO;
 }
 
 - (void)viewDidUnload
@@ -57,6 +59,7 @@
     self.messyView = nil;
     self.pickerView = nil;
     self.curlView = nil;
+    self.backView = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -69,6 +72,7 @@
     CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
     double angle = M_PI/2.5;
     [self.curlView drawViewOnFrontOfPage:self.messyView];
+    [self.curlView drawViewOnNextPage:self.backView];
     [self.curlView startAnimating];
     self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
     [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
