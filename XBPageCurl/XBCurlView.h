@@ -27,13 +27,14 @@
     GLuint sampleColorRenderbuffer;
     GLuint sampleDepthRenderbuffer;
     
+    //Texture size for all possible textures (front of page, back of page, nextPage).
+    GLuint textureWidth, textureHeight;
+    
     //Texture projected onto the front of the curling mesh.
     GLuint frontTexture;
-    GLuint frontTextureWidth, frontTextureHeight;
     
     //Texture projected onto the back of the curling mesh.
     GLuint backTexture;
-    GLuint backTextureWidth, backTextureHeight;
     
     //GPU program for the curling mesh.
     GLuint program;
@@ -45,10 +46,12 @@
     
     //Texture projected onto the two-triangle rectangle of the nextPage.
     GLuint nextPageTexture;
-    GLuint nextPageTextureWidth, nextPageTextureHeight;
     
     //Very simple GPU program for the nextPage.
     GLuint nextPageProgram;
+    
+    //Handles for the nextPageProgram variables.
+    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle;
     
     //Vertex buffer for the two-triangle rectangle of the nextPage.
     //No need for an index buffer. It is drawn as a triangle-strip.

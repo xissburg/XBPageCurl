@@ -37,7 +37,10 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
-- (GLuint)generateFullSizedTextureOutWidth:(GLuint *)width outHeight:(GLuint *)height;
+- (CGSize)minimumFullSizedTextureSize;
+- (GLuint)generateTexture;
+- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture;
+- (void)drawView:(UIView *)view onTexture:(GLuint)texture;
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -93,11 +96,14 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     [self setupMVP];
     
-    frontTexture = [self generateFullSizedTextureOutWidth:&frontTextureWidth outHeight:&frontTextureHeight];
+    CGSize textureSize = [self minimumFullSizedTextureSize];
+    textureWidth = (GLuint)textureSize.width;
+    textureHeight = (GLuint)textureSize.height;
+    frontTexture = [self generateTexture];
     
     //Set shader texture scale
     glUseProgram(program);
-    glUniform2f(texSizeHandle, frontTextureWidth, frontTextureHeight);
+    glUniform2f(texSizeHandle, textureWidth, textureHeight);
     glUseProgram(0);
     
     return YES;
@@ -469,24 +475,30 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 #pragma mark - Textures
 
-- (GLuint)generateFullSizedTextureOutWidth:(GLuint *)width outHeight:(GLuint *)height
+- (CGSize)minimumFullSizedTextureSize
 {
     //Compute the actual view size in the current screen scale
     CGFloat scale = [[UIScreen mainScreen] scale];
     CGSize actualViewSize = CGSizeMake(self.bounds.size.width*scale, self.bounds.size.height*scale);
     
     //Compute the closest, greater power of two
-    *width = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
-    *height = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
+    CGSize size = CGSizeZero;
+    size.width = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
+    size.height = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
     
-    if (*width < 64) {
-        *width = 64;
+    if (size.width < 64) {
+        size.width = 64;
     }
     
-    if (*height < 64) {
-        *height = 64;
+    if (size.height < 64) {
+        size.height = 64;
     }
     
+    return size;
+}
+
+- (GLuint)generateTexture
+{
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -499,29 +511,55 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return tex;
 }
 
-- (void)drawImageOnFrontOfPage:(UIImage *)image
+- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture
 {
     GLuint width = CGImageGetWidth(image.CGImage);
     GLuint height = CGImageGetHeight(image.CGImage);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSUInteger bytesPerPixel = 4;
     NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * frontTextureWidth;
-    GLubyte *textureData = malloc(frontTextureWidth * frontTextureHeight * bytesPerPixel * sizeof(GLubyte));
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, frontTextureWidth, frontTextureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
+    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     CGRect r = CGRectMake(0, 0, width, height);
     CGContextClearRect(bitmapContext, r);
-    CGContextTranslateCTM(bitmapContext, 0, frontTextureHeight-height);
+    CGContextTranslateCTM(bitmapContext, 0, textureHeight-height);
     CGContextDrawImage(bitmapContext, r, image.CGImage);
     
     CGContextRelease(bitmapContext);
     CGColorSpaceRelease(colorSpace);
     
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frontTextureWidth, frontTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     free(textureData);
+}
+
+- (void)drawView:(UIView *)view onTexture:(GLuint)texture
+{
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    NSUInteger bytesPerPixel = 4;
+    NSUInteger bitsPerChannel = 8;
+    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
+    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
+    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGContextTranslateCTM(bitmapContext, 0, textureHeight-view.layer.bounds.size.height);
+    [view.layer renderInContext:bitmapContext];
+    
+    CGContextRelease(bitmapContext);
+    CGColorSpaceRelease(colorSpace);
+    
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    free(textureData);
+}
+
+- (void)drawImageOnFrontOfPage:(UIImage *)image
+{
+    [self drawImage:image onTexture:frontTexture];
     
     //Force a redraw to avoid glitches
     [self draw:self.displayLink];
@@ -529,23 +567,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)drawViewOnFrontOfPage:(UIView *)view
 {
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    NSUInteger bytesPerPixel = 4;
-    NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * frontTextureWidth;
-    GLubyte *textureData = malloc(frontTextureWidth * frontTextureHeight * bytesPerPixel * sizeof(GLubyte));
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, frontTextureWidth, frontTextureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGContextTranslateCTM(bitmapContext, 0, frontTextureHeight-view.layer.bounds.size.height);
-    [view.layer renderInContext:bitmapContext];
-    
-    CGContextRelease(bitmapContext);
-    CGColorSpaceRelease(colorSpace);
-    
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frontTextureWidth, frontTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
-    free(textureData);
+    [self drawView:view onTexture:frontTexture];
     
     //Force a redraw to avoid glitches
     [self draw:self.displayLink];
@@ -557,6 +579,12 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         [self destroyNextPageTexture];
         return;
     }
+    
+    if (nextPageTexture == 0) {
+        nextPageTexture = [self generateTexture];
+    }
+    
+    [self drawImage:image onTexture:nextPageTexture];
 }
 
 - (void)drawViewOnNextPage:(UIView *)view
@@ -565,6 +593,12 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         [self destroyNextPageTexture];
         return;
     }
+    
+    if (nextPageTexture == 0) {
+        nextPageTexture = [self generateTexture];
+    }
+    
+    [self drawView:view onTexture:nextPageTexture];
 }
          
 - (void)destroyNextPageTexture
@@ -632,10 +666,19 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     //Draw the nextPage if the nextPageTexture is not 0
     if (nextPageTexture != 0) {
-        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
-        glUniform1i(nextPageSampleHandle, 0);
+        glUseProgram(nextPageProgram);
         
         glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+        glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+        glEnableVertexAttribArray(nextPagePositionHandle);
+        glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+        glEnableVertexAttribArray(nextPageTexCoordHandle);
+        glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
+        glUniform1i(nextPageSamplerHandle, 0);
+        
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
