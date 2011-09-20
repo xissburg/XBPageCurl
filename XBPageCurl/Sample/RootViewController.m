@@ -75,12 +75,13 @@
     [self.curlView drawViewOnNextPage:self.backView];
     [self.curlView startAnimating];
     self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
+    self.curlView.cylinderDirection = CGPointMake(0, 1);
     [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
     self.curlView.userInteractionEnabled = NO; //Allow interaction with back view
     [self.view addSubview:self.curlView];
-    [self.messyView removeFromSuperview];
+    //[self.messyView removeFromSuperview];
 }
 
 - (IBAction)uncurlButtonAction:(id)sender
@@ -89,7 +90,7 @@
     [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width, appFrame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
-        [self.view addSubview:self.messyView];
+        //[self.view addSubview:self.messyView];
         [self.curlView removeFromSuperview];
         [self.curlView stopAnimating];
     }];
