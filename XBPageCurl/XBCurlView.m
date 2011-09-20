@@ -104,6 +104,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     //Set shader texture scale
     glUseProgram(program);
     glUniform2f(texSizeHandle, textureWidth, textureHeight);
+    
+    glUseProgram(nextPageProgram);
+    glUniform2f(nextPageTexSizeHandle, textureWidth, textureHeight);
     glUseProgram(0);
     
     return YES;
@@ -365,27 +368,27 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     vertices[0].x = 0;
     vertices[0].y = 0;
-    vertices[0].z = 0;
+    vertices[0].z = -1;
     vertices[0].u = 0;
     vertices[0].v = 0;
     
     vertices[1].x = viewportWidth;
     vertices[1].y = 0;
-    vertices[1].z = 0;
-    vertices[1].u = 1;
+    vertices[1].z = -1;
+    vertices[1].u = viewportWidth;
     vertices[1].v = 0;
     
     vertices[2].x = 0;
     vertices[2].y = viewportHeight;
-    vertices[2].z = 0;
+    vertices[2].z = -1;
     vertices[2].u = 0;
-    vertices[2].v = 1;
+    vertices[2].v = viewportHeight;
     
     vertices[3].x = viewportWidth;
     vertices[3].y = viewportHeight;
-    vertices[3].z = 0;
-    vertices[3].u = 1;
-    vertices[3].v = 1;
+    vertices[3].z = -1;
+    vertices[3].u = viewportWidth;
+    vertices[3].v = viewportHeight;
     
     glGenBuffers(1, &nextPageVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
@@ -437,10 +440,10 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return shader;
 }
 
-- (BOOL)setupShaders
+- (BOOL)setupCurlShader
 {
-    GLuint vertexShader = [self loadShader:@"VertexProgram.glsl" type:GL_VERTEX_SHADER];
-    GLuint fragmentShader = [self loadShader:@"FragmentProgram.glsl" type:GL_FRAGMENT_SHADER];
+    GLuint vertexShader = [self loadShader:@"VertexShader.glsl" type:GL_VERTEX_SHADER];
+    GLuint fragmentShader = [self loadShader:@"FragmentShader.glsl" type:GL_FRAGMENT_SHADER];
     program = glCreateProgram();
     
     glAttachShader(program, vertexShader);
@@ -466,10 +469,61 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return YES;
 }
 
-- (void)destroyShaders
+- (void)destroyCurlShader
 {
     glDeleteProgram(program);
     program = 0;
+}
+
+- (BOOL)setupNextPageShader
+{
+    GLuint vertexShader = [self loadShader:@"NextPageVertexShader.glsl" type:GL_VERTEX_SHADER];
+    GLuint fragmentShader = [self loadShader:@"NextPageFragmentShader.glsl" type:GL_FRAGMENT_SHADER];
+    nextPageProgram = glCreateProgram();
+    
+    glAttachShader(nextPageProgram, vertexShader);
+    glAttachShader(nextPageProgram, fragmentShader);
+    glLinkProgram(nextPageProgram);
+    
+    GLint linked = 0;
+    glGetProgramiv(nextPageProgram, GL_LINK_STATUS, &linked);
+    if (linked == 0) {
+        glDeleteProgram(nextPageProgram);
+        return NO;
+    }
+    
+    nextPagePositionHandle = glGetAttribLocation(nextPageProgram, "a_position");
+    nextPageTexCoordHandle = glGetAttribLocation(nextPageProgram, "a_texCoord");
+    nextPageMvpHandle      = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
+    nextPageSamplerHandle  = glGetUniformLocation(nextPageProgram, "s_tex");
+    nextPageTexSizeHandle  = glGetUniformLocation(nextPageProgram, "u_texSize");
+    
+    return YES;
+}
+
+- (void)destroyNextPageShader
+{
+    glDeleteProgram(nextPageProgram);
+    nextPageProgram = 0;
+}
+
+- (BOOL)setupShaders
+{
+    if (![self setupCurlShader]) {
+        return NO;
+    }
+    
+    if (![self setupNextPageShader]) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (void)destroyShaders
+{
+    [self destroyCurlShader];
+    [self destroyNextPageShader];
 }
 
 
