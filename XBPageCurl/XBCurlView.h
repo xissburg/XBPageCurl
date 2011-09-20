@@ -51,7 +51,7 @@
     GLuint nextPageProgram;
     
     //Handles for the nextPageProgram variables.
-    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle;
+    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle, nextPageTexSizeHandle;
     
     //Vertex buffer for the two-triangle rectangle of the nextPage.
     //No need for an index buffer. It is drawn as a triangle-strip.
@@ -63,7 +63,7 @@
     //Model-View-Proj matrix.
     GLfloat mvp[16];
     
-    //Handles for the shader variables.
+    //Handles for the curl shader variables.
     int positionHandle, texCoordHandle, mvpHandle, samplerHandle;
     int texSizeHandle;
     int cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
