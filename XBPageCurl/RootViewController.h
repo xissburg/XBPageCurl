@@ -10,7 +10,7 @@
 #import "XBCurlView.h"
 
 
-@interface RootViewController : UIViewController {
+@interface RootViewController : UIViewController <UITextFieldDelegate> {
     UIDatePicker *pickerView;
 }
 
