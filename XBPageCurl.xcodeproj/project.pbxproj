@@ -24,7 +24,6 @@
 		1B8BC4281429866F0048682B /* RootViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC40A1429866F0048682B /* RootViewController_iPad.m */; };
 		1B8BC4291429866F0048682B /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC40B1429866F0048682B /* RootViewController_iPad.xib */; };
 		1B8BC42A1429866F0048682B /* RootViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC40C1429866F0048682B /* RootViewController_iPhone.xib */; };
-		1B8BC42B1429866F0048682B /* XBPageCurl-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC40D1429866F0048682B /* XBPageCurl-Info.plist */; };
 		1B8BC42C1429866F0048682B /* XBPageCurlAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4101429866F0048682B /* XBPageCurlAppDelegate.m */; };
 		1B8BC42D1429866F0048682B /* FragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4131429866F0048682B /* FragmentShader.glsl */; };
 		1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */; };
@@ -329,7 +328,6 @@
 				1B8BC4261429866F0048682B /* appleStore@2x.png in Resources */,
 				1B8BC4291429866F0048682B /* RootViewController_iPad.xib in Resources */,
 				1B8BC42A1429866F0048682B /* RootViewController_iPhone.xib in Resources */,
-				1B8BC42B1429866F0048682B /* XBPageCurl-Info.plist in Resources */,
 				1B8BC42D1429866F0048682B /* FragmentShader.glsl in Resources */,
 				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
 				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
