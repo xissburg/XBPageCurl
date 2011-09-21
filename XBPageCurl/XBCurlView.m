@@ -119,7 +119,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
 {
-    return [self initWithFrame:frame horizontalResolution:32 verticalResolution:48 antialiasing:antialiasing];
+    return [self initWithFrame:frame horizontalResolution:(NSUInteger)(frame.size.width/10) verticalResolution:(NSUInteger)(frame.size.height/10) antialiasing:antialiasing];
 }
 
 - (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing
