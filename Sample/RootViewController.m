@@ -68,24 +68,37 @@
 
 - (IBAction)curlButtonAction:(id)sender
 {
-    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+    CGRect frame = self.view.frame;
     double angle = M_PI/2.5;
+    
+    //Update the view drawn on the front of the curling page
     [self.curlView drawViewOnFrontOfPage:self.messyView];
-    self.curlView.cylinderPosition = CGPointMake(appFrame.size.width, appFrame.size.height/2);
+    
+    //Reset cylinder properties, positioning it on the right side, oriented vertically
+    self.curlView.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
     self.curlView.cylinderDirection = CGPointMake(0, 1);
-    [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width/6, appFrame.size.height/2) animatedWithDuration:kDuration];
+    self.curlView.cylinderRadius = 20;
+    
+    //Start the cylinder animation
+    [self.curlView setCylinderPosition:CGPointMake(frame.size.width/6, frame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
-    self.curlView.userInteractionEnabled = NO; //Allow interaction with back view
+    
+    //Allow interaction with back view
+    self.curlView.userInteractionEnabled = NO;
+    
+    //Setup the view hierarchy properly
     [self.view addSubview:self.curlView];
     [self.messyView removeFromSuperview];
+    
+    //Start the rendering loop
     [self.curlView startAnimating];
 }
 
 - (IBAction)uncurlButtonAction:(id)sender
 {
-    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
-    [self.curlView setCylinderPosition:CGPointMake(appFrame.size.width, appFrame.size.height/2) animatedWithDuration:kDuration];
+    CGRect frame = self.view.frame;
+    [self.curlView setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
         [self.view addSubview:self.messyView];
