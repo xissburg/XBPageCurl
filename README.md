@@ -75,5 +75,6 @@ CGRect frame = self.view.frame;
     [self.curlView stopAnimating];
 }];
 ```
+### Using XBPageCurlView
 
-
+XBPageCurlView is a view that has support for dragging the page with the finger like in a book. It controls the cylinder of a XBCurlView instance so that the corner of the page will follow the user's finger. It has a corresponding protocol that tells its delegate whether the user flipped to the next page, cancelled flipping to the next page, flipped to the previous page or cancelled flipping to the previous page. 

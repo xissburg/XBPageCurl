@@ -111,7 +111,11 @@
     }];
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField 
+{
     [textField resignFirstResponder];
     return YES;
 }
