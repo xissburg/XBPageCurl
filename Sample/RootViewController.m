@@ -98,11 +98,15 @@
 - (IBAction)uncurlButtonAction:(id)sender
 {
     CGRect frame = self.view.frame;
+    
+    //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
     [self.curlView setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:kDuration];
     [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
+        //Setup the view hierarchy properly after the animation is finished
         [self.view addSubview:self.messyView];
         [self.curlView removeFromSuperview];
+        //Stop the rendering loop since the curlView won't appear at the moment
         [self.curlView stopAnimating];
     }];
 }
