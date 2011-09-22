@@ -20,8 +20,60 @@ XBCurlView is a low level class that does the actual work for curling the view. 
 
 To use it, you first have to initialize an instance using the initializer that best satisfies your needs. The initWithFrame: initializer is a good start, it will create a grid mesh with a resolution proportional to the frame size, which gives good results for cylinder radius above 20. The initWithFrame:antialiasing: allows you to specify whether you want to switch the Open GL ES Multisampling Antialiasing on to get smoother edges. The initWithFrame:horizontalResolution:verticalResolution:antialiasing allows you to choose the mesh resolution (amount of rows and columns on the grid mesh), which you should try to keep proportional to the frame size in order to get a grid of squares, not rectangles. You should only worry about the mesh resolution if you start to see the edges of the triangles at the curled section of the mesh, which can be smoothed out by increasing the resolution.
 
-After it is initialized, you should draw the view or image you want to curl on it using drawViewOnFrontOfPage: or drawImageOnFrontOfPage:, which draws the view or image in the front of the mesh that will curl (in the near future it will be possible to draw another view on the back of this mesh using the methods drawViewOnBackOfPage: or drawImageOnBackOfPage:) to avoid a glitch. You should also set opaque to NO on the XBCurlView instance in order to see through it on the region that has nothing. Then, whenever you want to curl the view, first draw it again on the front of the page to update the image on the curling mesh,  set the initial cylinder properties, then set the final properties with animation, add the XBCurlView instance as a subview of the superview of the view you are gonna curl so that it is above that view, and remove the other view from its superview so that the other view behind it can appear. Then, also set userInteractionEnabled to NO on the XBCurlView instance to allow the user to interact with the view behind it. Lastly, you have to call startAnimating on the XBCurlView instance for it to start rendering the OpenGL ES stuff.
+After it is initialized, you should draw the view or image you want to curl on it using drawViewOnFrontOfPage: or drawImageOnFrontOfPage:, which draws the view or image in the front of the mesh that will curl (in the near future it will be possible to draw another view on the back of this mesh using the methods drawViewOnBackOfPage: or drawImageOnBackOfPage:) to avoid a glitch. You should also set opaque to NO on the XBCurlView instance in order to see through it on the region that has nothing. 
 
-To curl the view back, just set its cylinder position, orientation and radius with animation and for one of them assign a completion block that should add the original view back again, remove the XBCurlView instance from its superview and also call stopAnimating to stop the OpenGL ES rendering loop.
+```objective-c
+//Initializing a XBCurlView instance in viewDidLoad in the root view controller
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+        
+    CGRect r = CGRectZero;
+    r.size = self.view.bounds.size;
+    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    [self.curlView drawViewOnFrontOfPage:self.messyView];
+    self.curlView.opaque = NO;
+}
+```
+
+Whenever you want to curl the view, first draw it again on the front of the page to update the image on the curling mesh,  set the initial cylinder properties, then set the final properties with animation, add the XBCurlView instance as a subview of the superview of the view you are gonna curl so that it is above that view, and remove the other view from its superview so that the other view behind it will appear. Then, also set userInteractionEnabled to NO on the XBCurlView instance to allow the user to interact with the view behind it. Lastly, you have to call startAnimating on the XBCurlView instance for it to start rendering the OpenGL ES stuff.
+
+```objective-c
+GRect frame = self.view.frame;
+double angle = M_PI/2.5;
+//Update the view drawn on the front of the curling page
+[self.curlView drawViewOnFrontOfPage:self.messyView];
+//Reset cylinder properties, positioning it on the right side, oriented vertically
+self.curlView.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
+self.curlView.cylinderDirection = CGPointMake(0, 1);
+self.curlView.cylinderRadius = 20;
+//Start the cylinder animation
+[self.curlView setCylinderPosition:CGPointMake(frame.size.width/6, frame.size.height/2) animatedWithDuration:kDuration];
+[self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
+[self.curlView setCylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+//Allow interaction with back view
+self.curlView.userInteractionEnabled = NO;
+//Setup the view hierarchy properly
+[self.view addSubview:self.curlView];
+[self.messyView removeFromSuperview];
+//Start the rendering loop
+[self.curlView startAnimating];
+```
+
+To curl the view back, just set its cylinder position, orientation and radius with animation and for one of them assign a completion block that should add the original view back again, remove the XBCurlView instance from its superview and also call stopAnimating to stop the rendering loop.
+
+```objective-c
+CGRect frame = self.view.frame;
+//Animate the cylinder back to its start position at the right side of the screen, oriented vertically
+[self.curlView setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:kDuration];
+[self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
+[self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
+    //Setup the view hierarchy properly after the animation is finished
+    [self.view addSubview:self.messyView];
+    [self.curlView removeFromSuperview];
+    //Stop the rendering loop since the curlView won't appear at the moment
+    [self.curlView stopAnimating];
+}];
+```
 
 
