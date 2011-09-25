@@ -69,19 +69,19 @@
 - (IBAction)curlButtonAction:(id)sender
 {
     CGRect frame = self.view.frame;
-    double angle = M_PI/2.5;
+    double angle = M_PI/3;
     
     //Update the view drawn on the front of the curling page
     [self.curlView drawViewOnFrontOfPage:self.messyView];
     
     //Reset cylinder properties, positioning it on the right side, oriented vertically
     self.curlView.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
-    self.curlView.cylinderDirection = CGPointMake(0, 1);
+    self.curlView.cylinderAngle = M_PI_2;
     self.curlView.cylinderRadius = 20;
     
     //Start the cylinder animation
     [self.curlView setCylinderPosition:CGPointMake(frame.size.width/6, frame.size.height/2) animatedWithDuration:kDuration];
-    [self.curlView setCylinderDirection:CGPointMake(cos(angle), sin(angle)) animatedWithDuration:kDuration];
+    [self.curlView setCylinderAngle:angle animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
     
     //Allow interaction with back view
@@ -101,7 +101,7 @@
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
     [self.curlView setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:kDuration];
-    [self.curlView setCylinderDirection:CGPointMake(0,1) animatedWithDuration:kDuration];
+    [self.curlView setCylinderAngle:M_PI_2 animatedWithDuration:kDuration];
     [self.curlView setCylinderRadius:20 animatedWithDuration:kDuration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
         [self.view addSubview:self.messyView];
