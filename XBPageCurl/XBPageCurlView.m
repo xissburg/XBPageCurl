@@ -46,8 +46,9 @@
     dir = CGPointMake(-dir.y, dir.x);
     CGFloat length = sqrtf(dir.x*dir.x + dir.y*dir.y);
     dir.x /= length, dir.y /= length;
+    CGFloat angle = atan2f(dir.y, dir.x);
     
-    [self setCylinderDirection:dir animatedWithDuration:kDuration];
+    [self setCylinderAngle:angle animatedWithDuration:kDuration];
     [self setCylinderRadius:16+length/4 animatedWithDuration:kDuration];
 }
 
@@ -61,8 +62,9 @@
     dir = CGPointMake(-dir.y, dir.x);
     CGFloat length = sqrtf(dir.x*dir.x + dir.y*dir.y);
     dir.x /= length, dir.y /= length;
-    self.cylinderDirection = dir;
+    CGFloat angle = atan2f(dir.y, dir.x);
     
+    self.cylinderAngle = angle;
     self.cylinderRadius = 16 + length/4;
 }
 

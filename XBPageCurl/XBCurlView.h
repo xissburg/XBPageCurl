@@ -70,8 +70,8 @@
     
     //Position of any point in the cylinder axis projected on the xy plane.
     CGPoint _cylinderPosition;
-    //Direction vector (normalized) for the cylinder axis.
-    CGPoint _cylinderDirection;
+    //Angle for the cylinder axis.
+    CGFloat _cylinderAngle;
     CGFloat _cylinderRadius;
     
     //Multisampling anti-aliasing flag. It can only be set at init time.
@@ -85,7 +85,7 @@
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
 @property (nonatomic, assign) CGPoint cylinderPosition;
-@property (nonatomic, assign) CGPoint cylinderDirection;
+@property (nonatomic, assign) CGFloat cylinderAngle;
 @property (nonatomic, assign) CGFloat cylinderRadius;
 
 - (id)initWithFrame:(CGRect)frame;
@@ -94,8 +94,8 @@
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
-- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration;
-- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
+- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration;
+- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
 
@@ -113,5 +113,8 @@
 
 - (void)drawImageOnNextPage:(UIImage *)image;
 - (void)drawViewOnNextPage:(UIView *)view;
+
+- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(BOOL)duration;
+- (void)uncurl;
 
 @end

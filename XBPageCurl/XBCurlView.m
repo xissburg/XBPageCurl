@@ -53,7 +53,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @implementation XBCurlView
 
 @synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
-@synthesize cylinderPosition=_cylinderPosition, cylinderDirection=_cylinderDirection, cylinderRadius=_cylinderRadius;
+@synthesize cylinderPosition=_cylinderPosition, cylinderAngle=_cylinderAngle, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
 @synthesize animationManager;
 
@@ -82,7 +82,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     self.animationManager = [XBAnimationManager animationManager];
 
     self.cylinderPosition = CGPointMake(0, 0);
-    self.cylinderDirection = CGPointMake(0, 1);
+    self.cylinderAngle = M_PI_2;
     self.cylinderRadius = 32;
     
     framebuffer = colorRenderbuffer = depthRenderbuffer = 0;
@@ -190,19 +190,18 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self.animationManager runAnimation:animation];
 }
 
-- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration
+- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration
 {
-    [self setCylinderDirection:cylinderDirection animatedWithDuration:duration completion:^(void) {}];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:^(void) {}];
 }
 
-- (void)setCylinderDirection:(CGPoint)cylinderDirection animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
 {
-    double a0 = atan2(_cylinderDirection.y, _cylinderDirection.x);
-    double a1 = atan2(cylinderDirection.y, cylinderDirection.x);
+    double a0 = _cylinderAngle;
+    double a1 = cylinderAngle;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
-        double a = (1 - t)*a0 + t*a1;
-        _cylinderDirection = CGPointMake(cos(a), sin(a));
+        _cylinderAngle = (1 - t)*a0 + t*a1;
     } completion:completion];
     
     [self.animationManager runAnimation:animation];
@@ -662,6 +661,42 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 }
 
 
+#pragma mark - View Curling Utils
+
+- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(BOOL)duration
+{
+    CGRect frame = self.frame;
+    
+    //Update the view drawn on the front of the curling page
+    [self drawViewOnFrontOfPage:view];
+    
+    //Reset cylinder properties, positioning it on the right side, oriented vertically
+    self.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
+    self.cylinderAngle = M_PI_2;
+    self.cylinderRadius = 20;
+    
+    //Start the cylinder animation
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration];
+    
+    //Allow interaction with back view
+    self.userInteractionEnabled = NO;
+    
+    //Setup the view hierarchy properly
+    [view.superview addSubview:self];
+    [view removeFromSuperview];
+    
+    //Start the rendering loop
+    [self startAnimating];
+}
+
+- (void)uncurl
+{
+    
+}
+
+
 #pragma mark - Animation and updating
 
 - (void)startAnimating
@@ -701,7 +736,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glEnable(GL_DEPTH_TEST);
     
     glUniform2f(cylinderPositionHandle, self.cylinderPosition.x, self.cylinderPosition.y);
-    glUniform2f(cylinderDirectionHandle, self.cylinderDirection.x, self.cylinderDirection.y);
+    glUniform2f(cylinderDirectionHandle, cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     glUniform1f(cylinderRadiusHandle, self.cylinderRadius);
     
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
