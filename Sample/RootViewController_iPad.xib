@@ -4540,7 +4540,7 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="IBUINavigationItem" id="913312564">
 										<reference key="IBUINavigationBar" ref="104451306"/>
-										<string key="IBUITitle">xissburg</string>
+										<string key="IBUITitle">XBPageCurl</string>
 										<object class="IBUIBarButtonItem" key="IBUIRightBarButtonItem" id="841400831">
 											<string key="IBUITitle">Curl</string>
 											<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -4612,6 +4612,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 								<string key="NSFrame">{{0, 955}, {768, 49}}</string>
 								<reference key="NSSuperview" ref="619101374"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:518</string>
 								<reference key="IBUIBackgroundColor" ref="406204267"/>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>

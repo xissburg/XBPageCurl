@@ -4611,7 +4611,7 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="IBUINavigationItem" id="352301802">
 										<reference key="IBUINavigationBar" ref="345046328"/>
-										<string key="IBUITitle">xissburg</string>
+										<string key="IBUITitle">XBPageCurl</string>
 										<object class="IBUIBarButtonItem" key="IBUIRightBarButtonItem" id="899165104">
 											<string key="IBUITitle">Curl</string>
 											<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
