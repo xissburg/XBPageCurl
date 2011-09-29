@@ -217,9 +217,9 @@
 		1B8BC4121429866F0048682B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1B8BC4131429866F0048682B /* FragmentShader.glsl */,
 				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
 				1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */,
+				1B8BC4131429866F0048682B /* FragmentShader.glsl */,
 				1B8BC4161429866F0048682B /* VertexShader.glsl */,
 			);
 			path = Resources;

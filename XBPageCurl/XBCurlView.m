@@ -56,10 +56,11 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
 @synthesize cylinderPosition=_cylinderPosition, cylinderAngle=_cylinderAngle, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
-@synthesize animationManager, curlingView;
+@synthesize animationManager, curlingView, pageOpaque;
 
 - (BOOL)initialize
 {
+    self.pageOpaque = YES;
     self.opaque = YES;
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
     layer.opaque = YES;
@@ -576,6 +577,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
     GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
     CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    
     CGRect r = CGRectMake(0, 0, width, height);
     CGContextClearRect(bitmapContext, r);
     CGContextTranslateCTM(bitmapContext, 0, textureHeight-height);
@@ -599,6 +601,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
     GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
     CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    
+    CGRect r = CGRectMake(0, 0, view.bounds.size.width, view.bounds.size.height);
+    CGContextClearRect(bitmapContext, r);
     CGContextTranslateCTM(bitmapContext, 0, textureHeight-view.layer.bounds.size.height);
     [view.layer renderInContext:bitmapContext];
     
@@ -742,13 +747,15 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
     glUseProgram(program);
     
     glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    
+    if (!self.pageOpaque) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
     
     glUniform2f(cylinderPositionHandle, self.cylinderPosition.x, self.cylinderPosition.y);
     glUniform2f(cylinderDirectionHandle, cosf(self.cylinderAngle), sinf(self.cylinderAngle));
@@ -767,6 +774,10 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+    
+    if (!self.pageOpaque) {
+        glDisable(GL_BLEND);
+    }
     
     //Draw the nextPage if the nextPageTexture is not 0
     if (nextPageTexture != 0) {

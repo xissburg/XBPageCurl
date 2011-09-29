@@ -82,6 +82,7 @@
 }
 
 @property (nonatomic, readonly) BOOL antialiasing;
+@property (nonatomic, assign) BOOL pageOpaque;
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
 @property (nonatomic, assign) CGPoint cylinderPosition;

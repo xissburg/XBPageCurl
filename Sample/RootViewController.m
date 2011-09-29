@@ -50,6 +50,7 @@
     self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
     [self.curlView drawViewOnFrontOfPage:self.messyView];
     self.curlView.opaque = NO;
+    self.curlView.pageOpaque = NO;
 }
 
 - (void)viewDidUnload
