@@ -114,7 +114,7 @@
 - (void)drawImageOnNextPage:(UIImage *)image;
 - (void)drawViewOnNextPage:(UIView *)view;
 
-- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(BOOL)duration;
-- (void)uncurl;
+- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
+- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration;
 
 @end

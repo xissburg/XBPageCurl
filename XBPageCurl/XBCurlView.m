@@ -26,6 +26,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @property (nonatomic, retain) EAGLContext *context;
 @property (nonatomic, retain) CADisplayLink *displayLink;
 @property (nonatomic, retain) XBAnimationManager *animationManager;
+@property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -55,7 +56,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
 @synthesize cylinderPosition=_cylinderPosition, cylinderAngle=_cylinderAngle, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
-@synthesize animationManager;
+@synthesize animationManager, curlingView;
 
 - (BOOL)initialize
 {
@@ -147,6 +148,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self.displayLink invalidate];
     self.displayLink = nil;
     self.animationManager = nil;
+    self.curlingView = nil;
     [self destroyVertexBuffer];
     [self destroyNextPageVertexBuffer];
     [self destroyShaders];
@@ -663,17 +665,18 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 #pragma mark - View Curling Utils
 
-- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(BOOL)duration
+- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
+    self.curlingView = view;
     CGRect frame = self.frame;
-    
-    //Update the view drawn on the front of the curling page
-    [self drawViewOnFrontOfPage:view];
     
     //Reset cylinder properties, positioning it on the right side, oriented vertically
     self.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
     self.cylinderAngle = M_PI_2;
     self.cylinderRadius = 20;
+    
+    //Update the view drawn on the front of the curling page
+    [self drawViewOnFrontOfPage:self.curlingView];
     
     //Start the cylinder animation
     [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
@@ -684,16 +687,28 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     self.userInteractionEnabled = NO;
     
     //Setup the view hierarchy properly
-    [view.superview addSubview:self];
-    [view removeFromSuperview];
+    [self.curlingView.superview addSubview:self];
+    [self.curlingView removeFromSuperview];
     
     //Start the rendering loop
     [self startAnimating];
 }
 
-- (void)uncurl
+- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration
 {
+    CGRect frame = self.frame;
     
+    //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
+    [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
+    [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
+    [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
+        //Setup the view hierarchy properly after the animation is finished
+        [self.superview addSubview:self.curlingView];
+        [self removeFromSuperview];
+        //Stop the rendering loop since the curlView was removed from its superview nad hence won't appear
+        [self stopAnimating];
+        self.curlingView = nil;
+    }];
 }
 
 
