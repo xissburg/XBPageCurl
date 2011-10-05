@@ -595,26 +595,24 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 {
     GLuint width = CGImageGetWidth(image.CGImage);
     GLuint height = CGImageGetHeight(image.CGImage);
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    NSUInteger bytesPerPixel = 4;
-    NSUInteger bitsPerChannel = 8;
-    NSUInteger bytesPerRow = bytesPerPixel * textureWidth;
-    GLubyte *textureData = malloc(textureWidth * textureHeight * bytesPerPixel * sizeof(GLubyte));
-    CGContextRef bitmapContext = CGBitmapContextCreate(textureData, textureWidth, textureHeight, bitsPerChannel, bytesPerRow, colorSpace, kCGImageAlphaLast | kCGBitmapByteOrder32Big);
+    CGSize imageSize = CGSizeMake(textureWidth, textureHeight);
+    UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGRect r = CGRectMake(0, 0, width, height);
-    CGContextClearRect(bitmapContext, r);
-    CGContextTranslateCTM(bitmapContext, 0, textureHeight-height);
-    CGContextDrawImage(bitmapContext, r, image.CGImage);
+    CGContextClearRect(context, r);
+    CGContextTranslateCTM(context, 0, height/self.screenScale);
+    CGContextScaleCTM(context, 1, -1/self.screenScale);
     
-    CGContextRelease(bitmapContext);
-    CGColorSpaceRelease(colorSpace);
+    CGContextDrawImage(context, r, image.CGImage);
+    
+    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
-    free(textureData);
+    UIGraphicsEndImageContext();
 }
 
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture
