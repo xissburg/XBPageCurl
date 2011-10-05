@@ -79,6 +79,9 @@
     
     //Resolution of the grid mesh
     NSUInteger _horizontalResolution, _verticalResolution;
+    
+    //Screen scale
+    CGFloat _screenScale;
 }
 
 @property (nonatomic, readonly) BOOL antialiasing;

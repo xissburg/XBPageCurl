@@ -8,7 +8,7 @@ void main()
 {
     vec4 color = texture2D(s_tex, v_texCoord);
     
-    if (color.a < 0.01) {
+    if (color.a < 0.2) {
         discard;
     }
 

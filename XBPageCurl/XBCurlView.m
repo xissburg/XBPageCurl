@@ -27,6 +27,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @property (nonatomic, retain) CADisplayLink *displayLink;
 @property (nonatomic, retain) XBAnimationManager *animationManager;
 @property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
+@property (nonatomic, readonly) CGFloat screenScale;
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -54,12 +55,17 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 @implementation XBCurlView
 
 @synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
-@synthesize cylinderPosition=_cylinderPosition, cylinderAngle=_cylinderAngle, cylinderRadius=_cylinderRadius;
 @synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
 @synthesize animationManager, curlingView, pageOpaque;
+@synthesize cylinderAngle=_cylinderAngle;
+@synthesize screenScale=_screenScale;
 
 - (BOOL)initialize
 {
+    //Setup scale before everything
+    _screenScale = [[UIScreen mainScreen] scale];
+    [self setContentScaleFactor:self.screenScale];
+    
     self.pageOpaque = YES;
     self.opaque = YES;
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
@@ -75,10 +81,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     if (![self setupShaders]) {
         return NO;
-    }
-    
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
-        [self setContentScaleFactor:[[UIScreen mainScreen] scale]];
     }
     
     self.animationManager = [XBAnimationManager animationManager];
@@ -177,6 +179,17 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 #pragma mark - Properties
 
+//CylinderPosition
+- (CGPoint)cylinderPosition
+{
+    return CGPointMake(_cylinderPosition.x/self.screenScale, _cylinderPosition.y/self.screenScale);
+}
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition
+{
+    _cylinderPosition = CGPointMake(cylinderPosition.x*self.screenScale, cylinderPosition.y*self.screenScale);
+}
+
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
 {
     [self setCylinderPosition:cylinderPosition animatedWithDuration:duration completion:^(void) {}];
@@ -187,12 +200,13 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     CGPoint p0 = self.cylinderPosition;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
-        _cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
+        self.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
     } completion:completion];
     
     [self.animationManager runAnimation:animation];
 }
 
+//CylinderAngle
 - (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration
 {
     [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:^(void) {}];
@@ -210,6 +224,17 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self.animationManager runAnimation:animation];
 }
 
+//CylinderRadius
+- (CGFloat)cylinderRadius
+{
+    return _cylinderRadius/self.screenScale;
+}
+
+- (void)setCylinderRadius:(CGFloat)cylinderRadius
+{
+    _cylinderRadius = cylinderRadius*self.screenScale;
+}
+
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^(void) {}];
@@ -220,7 +245,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     CGFloat r = self.cylinderRadius;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
-        _cylinderRadius = (1 - t)*r + t*cylinderRadius;
+        self.cylinderRadius = (1 - t)*r + t*cylinderRadius;
     } completion:completion];
     
     [self.animationManager runAnimation:animation];
@@ -534,8 +559,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (CGSize)minimumFullSizedTextureSize
 {
     //Compute the actual view size in the current screen scale
-    CGFloat scale = [[UIScreen mainScreen] scale];
-    CGSize actualViewSize = CGSizeMake(self.bounds.size.width*scale, self.bounds.size.height*scale);
+    CGSize actualViewSize = CGSizeMake(self.frame.size.width*self.screenScale, self.frame.size.height*self.screenScale);
     
     //Compute the closest, greater power of two
     CGSize size = CGSizeZero;
@@ -601,8 +625,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     CGRect r = CGRectMake(0, 0, view.bounds.size.width, view.bounds.size.height);
     CGContextClearRect(context, r);
-    CGContextTranslateCTM(context, 0, view.layer.bounds.size.height);
-    CGContextScaleCTM(context, 1, -1);
+    CGContextTranslateCTM(context, 0, view.layer.bounds.size.height/self.screenScale);
+    CGContextScaleCTM(context, 1, -1/self.screenScale);
     
     [view.layer renderInContext:context];
     
@@ -752,12 +776,13 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     if (!self.pageOpaque) {
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     }
     
-    glUniform2f(cylinderPositionHandle, self.cylinderPosition.x, self.cylinderPosition.y);
-    glUniform2f(cylinderDirectionHandle, cosf(self.cylinderAngle), sinf(self.cylinderAngle));
-    glUniform1f(cylinderRadiusHandle, self.cylinderRadius);
+    //Give the shader the raw values
+    glUniform2f(cylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+    glUniform2f(cylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+    glUniform1f(cylinderRadiusHandle, _cylinderRadius);
     
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
