@@ -44,29 +44,30 @@
     GLuint indexBuffer;
     GLuint elementCount; //Number of entries in the index buffer
     
+    //Handles for the curl shader variables.
+    GLuint positionHandle, texCoordHandle, mvpHandle, samplerHandle;
+    GLuint texSizeHandle;
+    GLuint cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
+    
     //Texture projected onto the two-triangle rectangle of the nextPage.
     GLuint nextPageTexture;
     
     //Very simple GPU program for the nextPage.
     GLuint nextPageProgram;
     
-    //Handles for the nextPageProgram variables.
-    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle, nextPageTexSizeHandle;
-    
     //Vertex buffer for the two-triangle rectangle of the nextPage.
     //No need for an index buffer. It is drawn as a triangle-strip.
     GLuint nextPageVertexBuffer;
+    
+    //Handles for the nextPageProgram variables.
+    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle, nextPageTexSizeHandle;
+    GLuint nextPageCylinderPositionHandle, nextPageCylinderDirectionHandle, nextPageCylinderRadiusHandle;
     
     //Viewport/view/screen size.
     GLint viewportWidth, viewportHeight;
     
     //Model-View-Proj matrix.
     GLfloat mvp[16];
-    
-    //Handles for the curl shader variables.
-    int positionHandle, texCoordHandle, mvpHandle, samplerHandle;
-    int texSizeHandle;
-    int cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
     
     //Position of any point in the cylinder axis projected on the xy plane.
     CGPoint _cylinderPosition;

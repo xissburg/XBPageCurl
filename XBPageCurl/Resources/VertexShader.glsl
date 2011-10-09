@@ -52,4 +52,3 @@ void main()
     gl_Position = u_mvpMatrix * v;
     v_texCoord = a_texCoord/u_texSize;
 }
-

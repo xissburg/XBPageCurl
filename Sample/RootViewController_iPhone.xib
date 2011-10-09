@@ -121,7 +121,7 @@
 								</object>
 								<int key="IBUIButtonType">1</int>
 								<string key="IBUINormalTitle">Uncurl</string>
-								<object class="NSColor" key="IBUIHighlightedTitleColor">
+								<object class="NSColor" key="IBUIHighlightedTitleColor" id="904805566">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MQA</bytes>
 								</object>
@@ -4709,7 +4709,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="620230456"/>
 								<string key="NSReuseIdentifierKey">_NS:613</string>
-								<reference key="IBUIBackgroundColor" ref="224436429"/>
+								<reference key="IBUIBackgroundColor" ref="904805566"/>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<bool key="IBUIMultipleTouchEnabled">YES</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>

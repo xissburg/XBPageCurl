@@ -519,11 +519,14 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         return NO;
     }
     
-    nextPagePositionHandle = glGetAttribLocation(nextPageProgram, "a_position");
-    nextPageTexCoordHandle = glGetAttribLocation(nextPageProgram, "a_texCoord");
-    nextPageMvpHandle      = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
-    nextPageSamplerHandle  = glGetUniformLocation(nextPageProgram, "s_tex");
-    nextPageTexSizeHandle  = glGetUniformLocation(nextPageProgram, "u_texSize");
+    nextPagePositionHandle          = glGetAttribLocation(nextPageProgram, "a_position");
+    nextPageTexCoordHandle          = glGetAttribLocation(nextPageProgram, "a_texCoord");
+    nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
+    nextPageSamplerHandle           = glGetUniformLocation(nextPageProgram, "s_tex");
+    nextPageTexSizeHandle           = glGetUniformLocation(nextPageProgram, "u_texSize");
+    nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
+    nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
+    nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
     
     return YES;
 }
@@ -709,7 +712,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration];
     
     //Allow interaction with back view
-    self.userInteractionEnabled = NO;
+    //self.userInteractionEnabled = NO;
     
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
@@ -803,6 +806,10 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     //Draw the nextPage if the nextPageTexture is not 0
     if (nextPageTexture != 0) {
         glUseProgram(nextPageProgram);
+        
+        glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+        glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+        glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
         
         glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
         glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));

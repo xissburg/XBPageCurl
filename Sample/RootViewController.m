@@ -7,6 +7,7 @@
 //
 
 #import "RootViewController.h"
+#import "XBPageCurlView.h"
 
 #define kDuration 0.6
 
@@ -47,10 +48,11 @@
     
     CGRect r = CGRectZero;
     r.size = self.view.bounds.size;
-    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
     [self.curlView drawViewOnFrontOfPage:self.messyView];
+    [self.curlView drawViewOnNextPage:self.backView];
     self.curlView.opaque = NO;
-    self.curlView.pageOpaque = NO;
+    //self.curlView.pageOpaque = NO;
 }
 
 - (void)viewDidUnload
