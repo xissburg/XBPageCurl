@@ -50,9 +50,8 @@
     r.size = self.view.bounds.size;
     self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
     [self.curlView drawViewOnFrontOfPage:self.messyView];
-    [self.curlView drawViewOnNextPage:self.backView];
     self.curlView.opaque = NO;
-    //self.curlView.pageOpaque = NO;
+    self.curlView.pageOpaque = YES;
 }
 
 - (void)viewDidUnload

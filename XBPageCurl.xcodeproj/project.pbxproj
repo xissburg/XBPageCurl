@@ -40,6 +40,8 @@
 		1B8C27271415C6510081F180 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27261415C6510081F180 /* main.m */; };
 		1B8C27431415C9660081F180 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8C27411415C8D60081F180 /* GHUnitIOS.framework */; };
 		1B8C27471415CB170081F180 /* XBAnimationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27451415CA510081F180 /* XBAnimationTest.m */; };
+		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
+		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +90,8 @@
 		1B8C27281415C6510081F180 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		1B8C27411415C8D60081F180 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../gh-unit/Project-iOS/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		1B8C27451415CA510081F180 /* XBAnimationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimationTest.m; sourceTree = "<group>"; };
+		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
+		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +221,8 @@
 		1B8BC4121429866F0048682B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */,
+				1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */,
 				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
 				1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */,
 				1B8BC4131429866F0048682B /* FragmentShader.glsl */,
@@ -332,6 +338,8 @@
 				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
 				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
 				1B8BC4301429866F0048682B /* VertexShader.glsl in Resources */,
+				1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */,
+				1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

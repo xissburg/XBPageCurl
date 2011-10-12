@@ -36,6 +36,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)createNextPageVertexBuffer;
 - (void)destroyNextPageVertexBuffer;
 - (void)destroyNextPageTexture;
+- (void)destroyNextPageShader;
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
@@ -108,9 +109,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     //Set shader texture scale
     glUseProgram(program);
     glUniform2f(texSizeHandle, textureWidth, textureHeight);
-    
-    glUseProgram(nextPageProgram);
-    glUniform2f(nextPageTexSizeHandle, textureWidth, textureHeight);
     glUseProgram(0);
     
     return YES;
@@ -504,8 +502,12 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (BOOL)setupNextPageShader
 {
-    GLuint vertexShader = [self loadShader:@"NextPageVertexShader.glsl" type:GL_VERTEX_SHADER];
-    GLuint fragmentShader = [self loadShader:@"NextPageFragmentShader.glsl" type:GL_FRAGMENT_SHADER];
+    [self destroyNextPageShader];
+    
+    NSString *vsFilename = nextPageTexture != 0? @"NextPageVertexShader.glsl": @"NextPageNoTextureVertexShader.glsl";
+    NSString *fsFilename = nextPageTexture != 0? @"NextPageFragmentShader.glsl": @"NextPageNoTextureFragmentShader.glsl";
+    GLuint vertexShader = [self loadShader:vsFilename type:GL_VERTEX_SHADER];
+    GLuint fragmentShader = [self loadShader:fsFilename type:GL_FRAGMENT_SHADER];
     nextPageProgram = glCreateProgram();
     
     glAttachShader(nextPageProgram, vertexShader);
@@ -527,6 +529,10 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
     nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
     nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
+    
+    glUseProgram(nextPageProgram);
+    glUniform2f(nextPageTexSizeHandle, textureWidth, textureHeight);
+    glUseProgram(0);
     
     return YES;
 }
@@ -668,6 +674,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     }
     
     [self drawImage:image onTexture:nextPageTexture];
+    [self setupNextPageShader];
 }
 
 - (void)drawViewOnNextPage:(UIView *)view
@@ -682,6 +689,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     }
     
     [self drawView:view onTexture:nextPageTexture];
+    [self setupNextPageShader];
 }
          
 - (void)destroyNextPageTexture
@@ -712,7 +720,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration];
     
     //Allow interaction with back view
-    //self.userInteractionEnabled = NO;
+    self.userInteractionEnabled = NO;
     
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
@@ -803,27 +811,27 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         glDisable(GL_BLEND);
     }
     
-    //Draw the nextPage if the nextPageTexture is not 0
+    //Draw the nextPage
+    glUseProgram(nextPageProgram);
+    
+    glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+    glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+    glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(nextPagePositionHandle);
+    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+    
     if (nextPageTexture != 0) {
-        glUseProgram(nextPageProgram);
-        
-        glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-        glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-        glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
-        
-        glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-        glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-        glEnableVertexAttribArray(nextPagePositionHandle);
         glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
         glEnableVertexAttribArray(nextPageTexCoordHandle);
-        glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
-        
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, nextPageTexture);
         glUniform1i(nextPageSamplerHandle, 0);
-        
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+        
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     if (_antialiasing) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
