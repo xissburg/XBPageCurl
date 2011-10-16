@@ -45,13 +45,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    CGRect r = CGRectZero;
-    r.size = self.view.bounds.size;
-    self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
-    [self.curlView drawViewOnFrontOfPage:self.messyView];
-    self.curlView.opaque = NO;
-    self.curlView.pageOpaque = YES;
 }
 
 - (void)viewDidUnload
@@ -70,9 +63,13 @@
 
 - (IBAction)curlButtonAction:(id)sender
 {
-    CGRect frame = self.curlView.frame;
+    CGRect r = self.messyView.frame;
+    self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
+    [self.curlView drawViewOnFrontOfPage:self.messyView];
+    self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
+    self.curlView.pageOpaque = YES; //The page to be curled has no transparency
     
-    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(frame.size.width/6, frame.size.height/2) cylinderAngle:M_PI/2.3 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/6, r.size.height/2) cylinderAngle:M_PI/2.4 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
 }
 
 - (IBAction)uncurlButtonAction:(id)sender

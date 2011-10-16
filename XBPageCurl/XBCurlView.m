@@ -42,6 +42,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)setupMVP;
 - (CGSize)minimumFullSizedTextureSize;
 - (GLuint)generateTexture;
+- (void)destroyTextures;
 - (void)drawImage:(UIImage *)image onTexture:(GLuint)texture;
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture;
 - (void)draw:(CADisplayLink *)sender;
@@ -145,15 +146,18 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)dealloc
 {
-    self.context = nil;
+    [EAGLContext setCurrentContext:self.context]; //Set the context before performing OpenGl operations
     [self.displayLink invalidate];
     self.displayLink = nil;
     self.animationManager = nil;
     self.curlingView = nil;
+    [self destroyTextures];
     [self destroyVertexBuffer];
     [self destroyNextPageVertexBuffer];
     [self destroyShaders];
     [self destroyFramebuffer];
+    //Keep this last one as the last one
+    self.context = nil;
 
     [super dealloc];
 }
@@ -169,7 +173,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)layoutSubviews
 {
     [EAGLContext setCurrentContext:self.context];
-    [self destroyFramebuffer];
     [self createFramebuffer];
     [self setupMVP];
 }
@@ -254,6 +257,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (BOOL)createFramebuffer
 {
+    [self destroyFramebuffer];
+    
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     
@@ -648,6 +653,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)drawImageOnFrontOfPage:(UIImage *)image
 {
+    [EAGLContext setCurrentContext:self.context];
     [self drawImage:image onTexture:frontTexture];
     
     //Force a redraw to avoid glitches
@@ -656,6 +662,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)drawViewOnFrontOfPage:(UIView *)view
 {
+    [EAGLContext setCurrentContext:self.context];
     [self drawView:view onTexture:frontTexture];
     
     //Force a redraw to avoid glitches
@@ -664,6 +671,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)drawImageOnNextPage:(UIImage *)image
 {
+    [EAGLContext setCurrentContext:self.context];
+    
     if (image == nil) {
         [self destroyNextPageTexture];
         return;
@@ -679,6 +688,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)drawViewOnNextPage:(UIView *)view
 {
+    [EAGLContext setCurrentContext:self.context];
+    
     if (view == nil) {
         [self destroyNextPageTexture];
         return;
@@ -696,6 +707,14 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 {
     glDeleteTextures(1, &nextPageTexture);
     nextPageTexture = 0;
+}
+
+- (void)destroyTextures
+{
+    glDeleteTextures(1, &frontTexture);
+    frontTexture = 0;
+    
+    [self destroyNextPageTexture];
 }
 
 
@@ -724,7 +743,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
-    [self.curlingView removeFromSuperview];
+    self.curlingView.hidden = YES;
     
     //Start the rendering loop
     [self startAnimating];
@@ -739,7 +758,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
     [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
-        [self.superview addSubview:self.curlingView];
+        self.curlingView.hidden = NO;
         [self removeFromSuperview];
         //Stop the rendering loop since the curlView was removed from its superview nad hence won't appear
         [self stopAnimating];
