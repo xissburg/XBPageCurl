@@ -784,30 +784,64 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)draw:(CADisplayLink *)sender
 {
-    //Update all animations
+    /* Update all animations */
     [self.animationManager update:sender.duration];
     
-    //Render
+    /* Render everything */
     [EAGLContext setCurrentContext:self.context];
     
     glBindFramebuffer(GL_FRAMEBUFFER, _antialiasing? sampleFramebuffer: framebuffer);
     glViewport(0, 0, viewportWidth, viewportHeight);
     
+    /* Clear framebuffer */
     const CGFloat *color = CGColorGetComponents(self.backgroundColor.CGColor);
     glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glUseProgram(program);
+    /* Enable culling. First lets render the front facing triangles. */
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+    /* Disable depth testing. First we draw the nextPage and the previousPage, then, on top of
+     * these we draw the front facing triangles of the curled mesh and finally the back facing
+     * triangles of the curled mesh, hence no depth testing is required. */
+    glDisable(GL_DEPTH_TEST);
     
+    /* If the page is not opaque (the curled mesh) enable alpha blending. The glBlendFunc is
+     * setup that way bacause the texture has got pre-multiplied alpha. */
     if (!self.pageOpaque) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     }
     
-    //Give the shader the raw values
+    /* Draw the nextPage */
+    glUseProgram(nextPageProgram);
+    
+    glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+    glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+    glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(nextPagePositionHandle);
+    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+    
+    //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
+    if (nextPageTexture != 0) {
+        glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+        glEnableVertexAttribArray(nextPageTexCoordHandle);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
+        glUniform1i(nextPageSamplerHandle, 0);
+    }
+        
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    
+    /* Draw the previousPage if any */
+    
+    /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
+    glUseProgram(program);
+    
     glUniform2f(cylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
     glUniform2f(cylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
     glUniform1f(cylinderRadiusHandle, _cylinderRadius);
@@ -826,32 +860,16 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
+    /* Next draw the front faces (the buffers and the shader are already set) */
+    glCullFace(GL_FRONT);
+    glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+    
+    //Disable blending for now
     if (!self.pageOpaque) {
         glDisable(GL_BLEND);
     }
     
-    //Draw the nextPage
-    glUseProgram(nextPageProgram);
-    
-    glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-    glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-    glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(nextPagePositionHandle);
-    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
-    
-    if (nextPageTexture != 0) {
-        glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-        glEnableVertexAttribArray(nextPageTexCoordHandle);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
-        glUniform1i(nextPageSamplerHandle, 0);
-    }
-        
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
+    /* If antialiasing is enabled, draw on the multisampling buffers */
     if (_antialiasing) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
@@ -861,6 +879,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
     }
     
+    /* Finally, present, swap buffers, whatever */
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
