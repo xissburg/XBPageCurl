@@ -33,7 +33,7 @@
     //Texture projected onto the front of the curling mesh.
     GLuint frontTexture;
     
-    //Texture projected onto the back of the curling mesh.
+    //Texture projected onto the back of the curling mesh for double-sided pages.
     GLuint backTexture;
     
     //GPU program for the curling mesh.
@@ -115,6 +115,9 @@
 
 - (void)drawImageOnFrontOfPage:(UIImage *)image;
 - (void)drawViewOnFrontOfPage:(UIView *)view;
+
+- (void)drawImageOnBackOfPage:(UIImage *)image;
+- (void)drawViewOnBackOfPage:(UIView *)view;
 
 - (void)drawImageOnNextPage:(UIImage *)image;
 - (void)drawViewOnNextPage:(UIView *)view;

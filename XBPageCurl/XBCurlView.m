@@ -37,6 +37,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)destroyNextPageVertexBuffer;
 - (void)destroyNextPageTexture;
 - (void)destroyNextPageShader;
+- (void)destroyBackTexture;
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
@@ -669,6 +670,44 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self draw:self.displayLink];
 }
 
+- (void)drawImageOnBackOfPage:(UIImage *)image
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    if (image == nil) {
+        [self destroyBackTexture];
+        return;
+    }
+    
+    if (backTexture == 0) {
+       backTexture = [self generateTexture];
+    }
+    
+    [self drawImage:image onTexture:backTexture];
+}
+
+- (void)drawViewOnBackOfPage:(UIView *)view
+{
+    [EAGLContext setCurrentContext:self.context];
+
+    if (view == nil) {
+        [self destroyBackTexture];
+        return;
+    }
+    
+    if (backTexture == 0) {
+        backTexture = [self generateTexture];
+    }
+    
+    [self drawView:view onTexture:backTexture];
+}
+
+- (void)destroyBackTexture
+{
+    glDeleteTextures(1, &backTexture);
+    backTexture = 0;
+}
+
 - (void)drawImageOnNextPage:(UIImage *)image
 {
     [EAGLContext setCurrentContext:self.context];
@@ -715,6 +754,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     frontTexture = 0;
     
     [self destroyNextPageTexture];
+    [self destroyBackTexture];
 }
 
 
@@ -862,6 +902,12 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     /* Next draw the front faces (the buffers and the shader are already set) */
     glCullFace(GL_FRONT);
+    
+    if (backTexture != 0) {
+        glBindTexture(GL_TEXTURE_2D, backTexture);
+        glUniform1i(samplerHandle, 0);
+    }
+    
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
     //Disable blending for now
