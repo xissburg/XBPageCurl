@@ -619,6 +619,12 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     CGContextTranslateCTM(context, 0, height/self.screenScale);
     CGContextScaleCTM(context, 1, -1/self.screenScale);
     
+    //Flip the back texture horizontally
+    if (texture == backTexture) {
+        CGContextTranslateCTM(context, width/self.screenScale, 0);
+        CGContextScaleCTM(context, -1/self.screenScale, 1);
+    }
+    
     CGContextDrawImage(context, r, image.CGImage);
     
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
@@ -640,7 +646,13 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     CGContextClearRect(context, r);
     CGContextTranslateCTM(context, 0, view.layer.bounds.size.height/self.screenScale);
     CGContextScaleCTM(context, 1, -1/self.screenScale);
-    
+
+    //Flip the back texture horizontally
+    if (texture == backTexture) {
+        CGContextTranslateCTM(context, view.layer.bounds.size.width/self.screenScale, 0);
+        CGContextScaleCTM(context, -1/self.screenScale, 1);
+    }
+
     [view.layer renderInContext:context];
     
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
