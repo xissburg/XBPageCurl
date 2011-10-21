@@ -97,6 +97,15 @@
 - (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
 - (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing;
 
+/**
+ * The following set of methods allows you to set the cylinder properties, namely, the (x,y) position of its axis,
+ * the angle of its axis and its radius. The position is specified in UIKit's coordinate system: origin at the top
+ * left corner, x increases towards the right and y increases towards the bottom. In the zoomed-out two-page 
+ * configuration though, the origin is at the center horizontally and at the top vertically, but the cylinder axis
+ * cant pass the central, vertical axis (which holds the page in place). The angle is specified in radians and
+ * increases in counter clockwise direction. The radius allows you to control the curvature of the curled section
+ * of the page.
+ */
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration;
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
 - (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration;
@@ -108,7 +117,9 @@
  * Starts/stops the CADisplayLink that updates and redraws everything in this view.
  * This should be called manually whenever you are going to present this view and change its properties 
  * (for example, before adding it as subview and changing the cylinder properties). stopAnimating should
- * be called whenever you don't need to animate this anymore (for example, after removing it from superview).
+ * be called whenever you don't need to animate this anymore (for example, after removing it from superview),
+ * otherwise your XBCurlView instance won't be deallocated because, insternally, the CADisplayLink retains its
+ * target which is the XBCurlView instance itself.
  */
 - (void)startAnimating;
 - (void)stopAnimating;
@@ -119,6 +130,13 @@
 - (void)drawImageOnBackOfPage:(UIImage *)image;
 - (void)drawViewOnBackOfPage:(UIView *)view;
 
+/*
+ * The nextPage is a the page that is rendered behind the curled page. You can set the XBCurlView opaque property
+ * to NO in order to see whatever view is behind the XBCurlView through the pixels not filled by the curled page.
+ * You can also set it to YES and draw something in a texture to be rendered as the nextPage, using one of the
+ * methods below. Depending on your configuration and needs, it may be more efficient to draw just a texture than
+ * a full view. Also, they say a view backed by an CAEAGLLayer should be opaque for a better performance.
+ */
 - (void)drawImageOnNextPage:(UIImage *)image;
 - (void)drawViewOnNextPage:(UIView *)view;
 
