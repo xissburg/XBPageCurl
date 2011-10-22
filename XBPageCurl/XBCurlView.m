@@ -44,8 +44,13 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (CGSize)minimumFullSizedTextureSize;
 - (GLuint)generateTexture;
 - (void)destroyTextures;
+
 - (void)drawImage:(UIImage *)image onTexture:(GLuint)texture;
+- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal;
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture;
+- (void)drawView:(UIView *)view onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal;
+- (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock;
+
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -606,26 +611,19 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return tex;
 }
 
-- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture
+- (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock
 {
-    GLuint width = CGImageGetWidth(image.CGImage);
-    GLuint height = CGImageGetHeight(image.CGImage);
-    CGSize imageSize = CGSizeMake(textureWidth, textureHeight);
-    UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+    CGSize imageSize = CGSizeMake(textureWidth/self.screenScale, textureHeight/self.screenScale);
+    UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.screenScale);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGRect r = CGRectMake(0, 0, width, height);
     CGContextClearRect(context, r);
-    CGContextTranslateCTM(context, 0, height/self.screenScale);
-    CGContextScaleCTM(context, 1, -1/self.screenScale);
+    CGContextSaveGState(context);
     
-    //Flip the back texture horizontally
-    if (texture == backTexture) {
-        CGContextTranslateCTM(context, width/self.screenScale, 0);
-        CGContextScaleCTM(context, -1/self.screenScale, 1);
-    }
+    drawBlock(context);
     
-    CGContextDrawImage(context, r, image.CGImage);
+    CGContextRestoreGState(context);
     
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
@@ -636,32 +634,49 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     UIGraphicsEndImageContext();
 }
 
+- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture
+{
+    [self drawImage:image onTexture:texture flipHorizontal:NO];
+}
+
+- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal
+{
+    GLuint width = CGImageGetWidth(image.CGImage);
+    GLuint height = CGImageGetHeight(image.CGImage);
+    
+    [self drawOnTexture:texture width:width height:height drawBlock:^(CGContextRef context) {
+        if (flipHorizontal) {
+            CGContextTranslateCTM(context, width, 0);
+            CGContextScaleCTM(context, -1, 1);
+        }
+        else {
+            CGContextTranslateCTM(context, 0, 0);
+            CGContextScaleCTM(context, 1, 1);
+        }
+        
+        CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
+    }];
+}
+
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture
 {
-    CGSize imageSize = CGSizeMake(textureWidth, textureHeight);
-    UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGRect r = CGRectMake(0, 0, view.bounds.size.width, view.bounds.size.height);
-    CGContextClearRect(context, r);
-    CGContextTranslateCTM(context, 0, view.layer.bounds.size.height/self.screenScale);
-    CGContextScaleCTM(context, 1, -1/self.screenScale);
+    [self drawView:view onTexture:texture flipHorizontal:NO];
+}
 
-    //Flip the back texture horizontally
-    if (texture == backTexture) {
-        CGContextTranslateCTM(context, view.layer.bounds.size.width/self.screenScale, 0);
-        CGContextScaleCTM(context, -1/self.screenScale, 1);
-    }
+- (void)drawView:(UIView *)view onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal
+{
+    [self drawOnTexture:texture width:view.bounds.size.width height:view.bounds.size.height drawBlock:^(CGContextRef context) {
+        if (flipHorizontal) {
+            CGContextTranslateCTM(context, view.layer.bounds.size.width, view.layer.bounds.size.height);
+            CGContextScaleCTM(context, -1, -1);
+        }
+        else {
+            CGContextTranslateCTM(context, 0, view.layer.bounds.size.height);
+            CGContextScaleCTM(context, 1, -1);
+        }
 
-    [view.layer renderInContext:context];
-    
-    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
-    
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
-    UIGraphicsEndImageContext();
+        [view.layer renderInContext:context];
+    }];
 }
 
 - (void)drawImageOnFrontOfPage:(UIImage *)image
@@ -695,7 +710,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
        backTexture = [self generateTexture];
     }
     
-    [self drawImage:image onTexture:backTexture];
+    [self drawImage:image onTexture:backTexture flipHorizontal:YES];
 }
 
 - (void)drawViewOnBackOfPage:(UIView *)view
@@ -711,7 +726,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         backTexture = [self generateTexture];
     }
     
-    [self drawView:view onTexture:backTexture];
+    [self drawView:view onTexture:backTexture flipHorizontal:YES];
 }
 
 - (void)destroyBackTexture
@@ -726,6 +741,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     if (image == nil) {
         [self destroyNextPageTexture];
+        [self setupNextPageShader];
         return;
     }
     
@@ -743,6 +759,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     if (view == nil) {
         [self destroyNextPageTexture];
+        [self setupNextPageShader];
         return;
     }
     
