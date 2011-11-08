@@ -1,14 +1,14 @@
 //
-//  RootViewController_iPad.m
+//  SimpleCurlViewController_iPad.m
 //  XBPageCurl
 //
 //  Created by xiss burg on 9/13/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "RootViewController_iPad.h"
+#import "SimpleCurlViewController_iPad.h"
 
-@implementation RootViewController_iPad
+@implementation SimpleCurlViewController_iPad
 @synthesize webView=_webView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil

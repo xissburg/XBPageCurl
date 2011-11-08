@@ -2,18 +2,26 @@
 //  RootViewController.m
 //  XBPageCurl
 //
-//  Created by xiss burg on 8/27/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by xiss burg on 11/7/11.
+//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import "RootViewController.h"
-#import "XBPageCurlView.h"
 
-#define kDuration 0.6
+#define kNameKey @"name"
+#define kNibNameKey @"nib"
+
+
+@interface RootViewController ()
+
+@property (nonatomic, retain) NSMutableArray *dataArray;
+
+@end
+
 
 @implementation RootViewController
 
-@synthesize messyView, pickerView, curlView, backView;
+@synthesize tableView=_tableView, dataArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -24,11 +32,10 @@
     return self;
 }
 
-- (void)dealloc {
-    self.messyView = nil;
-    self.pickerView = nil;
-    self.curlView = nil;
-    self.backView = nil;
+- (void)dealloc
+{
+    self.tableView = nil;
+    self.dataArray = nil;
     [super dealloc];
 }
 
@@ -45,15 +52,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.title = @"XBPageCurl Demos";
+    self.dataArray = [NSMutableArray array];
+    [self.dataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Simple Curl", kNameKey, @"SimpleCurlViewController", kNibNameKey, nil]];
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    self.messyView = nil;
-    self.pickerView = nil;
-    self.curlView = nil;
-    self.backView = nil;
+    self.tableView = nil;
+    self.dataArray = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -61,30 +69,50 @@
     return YES;
 }
 
-- (IBAction)curlButtonAction:(id)sender
+
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    CGRect r = self.messyView.frame;
-    self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
-    [self.curlView drawViewOnFrontOfPage:self.messyView];
-    [self.curlView drawImageOnBackOfPage:[UIImage imageNamed:@"appleStore"]];
-    self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
-    self.curlView.pageOpaque = YES; //The page to be curled has no transparency
+    return self.dataArray.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    static NSString *cellIdentifier = @"cell";
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil) {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    }
     
-    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/6, r.size.height/2) cylinderAngle:M_PI/2.4 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+    NSDictionary *item = [self.dataArray objectAtIndex:indexPath.row];
+    cell.textLabel.text = [item objectForKey:kNameKey];
+
+    return cell;
 }
 
-- (IBAction)uncurlButtonAction:(id)sender
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self.curlView uncurlAnimatedWithDuration:kDuration];
-}
-
-
-#pragma mark - UITextFieldDelegate
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField 
-{
-    [textField resignFirstResponder];
-    return YES;
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    NSDictionary *item = [self.dataArray objectAtIndex:indexPath.row];
+    NSString *baseClassName = [item objectForKey:kNibNameKey];
+    NSString *postfix = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad? @"_iPad": @"_iPhone";
+    NSString *className = [baseClassName stringByAppendingString:postfix];
+    Class viewControllerClass = NSClassFromString(className);
+    
+    if (viewControllerClass == nil) {
+        viewControllerClass = NSClassFromString(baseClassName);
+    }
+    
+    UIViewController *viewController = [[viewControllerClass alloc] initWithNibName:className bundle:nil];
+    [self.navigationController pushViewController:viewController animated:YES];
+    [viewController release];
 }
 
 @end

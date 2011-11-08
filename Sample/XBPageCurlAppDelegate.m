@@ -7,7 +7,6 @@
 //
 
 #import "XBPageCurlAppDelegate.h"
-#import "RootViewController_iPad.h"
 
 @implementation XBPageCurlAppDelegate
 
@@ -16,13 +15,15 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad) {
-        _rootViewController = [[RootViewController_iPad alloc] initWithNibName:@"RootViewController_iPad" bundle:nil];
+        _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPad" bundle:nil];
     }
     else {
         _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPhone" bundle:nil];
     }
     
-    [self.window setRootViewController:self.rootViewController];
+    UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:self.rootViewController] autorelease];
+    
+    [self.window setRootViewController:navigationController];
     [self.window makeKeyAndVisible];
     return YES;
 }
