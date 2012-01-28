@@ -19,7 +19,6 @@ typedef struct _Vertex
 } Vertex;
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
-void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 @interface XBCurlView ()
 
@@ -967,19 +966,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 
 #pragma mark - Functions
-
-void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out)
-{
-    for (int i=0; i<4; ++i) {
-        for (int j=0; j<4; ++j) {
-            GLfloat f = 0.f;
-            for (int k=0; k<4; ++k) {
-                f += A[i*4+k] * B[k*4+j];
-            }
-            out[i*4+j] = f;
-        }
-    }
-}
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far)
 {
