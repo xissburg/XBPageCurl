@@ -9,12 +9,16 @@
 #import <UIKit/UIKit.h>
 #import "XBPageCurlView.h"
 
-@interface PageCurlViewController : UIViewController
+@interface PageCurlViewController : UIViewController <XBPageCurlViewDelegate>
 
-@property (nonatomic, retain) IBOutlet UIButton *curlButton;
+@property (nonatomic, retain) IBOutlet UIView *frontView;
+@property (nonatomic, retain) IBOutlet UIView *backView;
+@property (nonatomic, retain) IBOutlet UIImageView *curlImage;
 @property (nonatomic, retain) XBPageCurlView *pageCurlView;
+@property (nonatomic, assign) BOOL pageIsCurled;
+@property (nonatomic, assign) XBSnappingPoint *bottomSnappingPoint;
 
 - (IBAction)buttonAction:(id)sender;
-- (IBAction)curlButtonTouchDown:(id)sender;
+- (IBAction)backButtonAction:(id)sender;
 
 @end

@@ -13,5 +13,6 @@
 @property (nonatomic, assign) CGPoint position;
 @property (nonatomic, assign) CGFloat angle;
 @property (nonatomic, assign) CGFloat radius;
+@property (nonatomic, assign) int tag;
 
 @end

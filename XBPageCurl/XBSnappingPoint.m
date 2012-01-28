@@ -10,6 +10,6 @@
 
 @implementation XBSnappingPoint
 
-@synthesize position, angle, radius;
+@synthesize position, angle, radius, tag;
 
 @end

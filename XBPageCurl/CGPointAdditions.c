@@ -41,7 +41,7 @@ CGPoint CGPointMul(CGPoint p, CGFloat s)
 
 CGFloat CGPointToLineDistance(CGPoint p, CGPoint q, CGPoint v)
 {
-    return  sqrtf(CGPointToLineDistance(p, q, v));
+    return  sqrtf(CGPointToLineDistanceSq(p, q, v));
 }
 
 CGFloat CGPointToLineDistanceSq(CGPoint p, CGPoint q, CGPoint v)

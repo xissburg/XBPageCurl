@@ -41,7 +41,7 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesBegan:touches withEvent:event];
+    //[super touchesBegan:touches withEvent:event];
     CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
     startPickingPosition.x = self.bounds.size.width;
@@ -61,7 +61,7 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesMoved:touches withEvent:event];
+    //[super touchesMoved:touches withEvent:event];
     CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
     self.cylinderPosition = p;
@@ -77,7 +77,7 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesEnded:touches withEvent:event];
+    //[super touchesEnded:touches withEvent:event];
     
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
@@ -109,7 +109,7 @@
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesCancelled:touches withEvent:event];
+    //[super touchesCancelled:touches withEvent:event];
 }
 
 @end
