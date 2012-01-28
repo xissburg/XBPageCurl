@@ -7,25 +7,36 @@
 //
 
 #import "XBPageCurlView.h"
+#import "XBSnappingPoint.h"
+#import "CGPointAdditions.h"
 
-#define kDuration 1
+#define kDuration 0.3
+
+
+@interface XBPageCurlView ()
+
+
+
+@end
 
 
 @implementation XBPageCurlView
 
-@synthesize delegate;
+@synthesize delegate, snappingPoints, snappingEnabled;
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
+        self.snappingPoints = [NSMutableArray array];
+        self.snappingEnabled = NO;
     }
     return self;
 }
 
 - (void)dealloc
 {
+    self.snappingPoints = nil;
     [super dealloc];
 }
 
@@ -71,6 +82,30 @@
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesEnded:touches withEvent:event];
+    
+    if (self.snappingEnabled && self.snappingPoints.count > 0) {
+        XBSnappingPoint *closestSnappingPoint = nil;
+        CGFloat d = 123456789.f;
+        CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
+        //Find the snapping point closest to the cylinder axis
+        for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
+            //Compute the distance between the snappingPoint.position and the cylinder axis
+            CGPoint p = snappingPoint.position;
+            CGPoint w = CGPointSub(p, _cylinderPosition);
+            CGFloat s = CGPointDot(w, v)/CGPointDot(v, v);
+            CGPoint q = CGPointAdd(_cylinderPosition, CGPointMul(v, s));
+            CGFloat dSq = CGPointLengthSq(CGPointSub(q, p));
+            
+            if (dSq < d) {
+                closestSnappingPoint = snappingPoint;
+                d = dSq;
+            }
+        }
+        
+        [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
+        [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
+        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration];
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event

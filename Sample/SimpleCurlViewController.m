@@ -8,6 +8,7 @@
 
 #import "SimpleCurlViewController.h"
 #import "XBPageCurlView.h"
+#import "XBSnappingPoint.h"
 
 #define kDuration 0.6
 
@@ -55,13 +56,28 @@
 - (IBAction)curlButtonAction:(id)sender
 {
     CGRect r = self.messyView.frame;
-    self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
+    XBPageCurlView *pageCurlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
+    self.curlView = pageCurlView;
     [self.curlView drawViewOnFrontOfPage:self.messyView];
     //[self.curlView drawImageOnNextPage:[UIImage imageNamed:@"appleStore"]];
     self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
     self.curlView.pageOpaque = YES; //The page to be curled has no transparency
     
     [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/6, r.size.height/2) cylinderAngle:M_PI/2.4 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+    
+    pageCurlView.snappingEnabled = YES;
+    
+    XBSnappingPoint *p = [[[XBSnappingPoint alloc] init] autorelease];
+    p.position = CGPointMake(120, 100);
+    p.angle = M_PI/3;
+    p.radius = 40;
+    [pageCurlView.snappingPoints addObject:p];
+    
+    p = [[[XBSnappingPoint alloc] init] autorelease];
+    p.position = CGPointMake(320, 230);
+    p.angle = M_PI/2;
+    p.radius = 10;
+    [pageCurlView.snappingPoints addObject:p];
 }
 
 - (IBAction)uncurlButtonAction:(id)sender
