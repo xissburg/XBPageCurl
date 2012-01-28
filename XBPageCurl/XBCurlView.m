@@ -822,9 +822,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         [self stopAnimating];
     }];
     
-    //Allow interaction with back view
-    // self.userInteractionEnabled = NO;
-    
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
     self.curlingView.hidden = YES;

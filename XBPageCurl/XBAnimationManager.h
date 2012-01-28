@@ -11,7 +11,11 @@
 
 @class XBAnimation;
 
-
+/**
+ * XBAnimationManager
+ * Manages a set of animations. Animations can be added and removed manually and they are automatically removed after
+ * they're finished. The update: method must be called continuously with the elapsed time.
+ */
 @interface XBAnimationManager : NSObject {
     NSMutableDictionary *_animations;
 }

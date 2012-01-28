@@ -83,13 +83,19 @@
 }
 
 @property (nonatomic, readonly) BOOL antialiasing;
-@property (nonatomic, assign) BOOL pageOpaque;
+@property (nonatomic, assign) BOOL pageOpaque; // Whether the region behind the curl mesh/path should be opaque/transparent
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
 @property (nonatomic, assign) CGPoint cylinderPosition;
 @property (nonatomic, assign) CGFloat cylinderAngle;
 @property (nonatomic, assign) CGFloat cylinderRadius;
 
+/**
+ * Initializers
+ * The horizontalResolution: and verticalResolution arguments determine how many rows anc colums of quads (two triangles) the page
+ * curling 3D mesh should have. By default, it uses 1/10th of the view size, which is good enough for most situations. You should
+ * only use a higher resolution if you want to use a very low cylinder radius, below 20.
+ */
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
 - (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing;
@@ -127,8 +133,8 @@
 - (void)drawImageOnBackOfPage:(UIImage *)image;
 - (void)drawViewOnBackOfPage:(UIView *)view;
 
-/*
- * The nextPage is a the page that is rendered behind the curled page. You can set the XBCurlView opaque property
+/**
+ * The nextPage is a page that is rendered behind the curled page. You can set the XBCurlView opaque property
  * to NO in order to see whatever view is behind the XBCurlView through the pixels not filled by the curled page.
  * You can also set it to YES and draw something in a texture to be rendered as the nextPage, using one of the
  * methods below. Depending on your configuration and needs, it may be more efficient to draw just a texture than
@@ -137,6 +143,10 @@
 - (void)drawImageOnNextPage:(UIImage *)image;
 - (void)drawViewOnNextPage:(UIView *)view;
 
+/**
+ * The following methods allow you to curl a view without much code. Just choose the cylinder properties and go. Later you can uncurl it.
+ * It adds and removes itself to/from the target view automatically.
+ */
 - (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration;
 
