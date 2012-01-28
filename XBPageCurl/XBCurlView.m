@@ -808,7 +808,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration];
     
     //Allow interaction with back view
-    self.userInteractionEnabled = NO;
+    // self.userInteractionEnabled = NO;
     
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];

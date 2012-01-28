@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
+		1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742B714CD038D00BCADCF /* CGPointAdditions.c */; };
+		1B8742BF14CD07DA00BCADCF /* PageCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */; };
+		1B8742C014CD07DA00BCADCF /* PageCurlViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8742BE14CD07DA00BCADCF /* PageCurlViewController.xib */; };
 		1B8816A61401E4F000D579EF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A51401E4F000D579EF /* UIKit.framework */; };
 		1B8816A81401E4F000D579EF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A71401E4F000D579EF /* Foundation.framework */; };
 		1B8816AA1401E4F000D579EF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A91401E4F000D579EF /* CoreGraphics.framework */; };
@@ -48,6 +52,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBSnappingPoint.h; sourceTree = "<group>"; };
+		1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBSnappingPoint.m; sourceTree = "<group>"; };
+		1B8742B714CD038D00BCADCF /* CGPointAdditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CGPointAdditions.c; sourceTree = "<group>"; };
+		1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CGPointAdditions.h; sourceTree = "<group>"; };
+		1B8742BC14CD07DA00BCADCF /* PageCurlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PageCurlViewController.h; path = iPhone/PageCurlViewController.h; sourceTree = "<group>"; };
+		1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PageCurlViewController.m; path = iPhone/PageCurlViewController.m; sourceTree = "<group>"; };
+		1B8742BE14CD07DA00BCADCF /* PageCurlViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PageCurlViewController.xib; sourceTree = "<group>"; };
 		1B8816A11401E4F000D579EF /* XBPageCurl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBPageCurl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B8816A51401E4F000D579EF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1B8816A71401E4F000D579EF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -170,6 +181,8 @@
 				1BE4628414677E160013C1C6 /* RootViewController.m */,
 				1B8BC4071429866F0048682B /* SimpleCurlViewController.h */,
 				1B8BC4081429866F0048682B /* SimpleCurlViewController.m */,
+				1B8742BC14CD07DA00BCADCF /* PageCurlViewController.h */,
+				1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */,
 				1B8BC3F91429866F0048682B /* iPad */,
 				1B8BC3FE1429866F0048682B /* iPhone */,
 				1B8BC4351429875B0048682B /* Supporting Files */,
@@ -200,6 +213,7 @@
 				1B8BC4021429866F0048682B /* XBPageCurlAppDelegate_iPhone.m */,
 				1B8BC40C1429866F0048682B /* SimpleCurlViewController_iPhone.xib */,
 				1BE4628514677E160013C1C6 /* RootViewController_iPhone.xib */,
+				1B8742BE14CD07DA00BCADCF /* PageCurlViewController.xib */,
 			);
 			path = iPhone;
 			sourceTree = "<group>";
@@ -225,6 +239,10 @@
 				1B8BC41C1429866F0048682B /* XBCurlView.m */,
 				1B8BC41D1429866F0048682B /* XBPageCurlView.h */,
 				1B8BC41E1429866F0048682B /* XBPageCurlView.m */,
+				1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */,
+				1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */,
+				1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */,
+				1B8742B714CD038D00BCADCF /* CGPointAdditions.c */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
@@ -356,6 +374,7 @@
 				1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */,
 				1BE4628714677E160013C1C6 /* RootViewController_iPhone.xib in Resources */,
 				1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */,
+				1B8742C014CD07DA00BCADCF /* PageCurlViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +404,9 @@
 				1B8BC4331429866F0048682B /* XBCurlView.m in Sources */,
 				1B8BC4341429866F0048682B /* XBPageCurlView.m in Sources */,
 				1BE4628614677E160013C1C6 /* RootViewController.m in Sources */,
+				1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */,
+				1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */,
+				1B8742BF14CD07DA00BCADCF /* PageCurlViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,5 +33,7 @@ typedef enum {
 }
 
 @property (nonatomic, assign) id<XBPageCurlViewDelegate> delegate;
+@property (nonatomic, assign) BOOL snappingEnabled;
+@property (nonatomic, retain) NSMutableArray *snappingPoints;
 
 @end
