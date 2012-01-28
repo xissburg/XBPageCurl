@@ -18,4 +18,10 @@ CGFloat CGPointLength(CGPoint p);
 CGFloat CGPointLengthSq(CGPoint p);
 CGPoint CGPointMul(CGPoint p, CGFloat s);
 
+/**
+ * Returns the distance between the point p and the line with direction v (not necessarily normalized) and containing the point q.
+ */
+CGFloat CGPointToLineDistance(CGPoint p, CGPoint q, CGPoint v);
+CGFloat CGPointToLineDistanceSq(CGPoint p, CGPoint q, CGPoint v);
+
 #endif

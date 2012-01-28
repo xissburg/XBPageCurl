@@ -55,6 +55,7 @@
     self.title = @"XBPageCurl Demos";
     self.dataArray = [NSMutableArray array];
     [self.dataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Simple Curl", kNameKey, @"SimpleCurlViewController", kNibNameKey, nil]];
+    [self.dataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Page Curl", kNameKey, @"PageCurlViewController", kNibNameKey, nil]];
 }
 
 - (void)viewDidUnload
