@@ -11,6 +11,10 @@
 
 @interface PageCurlViewController : UIViewController
 
+@property (nonatomic, retain) IBOutlet UIButton *curlButton;
 @property (nonatomic, retain) XBPageCurlView *pageCurlView;
+
+- (IBAction)buttonAction:(id)sender;
+- (IBAction)curlButtonTouchDown:(id)sender;
 
 @end

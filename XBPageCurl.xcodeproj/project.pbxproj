@@ -46,6 +46,7 @@
 		1BE340FE14D4897C00261AF5 /* RootViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340FC14D4897C00261AF5 /* RootViewController_iPhone.xib */; };
 		1BE340FF14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340FD14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib */; };
 		1BE3410114D489BB00261AF5 /* PageCurlViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */; };
+		1BE3410314D48E5900261AF5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE3410214D48E5900261AF5 /* MapKit.framework */; };
 		1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */; };
 		1BE4628614677E160013C1C6 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4628414677E160013C1C6 /* RootViewController.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
@@ -107,6 +108,7 @@
 		1BE340FC14D4897C00261AF5 /* RootViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPhone.xib; sourceTree = "<group>"; };
 		1BE340FD14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SimpleCurlViewController_iPhone.xib; sourceTree = "<group>"; };
 		1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PageCurlViewController_iPad.xib; sourceTree = "<group>"; };
+		1BE3410214D48E5900261AF5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE4628314677E160013C1C6 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1BE4628414677E160013C1C6 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BE3410314D48E5900261AF5 /* MapKit.framework in Frameworks */,
 				1B8816D01401E5CF00D579EF /* QuartzCore.framework in Frameworks */,
 				1B8816CE1401E55600D579EF /* OpenGLES.framework in Frameworks */,
 				1B8816A61401E4F000D579EF /* UIKit.framework in Frameworks */,
@@ -165,6 +168,7 @@
 		1B8816A41401E4F000D579EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1BE3410214D48E5900261AF5 /* MapKit.framework */,
 				1B8C27411415C8D60081F180 /* GHUnitIOS.framework */,
 				1B8816CF1401E5CF00D579EF /* QuartzCore.framework */,
 				1B8816CD1401E55600D579EF /* OpenGLES.framework */,
@@ -520,7 +524,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -541,7 +545,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
