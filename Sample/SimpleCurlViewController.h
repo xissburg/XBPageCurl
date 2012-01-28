@@ -18,6 +18,8 @@
 @property (nonatomic, retain) IBOutlet UIView *messyView;
 @property (nonatomic, retain) IBOutlet UIView *backView;
 @property (nonatomic, retain) IBOutlet UIDatePicker *pickerView;
+@property (nonatomic, retain) IBOutlet UISearchBar *searchBar;
+@property (nonatomic, retain) IBOutlet UITextView *textView;
 
 - (IBAction)curlButtonAction:(id)sender;
 - (IBAction)uncurlButtonAction:(id)sender;
