@@ -7,18 +7,15 @@
 //
 
 #import "XBPageCurlView.h"
-#import "XBSnappingPoint.h"
 #import "CGPointAdditions.h"
 
 #define kDuration 0.3
-
 
 @interface XBPageCurlView ()
 
 
 
 @end
-
 
 @implementation XBPageCurlView
 
@@ -39,7 +36,6 @@
     self.snappingPoints = nil;
     [super dealloc];
 }
-
 
 #pragma mark - Touch handling
 
@@ -90,21 +86,24 @@
         //Find the snapping point closest to the cylinder axis
         for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
             //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGPoint p = snappingPoint.position;
-            CGPoint w = CGPointSub(p, _cylinderPosition);
-            CGFloat s = CGPointDot(w, v)/CGPointDot(v, v);
-            CGPoint q = CGPointAdd(_cylinderPosition, CGPointMul(v, s));
-            CGFloat dSq = CGPointLengthSq(CGPointSub(q, p));
-            
+            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, _cylinderPosition, v);
             if (dSq < d) {
                 closestSnappingPoint = snappingPoint;
                 d = dSq;
             }
         }
         
+        if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
+            [self.delegate performSelector:@selector(pageCurlView:willSnapToPoint:) withObject:closestSnappingPoint];
+        }
+        
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
         [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
-        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration];
+        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
+            if ([self.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+                [self.delegate performSelector:@selector(pageCurlView:didSnapToPoint:) withObject:closestSnappingPoint];
+            }
+        }];
     }
 }
 

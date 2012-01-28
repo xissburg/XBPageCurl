@@ -38,3 +38,17 @@ CGPoint CGPointMul(CGPoint p, CGFloat s)
 {
     return CGPointMake(p.x*s, p.y*s);
 }
+
+CGFloat CGPointToLineDistance(CGPoint p, CGPoint q, CGPoint v)
+{
+    return  sqrtf(CGPointToLineDistance(p, q, v));
+}
+
+CGFloat CGPointToLineDistanceSq(CGPoint p, CGPoint q, CGPoint v)
+{
+    CGPoint w = CGPointSub(p, q);
+    CGFloat s = CGPointDot(w, v)/CGPointDot(v, v);
+    CGPoint r = CGPointAdd(q, CGPointMul(v, s));
+    CGFloat dSq = CGPointLengthSq(CGPointSub(r, p));
+    return dSq;
+}

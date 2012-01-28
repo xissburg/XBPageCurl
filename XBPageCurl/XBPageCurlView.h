@@ -8,22 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "XBCurlView.h"
-
+#import "XBSnappingPoint.h"
 
 @class XBPageCurlView;
 
-typedef enum {
-    XBNone,
-    XBNext,
-    XBPrevious
-} XBDirection;
-
-
 @protocol XBPageCurlViewDelegate <NSObject>
 
-- (void)pageCurlView:(XBPageCurlView *)pageCurlView willFlipToDirection:(XBDirection)direction;
-- (void)pageCurlView:(XBPageCurlView *)pageCurlView didFlipToDirection:(XBDirection)direction;
-- (void)pageCurlView:(XBPageCurlView *)pageCurlView didCancelFlipToDirection:(XBDirection)direction;
+@optional
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView willSnapToPoint:(XBSnappingPoint *)snappintPoint;
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappintPoint;
 
 @end
 
