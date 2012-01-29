@@ -62,9 +62,9 @@
     self.bottomSnappingPoint = point;
     
     point = [[[XBSnappingPoint alloc] init] autorelease];
-    point.position = CGPointMake(160, 220);
-    point.angle = M_PI/7;
-    point.radius = 60;
+    point.position = CGPointMake(160, 280);
+    point.angle = M_PI/8;
+    point.radius = 80;
     [self.pageCurlView.snappingPoints addObject:point];
 }
 
@@ -109,6 +109,7 @@
         self.pageCurlView.cylinderPosition =self.bottomSnappingPoint.position;
         self.pageCurlView.cylinderAngle = self.bottomSnappingPoint.angle;
         self.pageCurlView.cylinderRadius = self.bottomSnappingPoint.radius;
+        [self.pageCurlView touchesBegan:touches withEvent:event];
         self.pageCurlView.hidden = NO;
         self.frontView.hidden = YES;
         [self.pageCurlView startAnimating];

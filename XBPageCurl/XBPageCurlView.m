@@ -39,46 +39,59 @@
 
 #pragma mark - Touch handling
 
+- (void)updateCylinderStateWithPoint:(CGPoint)p animatedWithDuration:(NSTimeInterval)duration
+{
+    CGPoint v = CGPointSub(p, startPickingPosition);
+    CGFloat l = CGPointLength(v);
+    CGFloat r = 16 + l/8;
+    CGFloat d = 0; // Displacement of the cylinder position along the segment with direction v starting at startPickingPosition
+    CGFloat quarterDistance = (M_PI_2 - 1)*r; // Distance ran by the finger to make the cylinder perform a quarter turn
+    
+    if (l < quarterDistance) {
+        d = (l/quarterDistance)*(M_PI_2*r);
+    }
+    else if (l < M_PI*r) {
+        d = (((l - quarterDistance)/(M_PI*r - quarterDistance)) + 1)*(M_PI_2*r);
+    }
+    else {
+        d = M_PI*r + (l - M_PI*r)/2;
+    }
+    
+    CGPoint vn = CGPointMul(v, 1.f/l); //Normalized
+    CGPoint c = CGPointAdd(startPickingPosition, CGPointMul(vn, d));
+    CGFloat angle = atan2f(-vn.x, vn.y);
+    
+    if (duration > 0) {
+        [self setCylinderPosition:c animatedWithDuration:duration];
+        [self setCylinderAngle:angle animatedWithDuration:duration];
+        [self setCylinderRadius:r animatedWithDuration:duration];
+    }
+    else {
+        self.cylinderPosition = c;
+        self.cylinderAngle = angle;
+        self.cylinderRadius = r;
+    }
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    //[super touchesBegan:touches withEvent:event];
     CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
     startPickingPosition.x = self.bounds.size.width;
     startPickingPosition.y = p.y;
     
-    [self setCylinderPosition:p animatedWithDuration:kDuration];
-    
-    CGPoint dir = CGPointMake(startPickingPosition.x-p.x, startPickingPosition.y-p.y);
-    dir = CGPointMake(-dir.y, dir.x);
-    CGFloat length = sqrtf(dir.x*dir.x + dir.y*dir.y);
-    dir.x /= length, dir.y /= length;
-    CGFloat angle = atan2f(dir.y, dir.x);
-    
-    [self setCylinderAngle:angle animatedWithDuration:kDuration];
-    [self setCylinderRadius:16+length/4 animatedWithDuration:kDuration];
+    [self updateCylinderStateWithPoint:p animatedWithDuration:kDuration];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    //[super touchesMoved:touches withEvent:event];
     CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
-    self.cylinderPosition = p;
-    CGPoint dir = CGPointMake(startPickingPosition.x-self.cylinderPosition.x, startPickingPosition.y-self.cylinderPosition.y);
-    dir = CGPointMake(-dir.y, dir.x);
-    CGFloat length = sqrtf(dir.x*dir.x + dir.y*dir.y);
-    dir.x /= length, dir.y /= length;
-    CGFloat angle = atan2f(dir.y, dir.x);
-    
-    self.cylinderAngle = angle;
-    self.cylinderRadius = 16 + length/4;
+    [self updateCylinderStateWithPoint:p animatedWithDuration:0];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    //[super touchesEnded:touches withEvent:event];
-    
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
         CGFloat d = 123456789.f;
@@ -109,7 +122,7 @@
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    //[super touchesCancelled:touches withEvent:event];
+    [self touchesEnded:touches withEvent:event];
 }
 
 @end
