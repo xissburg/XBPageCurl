@@ -77,8 +77,23 @@
 {
     CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
-    startPickingPosition.x = self.bounds.size.width;
-    startPickingPosition.y = p.y;
+    
+    CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
+    CGPoint vp = CGPointRotateCW(v);
+    CGPoint p0 = p;
+    CGPoint p1 = CGPointAdd(p0, CGPointMul(vp, 12345.6));
+    CGPoint q0 = CGPointMake(self.bounds.size.width, 0);
+    CGPoint q1 = CGPointMake(self.bounds.size.width, self.bounds.size.height);
+    CGPoint x = CGPointZero;
+    
+    if (CGPointIntersectSegments(p0, p1, q0, q1, &x))
+    {
+        startPickingPosition = x;
+    }
+    else {
+        startPickingPosition.x = self.bounds.size.width;
+        startPickingPosition.y = p.y;
+    }
     
     [self updateCylinderStateWithPoint:p animatedWithDuration:kDuration];
 }
