@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
 		1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742B714CD038D00BCADCF /* CGPointAdditions.c */; };
-		1B8742BF14CD07DA00BCADCF /* PageCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */; };
 		1B8742C014CD07DA00BCADCF /* PageCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */; };
 		1B8816A61401E4F000D579EF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A51401E4F000D579EF /* UIKit.framework */; };
 		1B8816A81401E4F000D579EF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8816A71401E4F000D579EF /* Foundation.framework */; };
@@ -47,6 +46,7 @@
 		1BE340FF14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340FD14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib */; };
 		1BE3410114D489BB00261AF5 /* PageCurlViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */; };
 		1BE3410314D48E5900261AF5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE3410214D48E5900261AF5 /* MapKit.framework */; };
+		1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */; };
 		1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */; };
 		1BE4628614677E160013C1C6 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4628414677E160013C1C6 /* RootViewController.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
@@ -58,8 +58,6 @@
 		1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBSnappingPoint.m; sourceTree = "<group>"; };
 		1B8742B714CD038D00BCADCF /* CGPointAdditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CGPointAdditions.c; sourceTree = "<group>"; };
 		1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CGPointAdditions.h; sourceTree = "<group>"; };
-		1B8742BC14CD07DA00BCADCF /* PageCurlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PageCurlViewController.h; path = iPhone/PageCurlViewController.h; sourceTree = "<group>"; };
-		1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PageCurlViewController.m; path = iPhone/PageCurlViewController.m; sourceTree = "<group>"; };
 		1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PageCurlViewController_iPhone.xib; sourceTree = "<group>"; };
 		1B8816A11401E4F000D579EF /* XBPageCurl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBPageCurl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B8816A51401E4F000D579EF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -109,6 +107,8 @@
 		1BE340FD14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SimpleCurlViewController_iPhone.xib; sourceTree = "<group>"; };
 		1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PageCurlViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE3410214D48E5900261AF5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		1BE3410414D4A9ED00261AF5 /* PageCurlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageCurlViewController.h; sourceTree = "<group>"; };
+		1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController.m; sourceTree = "<group>"; };
 		1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE4628314677E160013C1C6 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1BE4628414677E160013C1C6 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
@@ -187,8 +187,8 @@
 				1BE4628414677E160013C1C6 /* RootViewController.m */,
 				1B8BC4071429866F0048682B /* SimpleCurlViewController.h */,
 				1B8BC4081429866F0048682B /* SimpleCurlViewController.m */,
-				1B8742BC14CD07DA00BCADCF /* PageCurlViewController.h */,
-				1B8742BD14CD07DA00BCADCF /* PageCurlViewController.m */,
+				1BE3410414D4A9ED00261AF5 /* PageCurlViewController.h */,
+				1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */,
 				1B8BC3F91429866F0048682B /* iPad */,
 				1B8BC3FE1429866F0048682B /* iPhone */,
 				1B8BC4351429875B0048682B /* Supporting Files */,
@@ -413,8 +413,8 @@
 				1BE4628614677E160013C1C6 /* RootViewController.m in Sources */,
 				1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */,
 				1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */,
-				1B8742BF14CD07DA00BCADCF /* PageCurlViewController.m in Sources */,
 				1BE340FA14D4896900261AF5 /* SimpleCurlViewController_iPad.m in Sources */,
+				1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
