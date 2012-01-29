@@ -112,9 +112,8 @@
 		1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE4628314677E160013C1C6 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1BE4628414677E160013C1C6 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
-		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
->>>>>>> Refactor, reorganized files.
+		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
+		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

@@ -4618,7 +4618,7 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 										</object>
 									</array>
 								</array>
-								<object class="NSColor" key="NSColor">
+								<object class="NSColor" key="NSColor" id="894069939">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MCAwAA</bytes>
 								</object>
@@ -4640,7 +4640,7 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 								<reference key="NSNextKeyView" ref="545710621"/>
 								<string key="NSReuseIdentifierKey">_NS:260</string>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<array class="NSMutableArray" key="IBUIItems">
+								<array key="IBUIItems">
 									<object class="IBUINavigationItem" id="900167855">
 										<reference key="IBUINavigationBar" ref="500216326"/>
 										<string key="IBUITitle">Page Curl</string>
@@ -4689,10 +4689,7 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:567</string>
-						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MC4xNjc2NTM3Mjk4AA</bytes>
-						</object>
+						<reference key="IBUIBackgroundColor" ref="894069939"/>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
 				</array>
