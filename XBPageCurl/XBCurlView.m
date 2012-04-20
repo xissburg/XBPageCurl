@@ -852,7 +852,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)stopAnimating
 {
     [self.displayLink invalidate];
-    [self.displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     self.displayLink = nil;
 }
 
