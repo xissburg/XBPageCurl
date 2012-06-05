@@ -96,8 +96,8 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     self.cylinderAngle = M_PI_2;
     self.cylinderRadius = 32;
     
-    framebuffer = colorRenderbuffer = depthRenderbuffer = 0;
-    sampleFramebuffer = sampleColorRenderbuffer = sampleDepthRenderbuffer = 0;
+    framebuffer = colorRenderbuffer = 0;
+    sampleFramebuffer = sampleColorRenderbuffer = 0;
     vertexBuffer = indexBuffer = elementCount = 0;
     frontTexture = 0;
     
@@ -139,6 +139,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         
         [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
         [self createNextPageVertexBuffer];
+        [self setupInitialGLState];
     }
     return self;
 }
@@ -252,6 +253,22 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [self.animationManager runAnimation:animation];
 }
 
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+{
+    [super setBackgroundColor:backgroundColor];
+    const CGFloat *color = CGColorGetComponents(self.backgroundColor.CGColor);
+    if (color == NULL) {
+        color = (CGFloat[]){1, 1, 1};
+    }
+    glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
+}
+
+- (void)setOpaque:(BOOL)opaque
+{
+    [super setOpaque:opaque];
+    self.backgroundColor = self.backgroundColor;
+}
+
 
 #pragma mark - Framebuffer
 
@@ -270,11 +287,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &viewportWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &viewportHeight);
     
-    glGenRenderbuffers(1, &depthRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, viewportWidth, viewportHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
-    
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -292,18 +304,15 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_RGBA8_OES, viewportWidth, viewportHeight);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sampleColorRenderbuffer);
         
-        glGenRenderbuffers(1, &sampleDepthRenderbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, sampleDepthRenderbuffer);
-        glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT16, viewportWidth, viewportHeight);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sampleDepthRenderbuffer);
-        
         status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             NSLog(@"Failed to create multisamping framebuffer: %x", status);
             return NO;
         }
-    }    
+        
+        glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
+    }
     
     return YES;
 }
@@ -316,17 +325,39 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glDeleteRenderbuffers(1, &colorRenderbuffer);
     colorRenderbuffer = 0;
     
-    glDeleteRenderbuffers(1, &depthRenderbuffer);
-    depthRenderbuffer = 0;
-    
     glDeleteFramebuffers(1, &sampleFramebuffer);
     sampleFramebuffer = 0;
     
     glDeleteRenderbuffers(1, &sampleColorRenderbuffer);
     sampleColorRenderbuffer = 0;
+}
+
+- (void)setupInitialGLState
+{
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glViewport(0, 0, viewportWidth, viewportHeight);
+    self.backgroundColor = [UIColor clearColor];
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glActiveTexture(GL_TEXTURE0);
     
-    glDeleteRenderbuffers(1, &sampleDepthRenderbuffer);
-    sampleDepthRenderbuffer = 0;
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(positionHandle);
+    glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+    glEnableVertexAttribArray(texCoordHandle);
+    glUseProgram(program);
+    glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, mvp);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    glUniform1i(samplerHandle, 0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(nextPagePositionHandle);
+    glUseProgram(nextPageProgram);
+    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
 }
 
 
@@ -422,6 +453,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glGenBuffers(1, &nextPageVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
+    
     free(vertices);
 }
 
@@ -521,6 +553,12 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     NSString *fsFilename = nextPageTexture != 0? @"NextPageFragmentShader.glsl": @"NextPageNoTextureFragmentShader.glsl";
     
     if ((nextPageProgram = [self createProgramWithVertexShader:vsFilename fragmentShader:fsFilename]) != 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+        
+        if (nextPageTexture == 0) {
+            glDisableVertexAttribArray(nextPageTexCoordHandle);
+        }
+        
         nextPagePositionHandle          = glGetAttribLocation(nextPageProgram, "a_position");
         nextPageTexCoordHandle          = glGetAttribLocation(nextPageProgram, "a_texCoord");
         nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
@@ -528,6 +566,20 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
         nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
         nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
+        
+        glUseProgram(nextPageProgram);
+        glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+        glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+        glEnableVertexAttribArray(nextPagePositionHandle);
+        
+        //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
+        if (nextPageTexture != 0) {
+            glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+            glEnableVertexAttribArray(nextPageTexCoordHandle);
+            glBindTexture(GL_TEXTURE_2D, nextPageTexture);
+            glUniform1i(nextPageSamplerHandle, 0);
+        }
+        
         return YES;
     }
     
@@ -827,29 +879,19 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     /* Render everything */
     [EAGLContext setCurrentContext:self.context];
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, _antialiasing? sampleFramebuffer: framebuffer);
-    glViewport(0, 0, viewportWidth, viewportHeight);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, self.antialiasing? sampleFramebuffer: framebuffer);
     
     /* Clear framebuffer */
-    const CGFloat *color = CGColorGetComponents(self.backgroundColor.CGColor);
-    glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     
     /* Enable culling. First lets render the front facing triangles. */
-    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    
-    /* Disable depth testing. First we draw the nextPage and the previousPage, then, on top of
-     * these we draw the front facing triangles of the curled mesh and finally the back facing
-     * triangles of the curled mesh, hence no depth testing is required. */
-    glDisable(GL_DEPTH_TEST);
     
     /* If the page is not opaque (the curled mesh) enable alpha blending. The glBlendFunc is
      * setup that way bacause the texture has got pre-multiplied alpha. */
     if (!self.pageOpaque) {
         glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     }
     
     /* Draw the nextPage */
@@ -861,16 +903,11 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
     glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(nextPagePositionHandle);
-    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
     
     //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
     if (nextPageTexture != 0) {
         glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-        glEnableVertexAttribArray(nextPageTexCoordHandle);
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, nextPageTexture);
-        glUniform1i(nextPageSamplerHandle, 0);
     }
         
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -887,16 +924,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(positionHandle);
     glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-    glEnableVertexAttribArray(texCoordHandle);
-    glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, mvp);
     
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frontTexture);
-    glUniform1i(samplerHandle, 0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
     /* Next draw the front faces (the buffers and the shader are already bound) */
@@ -920,12 +951,11 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
         glResolveMultisampleFramebufferAPPLE();
         
-        GLenum attachments[] = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
-        glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
+        GLenum attachments[] = {GL_COLOR_ATTACHMENT0};
+        glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 1, attachments);
     }
     
     /* Finally, present, swap buffers, whatever */
-    glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
 #ifdef DEBUG

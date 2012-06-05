@@ -22,10 +22,8 @@
     //OpenGL buffers.
     GLuint framebuffer;
     GLuint colorRenderbuffer;
-    GLuint depthRenderbuffer;
     GLuint sampleFramebuffer;
     GLuint sampleColorRenderbuffer;
-    GLuint sampleDepthRenderbuffer;
     
     //Texture size for all possible textures (front of page, back of page, nextPage).
     GLuint textureWidth, textureHeight;

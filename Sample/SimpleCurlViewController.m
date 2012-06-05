@@ -78,7 +78,7 @@
     CGRect r = self.messyView.frame;
     self.curlView = [[[XBPageCurlView alloc] initWithFrame:r] autorelease];
     [self.curlView drawViewOnFrontOfPage:self.messyView];
-    //[self.curlView drawImageOnBackOfPage:[UIImage imageNamed:@"appleStore"]];
+    //[self.curlView drawImageOnNextPage:[UIImage imageNamed:@"appleStore"]];
     self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
     self.curlView.pageOpaque = YES; //The page to be curled has no transparency
     
