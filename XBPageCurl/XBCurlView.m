@@ -30,6 +30,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 @property (nonatomic, retain) XBAnimationManager *animationManager;
 @property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
+@property (nonatomic, assign) NSTimeInterval lastTimestamp;
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -64,6 +65,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 @synthesize animationManager, curlingView, pageOpaque;
 @synthesize cylinderAngle=_cylinderAngle;
 @synthesize screenScale=_screenScale;
+@synthesize lastTimestamp=_lastTimestamp;
 
 - (BOOL)initialize
 {
@@ -812,12 +814,16 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 {
     [self.displayLink invalidate];
     self.displayLink = nil;
+    self.lastTimestamp = 0;
 }
 
 - (void)draw:(CADisplayLink *)sender
 {
     /* Update all animations */
-    [self.animationManager update:sender.duration];
+    NSTimeInterval dt = self.lastTimestamp>0? sender.timestamp - self.lastTimestamp: 0;
+    self.lastTimestamp = sender.timestamp;
+    dt = MAX(0, MIN(dt, 0.2));
+    [self.animationManager update:dt];
     
     /* Render everything */
     [EAGLContext setCurrentContext:self.context];
