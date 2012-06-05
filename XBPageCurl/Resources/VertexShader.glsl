@@ -4,7 +4,6 @@ uniform mat4 u_mvpMatrix;
 attribute vec4 a_position;
 attribute vec2 a_texCoord;
 
-uniform vec2 u_texSize;
 uniform vec2 u_cylinderPosition;
 uniform vec2 u_cylinderDirection;
 uniform float u_cylinderRadius;
@@ -50,5 +49,5 @@ void main()
     }
 
     gl_Position = u_mvpMatrix * v;
-    v_texCoord = a_texCoord/u_texSize;
+    v_texCoord = a_texCoord;
 }

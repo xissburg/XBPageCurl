@@ -11,6 +11,9 @@
 #import "XBAnimationManager.h"
 #import <QuartzCore/QuartzCore.h>
 
+#define kCylinderPositionAnimationName @"cylinderPosition"
+#define kCylinderDirectionAnimationName @"cylinderDirection"
+#define kCylinderRadiusAnimationName @"cylinderRadius"
 
 typedef struct _Vertex
 {
@@ -19,7 +22,6 @@ typedef struct _Vertex
 } Vertex;
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
-void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 @interface XBCurlView ()
 
@@ -41,7 +43,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
-- (CGSize)minimumFullSizedTextureSize;
 - (GLuint)generateTexture;
 - (void)destroyTextures;
 
@@ -54,10 +55,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 - (void)draw:(CADisplayLink *)sender;
 
 @end
-
-#define kCylinderPositionAnimationName @"cylinderPosition"
-#define kCylinderDirectionAnimationName @"cylinderDirection"
-#define kCylinderRadiusAnimationName @"cylinderRadius"
 
 
 @implementation XBCurlView
@@ -108,15 +105,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     [self setupMVP];
     
-    CGSize textureSize = [self minimumFullSizedTextureSize];
-    textureWidth = (GLuint)textureSize.width;
-    textureHeight = (GLuint)textureSize.height;
+    textureWidth = (GLuint)(self.frame.size.width*self.screenScale);
+    textureHeight = (GLuint)(self.frame.size.height*self.screenScale);
     frontTexture = [self generateTexture];
-    
-    //Set shader texture scale
-    glUseProgram(program);
-    glUniform2f(texSizeHandle, textureWidth, textureHeight);
-    glUseProgram(0);
     
     return YES;
 }
@@ -152,7 +143,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (void)dealloc
 {
-    [EAGLContext setCurrentContext:self.context]; //Set the context before performing OpenGl operations
+    [EAGLContext setCurrentContext:self.context];
     [self.displayLink invalidate];
     self.displayLink = nil;
     self.animationManager = nil;
@@ -164,7 +155,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     [self destroyFramebuffer];
     //Keep this last one as the last one
     self.context = nil;
-
+    [EAGLContext setCurrentContext:nil];
+    
     [super dealloc];
 }
 
@@ -346,17 +338,22 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     Vertex *vertices = malloc(verticesSize);
     
     for (int y=0; y<yRes+1; ++y) {
-        GLfloat vy = ((GLfloat)y/yRes)*viewportHeight;
-        GLfloat tv = vy;///viewportHeight;
+        GLfloat tv = (GLfloat)y/yRes;
+        GLfloat vy = tv*viewportHeight;
         for (int x=0; x<xRes+1; ++x) {
             Vertex *v = &vertices[y*(xRes+1) + x];
-            v->x = ((GLfloat)x/xRes)*viewportWidth;
+            v->u = (GLfloat)x/xRes;
+            v->v = tv;
+            v->x = v->u*viewportWidth;
             v->y = vy;
             v->z = 0;
-            v->u = v->x;///viewportWidth;
-            v->v = tv;
         }
     }
+    
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
+    free(vertices);
     
     elementCount = xRes*yRes*2*3;
     GLsizeiptr indicesSize = elementCount*sizeof(GLushort);//Two triangles per square, 3 indices per triangle
@@ -376,15 +373,9 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         }
     }
     
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
-    
     glGenBuffers(1, &indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, (GLvoid *)indices, GL_STATIC_DRAW);
-    
-    free(vertices);
     free(indices);
 }
 
@@ -411,25 +402,24 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     vertices[1].x = viewportWidth;
     vertices[1].y = 0;
     vertices[1].z = -1;
-    vertices[1].u = viewportWidth;
+    vertices[1].u = 1;
     vertices[1].v = 0;
     
     vertices[2].x = 0;
     vertices[2].y = viewportHeight;
     vertices[2].z = -1;
     vertices[2].u = 0;
-    vertices[2].v = viewportHeight;
+    vertices[2].v = 1;
     
     vertices[3].x = viewportWidth;
     vertices[3].y = viewportHeight;
     vertices[3].z = -1;
-    vertices[3].u = viewportWidth;
-    vertices[3].v = viewportHeight;
+    vertices[3].u = 1;
+    vertices[3].v = 1;
     
     glGenBuffers(1, &nextPageVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
-    
     free(vertices);
 }
 
@@ -476,33 +466,43 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     return shader;
 }
 
-- (BOOL)setupCurlShader
+- (GLuint)createProgramWithVertexShader:(NSString *)vertexShaderFilename fragmentShader:(NSString *)fragmentShaderFilename
 {
-    GLuint vertexShader = [self loadShader:@"VertexShader.glsl" type:GL_VERTEX_SHADER];
-    GLuint fragmentShader = [self loadShader:@"FragmentShader.glsl" type:GL_FRAGMENT_SHADER];
-    program = glCreateProgram();
+    GLuint vertexShader = [self loadShader:vertexShaderFilename type:GL_VERTEX_SHADER];
+    GLuint fragmentShader = [self loadShader:fragmentShaderFilename type:GL_FRAGMENT_SHADER];
+    GLuint prog = glCreateProgram();
     
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
+    glAttachShader(prog, vertexShader);
+    glAttachShader(prog, fragmentShader);
+    glLinkProgram(prog);
+    
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
     
     GLint linked = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &linked);
+    glGetProgramiv(prog, GL_LINK_STATUS, &linked);
     if (linked == 0) {
-        glDeleteProgram(program);
-        return NO;
+        glDeleteProgram(prog);
+        return 0;
     }
     
-    positionHandle          = glGetAttribLocation(program, "a_position");
-    texCoordHandle          = glGetAttribLocation(program, "a_texCoord");
-    mvpHandle               = glGetUniformLocation(program, "u_mvpMatrix");
-    samplerHandle           = glGetUniformLocation(program, "s_tex");
-    texSizeHandle           = glGetUniformLocation(program, "u_texSize");
-    cylinderPositionHandle  = glGetUniformLocation(program, "u_cylinderPosition");
-    cylinderDirectionHandle = glGetUniformLocation(program, "u_cylinderDirection");
-    cylinderRadiusHandle    = glGetUniformLocation(program, "u_cylinderRadius");
+    return prog;
+}
+
+- (BOOL)setupCurlShader
+{
+    if ((program = [self createProgramWithVertexShader:@"VertexShader.glsl" fragmentShader:@"FragmentShader.glsl"]) != 0) {
+        positionHandle          = glGetAttribLocation(program, "a_position");
+        texCoordHandle          = glGetAttribLocation(program, "a_texCoord");
+        mvpHandle               = glGetUniformLocation(program, "u_mvpMatrix");
+        samplerHandle           = glGetUniformLocation(program, "s_tex");
+        cylinderPositionHandle  = glGetUniformLocation(program, "u_cylinderPosition");
+        cylinderDirectionHandle = glGetUniformLocation(program, "u_cylinderDirection");
+        cylinderRadiusHandle    = glGetUniformLocation(program, "u_cylinderRadius");
+        return YES;
+    }
     
-    return YES;
+    return NO;
 }
 
 - (void)destroyCurlShader
@@ -517,35 +517,19 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     
     NSString *vsFilename = nextPageTexture != 0? @"NextPageVertexShader.glsl": @"NextPageNoTextureVertexShader.glsl";
     NSString *fsFilename = nextPageTexture != 0? @"NextPageFragmentShader.glsl": @"NextPageNoTextureFragmentShader.glsl";
-    GLuint vertexShader = [self loadShader:vsFilename type:GL_VERTEX_SHADER];
-    GLuint fragmentShader = [self loadShader:fsFilename type:GL_FRAGMENT_SHADER];
-    nextPageProgram = glCreateProgram();
     
-    glAttachShader(nextPageProgram, vertexShader);
-    glAttachShader(nextPageProgram, fragmentShader);
-    glLinkProgram(nextPageProgram);
-    
-    GLint linked = 0;
-    glGetProgramiv(nextPageProgram, GL_LINK_STATUS, &linked);
-    if (linked == 0) {
-        glDeleteProgram(nextPageProgram);
-        return NO;
+    if ((nextPageProgram = [self createProgramWithVertexShader:vsFilename fragmentShader:fsFilename]) != 0) {
+        nextPagePositionHandle          = glGetAttribLocation(nextPageProgram, "a_position");
+        nextPageTexCoordHandle          = glGetAttribLocation(nextPageProgram, "a_texCoord");
+        nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
+        nextPageSamplerHandle           = glGetUniformLocation(nextPageProgram, "s_tex");
+        nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
+        nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
+        nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
+        return YES;
     }
     
-    nextPagePositionHandle          = glGetAttribLocation(nextPageProgram, "a_position");
-    nextPageTexCoordHandle          = glGetAttribLocation(nextPageProgram, "a_texCoord");
-    nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
-    nextPageSamplerHandle           = glGetUniformLocation(nextPageProgram, "s_tex");
-    nextPageTexSizeHandle           = glGetUniformLocation(nextPageProgram, "u_texSize");
-    nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
-    nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
-    nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
-    
-    glUseProgram(nextPageProgram);
-    glUniform2f(nextPageTexSizeHandle, textureWidth, textureHeight);
-    glUseProgram(0);
-    
-    return YES;
+    return NO;
 }
 
 - (void)destroyNextPageShader
@@ -556,15 +540,11 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 - (BOOL)setupShaders
 {
-    if (![self setupCurlShader]) {
-        return NO;
+    if ([self setupCurlShader] && [self setupNextPageShader]) {
+        return YES;
     }
     
-    if (![self setupNextPageShader]) {
-        return NO;
-    }
-    
-    return YES;
+    return NO;
 }
 
 - (void)destroyShaders
@@ -576,27 +556,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 #pragma mark - Textures
 
-- (CGSize)minimumFullSizedTextureSize
-{
-    //Compute the actual view size in the current screen scale
-    CGSize actualViewSize = CGSizeMake(self.frame.size.width*self.screenScale, self.frame.size.height*self.screenScale);
-    
-    //Compute the closest, greater power of two
-    CGSize size = CGSizeZero;
-    size.width = 1<<((int)floorf(log2f(actualViewSize.width - 1)) + 1);
-    size.height = 1<<((int)floorf(log2f(actualViewSize.height - 1)) + 1);
-    
-    if (size.width < 64) {
-        size.width = 64;
-    }
-    
-    if (size.height < 64) {
-        size.height = 64;
-    }
-    
-    return size;
-}
-
 - (GLuint)generateTexture
 {
     GLuint tex;
@@ -604,8 +563,8 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     return tex;
@@ -831,7 +790,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
         //Setup the view hierarchy properly after the animation is finished
         self.curlingView.hidden = NO;
         [self removeFromSuperview];
-        //Stop the rendering loop since the curlView was removed from its superview nad hence won't appear
+        //Stop the rendering loop since the curlView was removed from its superview and hence won't appear
         [self stopAnimating];
         self.curlingView = nil;
     }];
@@ -911,6 +870,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     /* Draw the previousPage if any */
+    /* TODO */
     
     /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
     glUseProgram(program);
@@ -933,7 +893,7 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
-    /* Next draw the front faces (the buffers and the shader are already set) */
+    /* Next draw the front faces (the buffers and the shader are already bound) */
     glCullFace(GL_FRONT);
     
     if (backTexture != 0) {
@@ -974,19 +934,6 @@ void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out);
 
 
 #pragma mark - Functions
-
-void MultiplyM4x4(const GLfloat *A, const GLfloat *B, GLfloat *out)
-{
-    for (int i=0; i<4; ++i) {
-        for (int j=0; j<4; ++j) {
-            GLfloat f = 0.f;
-            for (int k=0; k<4; ++k) {
-                f += A[i*4+k] * B[k*4+j];
-            }
-            out[i*4+j] = f;
-        }
-    }
-}
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far)
 {

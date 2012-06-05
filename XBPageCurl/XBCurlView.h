@@ -46,7 +46,6 @@
     
     //Handles for the curl shader variables.
     GLuint positionHandle, texCoordHandle, mvpHandle, samplerHandle;
-    GLuint texSizeHandle;
     GLuint cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
     
     //Texture projected onto the two-triangle rectangle of the nextPage.
@@ -60,7 +59,7 @@
     GLuint nextPageVertexBuffer;
     
     //Handles for the nextPageProgram variables.
-    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle, nextPageTexSizeHandle;
+    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle;
     GLuint nextPageCylinderPositionHandle, nextPageCylinderDirectionHandle, nextPageCylinderRadiusHandle;
     
     //Viewport/view/screen size.
@@ -118,7 +117,7 @@
  * This should be called manually whenever you are going to present this view and change its properties 
  * (for example, before adding it as subview and changing the cylinder properties). stopAnimating should
  * be called whenever you don't need to animate this anymore (for example, after removing it from superview),
- * otherwise your XBCurlView instance won't be deallocated because, insternally, the CADisplayLink retains its
+ * otherwise your XBCurlView instance won't be deallocated because, internally, the CADisplayLink retains its
  * target which is the XBCurlView instance itself.
  */
 - (void)startAnimating;
