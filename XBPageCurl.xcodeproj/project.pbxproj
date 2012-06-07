@@ -50,6 +50,7 @@
 		1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */; };
 		1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */; };
 		1BE4628614677E160013C1C6 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4628414677E160013C1C6 /* RootViewController.m */; };
+		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
 /* End PBXBuildFile section */
@@ -115,6 +116,8 @@
 		1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE4628314677E160013C1C6 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1BE4628414677E160013C1C6 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		1BEBF5231580E930004C34DD /* PageCurlViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageCurlViewController_iPad.h; sourceTree = "<group>"; };
+		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
 		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -210,6 +213,8 @@
 				1BE340F714D4896900261AF5 /* SimpleCurlViewController_iPad.h */,
 				1BE340F814D4896900261AF5 /* SimpleCurlViewController_iPad.m */,
 				1BE340F914D4896900261AF5 /* SimpleCurlViewController_iPad.xib */,
+				1BEBF5231580E930004C34DD /* PageCurlViewController_iPad.h */,
+				1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */,
 				1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */,
 			);
 			path = iPad;
@@ -421,6 +426,7 @@
 				1BE340FA14D4896900261AF5 /* SimpleCurlViewController_iPad.m in Sources */,
 				1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */,
 				1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */,
+				1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

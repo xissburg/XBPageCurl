@@ -15,5 +15,6 @@
 @property (nonatomic, readonly) BOOL pageIsCurled;
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion;
+- (void)refreshPageCurlView;
 
 @end

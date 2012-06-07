@@ -24,17 +24,7 @@
     [super dealloc];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-}
-
 #pragma mark - View lifecycle
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
 
 - (void)viewDidUnload
 {
@@ -50,6 +40,14 @@
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    // If the viewController was pushed in a landscape orientation its frame was that of a portrait view yet, then we have to reset the
+    // page curl view's mesh here.
+    [self.pageDragView refreshPageCurlView];
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
@@ -58,7 +56,13 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    // After a rotation we have to reset the viewToCurl for the curling mesh to be updated.
+    [self.pageDragView refreshPageCurlView];
 }
 
 #pragma mark - Buttons Actions

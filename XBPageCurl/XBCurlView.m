@@ -870,7 +870,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 {
     [self.displayLink invalidate];
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)stopAnimating

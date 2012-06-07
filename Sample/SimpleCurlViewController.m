@@ -29,13 +29,6 @@
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    CGRect r = self.messyView.frame;
-    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
-}
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -51,6 +44,13 @@
 {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    CGRect r = self.messyView.frame;
+    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

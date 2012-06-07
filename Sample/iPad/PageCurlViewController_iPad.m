@@ -1,18 +1,18 @@
 //
-//  SimpleCurlViewController_iPad.m
+//  PageCurlViewController_iPad.m
 //  XBPageCurl
 //
-//  Created by xiss burg on 9/13/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by xiss burg on 6/7/12.
+//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "SimpleCurlViewController_iPad.h"
+#import "PageCurlViewController_iPad.h"
 
-@implementation SimpleCurlViewController_iPad
+@implementation PageCurlViewController_iPad
 
 @synthesize webView = _webView;
 
-- (void)dealloc 
+- (void)dealloc
 {
     self.webView = nil;
     [super dealloc];

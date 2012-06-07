@@ -8,9 +8,7 @@
 
 #import "SimpleCurlViewController.h"
 
-@interface SimpleCurlViewController_iPad : SimpleCurlViewController {
-    UIWebView *_webView;
-}
+@interface SimpleCurlViewController_iPad : SimpleCurlViewController
 
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
 

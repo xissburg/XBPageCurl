@@ -12,4 +12,9 @@
 
 @synthesize position, angle, radius, tag;
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: 0x%x> {\n\tposition = %@,\n\tangle = %f,\n\tradius = %f,\n\ttag = %d\n}", NSStringFromClass([self class]), self, NSStringFromCGPoint(position), angle, radius, tag];
+}
+
 @end
