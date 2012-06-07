@@ -12,7 +12,9 @@
 
 #define kDuration 0.6
 
-@implementation SimpleCurlViewController
+@implementation SimpleCurlViewController {
+    BOOL isCurled;
+}
 
 @synthesize messyView, pickerView, searchBar, textView, curlView, backView;
 
@@ -61,7 +63,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return YES;
+    return !isCurled;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -79,18 +81,19 @@
     self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
     self.curlView.pageOpaque = YES; //The page to be curled has no transparency
     [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/6, r.size.height/2) cylinderAngle:M_PI/2.4 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+    isCurled = YES;
 }
 
 - (IBAction)uncurlButtonAction:(id)sender
 {
     [self.curlView uncurlAnimatedWithDuration:kDuration];
+    isCurled = NO;
 }
 
 - (IBAction)backButtonAction:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
-
 
 #pragma mark - UITextFieldDelegate
 
