@@ -13,6 +13,7 @@
 
 @property (nonatomic, retain) IBOutlet UIView *viewToCurl;
 @property (nonatomic, readonly) BOOL pageIsCurled;
+@property (nonatomic, retain, readonly) XBPageCurlView *pageCurlView;
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion;
 - (void)refreshPageCurlView;

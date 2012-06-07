@@ -7,6 +7,7 @@
 //
 
 #import "XBCurlView.h"
+#import "CGPointAdditions.h"
 #import <QuartzCore/QuartzCore.h>
 
 #define kCylinderPositionAnimationName @"cylinderPosition"
@@ -174,6 +175,19 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [EAGLContext setCurrentContext:self.context];
     [self createFramebuffer];
     [self setupMVP];
+}
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    if (CGRectContainsPoint(self.frame, point)) {
+        CGPoint p = CGPointMake(point.x, self.bounds.size.height - point.y);
+        CGPoint v = CGPointMake(-sinf(_cylinderAngle), cosf(_cylinderAngle));
+        CGPoint w = CGPointSub(p, CGPointSub(_cylinderPosition, CGPointMul(v, _cylinderRadius)));
+        CGFloat dot = CGPointDot(v, w);
+        return dot > 0;
+    }
+    
+    return NO;
 }
 
 
@@ -838,7 +852,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
     self.curlingView.hidden = YES;
-    self.userInteractionEnabled = NO;
     
     //Start the rendering loop
     [self startAnimating];
