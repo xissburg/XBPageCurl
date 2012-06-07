@@ -33,4 +33,8 @@
 @property (nonatomic, assign) BOOL snappingEnabled;
 @property (nonatomic, retain) NSMutableArray *snappingPoints;
 
+- (void)touchBeganAtPoint:(CGPoint)p;
+- (void)touchMovedToPoint:(CGPoint)p;
+- (void)touchEndedAtPoint:(CGPoint)p;
+
 @end

@@ -7,8 +7,6 @@
 //
 
 #import "XBCurlView.h"
-#import "XBAnimation.h"
-#import "XBAnimationManager.h"
 #import <QuartzCore/QuartzCore.h>
 
 #define kCylinderPositionAnimationName @"cylinderPosition"
@@ -194,16 +192,21 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
 {
-    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration completion:^(void) {}];
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration completion:nil];
 }
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
+}
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGPoint p0 = self.cylinderPosition;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
         self.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
-    } completion:completion];
+    } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
 }
@@ -211,17 +214,22 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 //CylinderAngle
 - (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration
 {
-    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:^(void) {}];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:nil];
 }
 
 - (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
+}
+
+- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     double a0 = _cylinderAngle;
     double a1 = cylinderAngle;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
         _cylinderAngle = (1 - t)*a0 + t*a1;
-    } completion:completion];
+    } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
 }
@@ -239,16 +247,21 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
-    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^(void) {}];
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:nil];
 }
 
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
+}
+
+- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGFloat r = self.cylinderRadius;
     
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
         self.cylinderRadius = (1 - t)*r + t*cylinderRadius;
-    } completion:completion];
+    } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
 }
@@ -825,6 +838,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     //Setup the view hierarchy properly
     [self.curlingView.superview addSubview:self];
     self.curlingView.hidden = YES;
+    self.userInteractionEnabled = NO;
     
     //Start the rendering loop
     [self startAnimating];

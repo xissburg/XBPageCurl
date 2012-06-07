@@ -74,7 +74,6 @@
 - (IBAction)curlButtonAction:(id)sender
 {
     CGRect r = self.messyView.frame;
-    self.curlView = pageCurlView;
     [self.curlView drawViewOnFrontOfPage:self.messyView];
     //[self.curlView drawImageOnNextPage:[UIImage imageNamed:@"appleStore"]];
     self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)

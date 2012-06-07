@@ -40,6 +40,7 @@
 		1B8C27271415C6510081F180 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27261415C6510081F180 /* main.m */; };
 		1B8C27431415C9660081F180 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8C27411415C8D60081F180 /* GHUnitIOS.framework */; };
 		1B8C27471415CB170081F180 /* XBAnimationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27451415CA510081F180 /* XBAnimationTest.m */; };
+		1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD79F081580517A00B19785 /* XBPageDragView.m */; };
 		1BE340FA14D4896900261AF5 /* SimpleCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE340F814D4896900261AF5 /* SimpleCurlViewController_iPad.m */; };
 		1BE340FB14D4896900261AF5 /* SimpleCurlViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340F914D4896900261AF5 /* SimpleCurlViewController_iPad.xib */; };
 		1BE340FE14D4897C00261AF5 /* RootViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340FC14D4897C00261AF5 /* RootViewController_iPhone.xib */; };
@@ -100,6 +101,8 @@
 		1B8C27281415C6510081F180 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		1B8C27411415C8D60081F180 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../gh-unit/Project-iOS/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		1B8C27451415CA510081F180 /* XBAnimationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimationTest.m; sourceTree = "<group>"; };
+		1BD79F071580517A00B19785 /* XBPageDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageDragView.h; sourceTree = "<group>"; };
+		1BD79F081580517A00B19785 /* XBPageDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageDragView.m; sourceTree = "<group>"; };
 		1BE340F714D4896900261AF5 /* SimpleCurlViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCurlViewController_iPad.h; sourceTree = "<group>"; };
 		1BE340F814D4896900261AF5 /* SimpleCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BE340F914D4896900261AF5 /* SimpleCurlViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SimpleCurlViewController_iPad.xib; sourceTree = "<group>"; };
@@ -250,6 +253,8 @@
 				1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */,
 				1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */,
 				1B8742B714CD038D00BCADCF /* CGPointAdditions.c */,
+				1BD79F071580517A00B19785 /* XBPageDragView.h */,
+				1BD79F081580517A00B19785 /* XBPageDragView.m */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
@@ -415,6 +420,7 @@
 				1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */,
 				1BE340FA14D4896900261AF5 /* SimpleCurlViewController_iPad.m in Sources */,
 				1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */,
+				1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

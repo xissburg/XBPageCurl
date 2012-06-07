@@ -23,7 +23,7 @@
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self animationWithName:name duration:duration update:update completion:^(void) {}];
+    return [self animationWithName:name duration:duration update:update completion:nil];
 }
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion
@@ -38,7 +38,7 @@
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
-    return [self initWithName:name duration:duration update:update completion:^(void) {}];
+    return [self initWithName:name duration:duration update:update completion:nil];
 }
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion
@@ -73,9 +73,11 @@
 {
     _elapsedTime += dt;
     
-    if (_elapsedTime > _duration) {
+    if (_elapsedTime > _duration || _duration == 0) {
         self.update(1.0);
-        self.completion();
+        if (self.completion != nil) {
+            self.completion();
+        }
         return NO;
     }
     

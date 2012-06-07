@@ -11,12 +11,6 @@
 
 #define kDuration 0.3
 
-@interface XBPageCurlView ()
-
-
-
-@end
-
 @implementation XBPageCurlView
 
 @synthesize delegate, snappingPoints, snappingEnabled;
@@ -37,12 +31,17 @@
     [super dealloc];
 }
 
-#pragma mark - Touch handling
+#pragma mark - Methods
 
-- (void)updateCylinderStateWithPoint:(CGPoint)p animatedWithDuration:(NSTimeInterval)duration
+- (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
 {
     CGPoint v = CGPointSub(p, startPickingPosition);
     CGFloat l = CGPointLength(v);
+    
+    if (fabs(l) < FLT_EPSILON) {
+        return;
+    }
+    
     CGFloat r = 16 + l/8;
     CGFloat d = 0; // Displacement of the cylinder position along the segment with direction v starting at startPickingPosition
     CGFloat quarterDistance = (M_PI_2 - 1)*r; // Distance ran by the finger to make the cylinder perform a quarter turn
@@ -61,21 +60,14 @@
     CGPoint c = CGPointAdd(startPickingPosition, CGPointMul(vn, d));
     CGFloat angle = atan2f(-vn.x, vn.y);
     
-    if (duration > 0) {
-        [self setCylinderPosition:c animatedWithDuration:duration];
-        [self setCylinderAngle:angle animatedWithDuration:duration];
-        [self setCylinderRadius:r animatedWithDuration:duration];
-    }
-    else {
-        self.cylinderPosition = c;
-        self.cylinderAngle = angle;
-        self.cylinderRadius = r;
-    }
+    NSTimeInterval duration = animated? kDuration: 0;
+    [self setCylinderPosition:c animatedWithDuration:duration];
+    [self setCylinderAngle:angle animatedWithDuration:duration];
+    [self setCylinderRadius:r animatedWithDuration:duration];
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchBeganAtPoint:(CGPoint)p
 {
-    CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
     
     CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
@@ -86,8 +78,7 @@
     CGPoint q1 = CGPointMake(self.bounds.size.width, self.bounds.size.height);
     CGPoint x = CGPointZero;
     
-    if (CGPointIntersectSegments(p0, p1, q0, q1, &x))
-    {
+    if (CGPointIntersectSegments(p0, p1, q0, q1, &x)) {
         startPickingPosition = x;
     }
     else {
@@ -95,21 +86,20 @@
         startPickingPosition.y = p.y;
     }
     
-    [self updateCylinderStateWithPoint:p animatedWithDuration:kDuration];
+    [self updateCylinderStateWithPoint:p animated:YES];
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchMovedToPoint:(CGPoint)p
 {
-    CGPoint p = [[touches anyObject] locationInView:self];
     p.y = self.bounds.size.height - p.y;
-    [self updateCylinderStateWithPoint:p animatedWithDuration:0];
+    [self updateCylinderStateWithPoint:p animated:NO];
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchEndedAtPoint:(CGPoint)p
 {
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
-        CGFloat d = 123456789.f;
+        CGFloat d = FLT_MAX;
         CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
         //Find the snapping point closest to the cylinder axis
         for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
@@ -121,18 +111,42 @@
             }
         }
         
+        NSAssert(closestSnappingPoint != nil, @"There is always a closest point in a non-empty set of points hence closestSnappingPoint should not be nil.");
+        
         if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
-            [self.delegate performSelector:@selector(pageCurlView:willSnapToPoint:) withObject:closestSnappingPoint];
+            [self.delegate pageCurlView:self willSnapToPoint:closestSnappingPoint];
         }
         
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
         [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
         [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
             if ([self.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [self.delegate performSelector:@selector(pageCurlView:didSnapToPoint:) withObject:closestSnappingPoint];
+                [self.delegate pageCurlView:self didSnapToPoint:closestSnappingPoint];
             }
         }];
     }
+}
+
+
+#pragma mark - Touch handling
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [touches anyObject];
+    CGPoint p = [touch locationInView:self];
+    [self touchBeganAtPoint:p];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    CGPoint p = [[touches anyObject] locationInView:self];
+    [self touchMovedToPoint:p];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    CGPoint p = [[touches anyObject] locationInView:self];
+    [self touchEndedAtPoint:p];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
