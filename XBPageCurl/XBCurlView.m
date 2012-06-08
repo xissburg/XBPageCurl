@@ -180,7 +180,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
     if (CGRectContainsPoint(self.frame, point)) {
-        CGPoint p = CGPointMake(point.x, self.bounds.size.height - point.y);
+        CGPoint p = CGPointMake(point.x*self.screenScale, (self.bounds.size.height - point.y)*self.screenScale);
         CGPoint v = CGPointMake(-sinf(_cylinderAngle), cosf(_cylinderAngle));
         CGPoint w = CGPointSub(p, CGPointSub(_cylinderPosition, CGPointMul(v, _cylinderRadius)));
         CGFloat dot = CGPointDot(v, w);
