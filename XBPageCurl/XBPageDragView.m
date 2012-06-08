@@ -82,7 +82,7 @@
     XBSnappingPoint *point = [[[XBSnappingPoint alloc] init] autorelease];
     point.position = CGPointMake(self.viewToCurl.frame.size.width*0.875, self.viewToCurl.frame.size.height*0.06);
     point.angle = M_PI_4;
-    point.radius = 20;
+    point.radius = 30;
     [self.pageCurlView.snappingPoints addObject:point];
     self.bottomSnappingPoint = point;
     

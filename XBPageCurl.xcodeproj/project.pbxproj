@@ -254,12 +254,12 @@
 				1B8BC41C1429866F0048682B /* XBCurlView.m */,
 				1B8BC41D1429866F0048682B /* XBPageCurlView.h */,
 				1B8BC41E1429866F0048682B /* XBPageCurlView.m */,
+				1BD79F071580517A00B19785 /* XBPageDragView.h */,
+				1BD79F081580517A00B19785 /* XBPageDragView.m */,
 				1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */,
 				1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */,
 				1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */,
 				1B8742B714CD038D00BCADCF /* CGPointAdditions.c */,
-				1BD79F071580517A00B19785 /* XBPageDragView.h */,
-				1BD79F081580517A00B19785 /* XBPageDragView.m */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
