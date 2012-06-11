@@ -889,6 +889,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 - (void)stopAnimating
 {
     [self.displayLink invalidate];
+    [self.displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     self.displayLink = nil;
     self.lastTimestamp = 0;
 }
