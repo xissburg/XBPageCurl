@@ -12,12 +12,14 @@
 
 @implementation PageCurlViewController
 
+@synthesize mapView = _mapView;
 @synthesize frontView = _frontView;
 @synthesize backView = _backView;
 @synthesize pageDragView = _pageDragView;
 
 - (void)dealloc
 {
+    self.mapView = nil;
     self.frontView = nil;
     self.backView = nil;
     self.pageDragView = nil;
@@ -29,6 +31,7 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
+    self.mapView = nil;
     self.frontView = nil;
     self.backView = nil;
     self.pageDragView = nil;
@@ -77,6 +80,21 @@
 - (IBAction)backButtonAction:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)standardButtonAction:(id)sender
+{
+    self.mapView.mapType = MKMapTypeStandard;
+}
+
+- (void)satelliteButtonAction:(id)sender
+{
+    self.mapView.mapType = MKMapTypeSatellite;
+}
+
+- (void)hybridButtonAction:(id)sender
+{
+    self.mapView.mapType = MKMapTypeHybrid;
 }
 
 @end
