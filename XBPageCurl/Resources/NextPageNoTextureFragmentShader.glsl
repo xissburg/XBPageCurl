@@ -13,12 +13,6 @@ void main()
     vec2 dir = vec2(u_cylinderDirection.y, -u_cylinderDirection.x);
     vec2 v = v_position - u_cylinderPosition;
     float d = dot(v, dir);
-    float l = 0.0;
-
-    if (d < 2.0*u_cylinderRadius) {
-        float a = (d/(2.0*u_cylinderRadius))*M_PI;
-        l = (cos(a) + 1.0)*0.5;
-    }
-
+    float l = 0.56 - 0.56*smoothstep(0.5, 0.8, d/(2.0*u_cylinderRadius));
     gl_FragColor = vec4(0.0, 0.0, 0.0, l);
 }
