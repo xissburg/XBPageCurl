@@ -652,10 +652,12 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 }
 
 - (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock
-{
-    CGSize imageSize = CGSizeMake(textureWidth/self.screenScale, textureHeight/self.screenScale);
-    UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.screenScale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
+{    
+    size_t bitsPerComponent = 8;
+    size_t bytesPerRow = textureWidth * 4;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, textureWidth, textureHeight, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
     
     CGRect r = CGRectMake(0, 0, width, height);
     CGContextClearRect(context, r);
@@ -668,10 +670,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
-    UIGraphicsEndImageContext();
+    CGContextRelease(context);
 }
 
 - (void)drawImage:(UIImage *)image onTexture:(GLuint)texture
@@ -686,12 +688,12 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     [self drawOnTexture:texture width:width height:height drawBlock:^(CGContextRef context) {
         if (flipHorizontal) {
-            CGContextTranslateCTM(context, width, 0);
-            CGContextScaleCTM(context, -1, 1);
+            CGContextTranslateCTM(context, width, height);
+            CGContextScaleCTM(context, -1, -1);
         }
         else {
-            CGContextTranslateCTM(context, 0, 0);
-            CGContextScaleCTM(context, 1, 1);
+            CGContextTranslateCTM(context, 0, height);
+            CGContextScaleCTM(context, 1, -1);
         }
         
         CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
@@ -707,12 +709,11 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 {
     [self drawOnTexture:texture width:view.bounds.size.width height:view.bounds.size.height drawBlock:^(CGContextRef context) {
         if (flipHorizontal) {
-            CGContextTranslateCTM(context, view.layer.bounds.size.width, view.layer.bounds.size.height);
-            CGContextScaleCTM(context, -1, -1);
+            CGContextTranslateCTM(context, view.bounds.size.width*self.screenScale, 0);
+            CGContextScaleCTM(context, -self.screenScale, self.screenScale);
         }
         else {
-            CGContextTranslateCTM(context, 0, view.layer.bounds.size.height);
-            CGContextScaleCTM(context, 1, -1);
+            CGContextScaleCTM(context, self.screenScale, self.screenScale);
         }
 
         [view.layer renderInContext:context];
