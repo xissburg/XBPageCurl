@@ -4671,7 +4671,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 								<string key="NSFrame">{{0, 411}, {320, 49}}</string>
 								<reference key="NSSuperview" ref="635516978"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:515</string>
 								<reference key="IBUIBackgroundColor" ref="224436429"/>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>

@@ -50,6 +50,7 @@
 		1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */; };
 		1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */; };
 		1BE4628614677E160013C1C6 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4628414677E160013C1C6 /* RootViewController.m */; };
+		1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */; };
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
@@ -116,6 +117,7 @@
 		1BE4585D1468D44B0064D4B3 /* RootViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController_iPad.xib; sourceTree = "<group>"; };
 		1BE4628314677E160013C1C6 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		1BE4628414677E160013C1C6 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BackPageGradient.png; sourceTree = "<group>"; };
 		1BEBF5231580E930004C34DD /* PageCurlViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageCurlViewController_iPad.h; sourceTree = "<group>"; };
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 		1B8BC4121429866F0048682B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */,
 				1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */,
 				1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */,
 				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
@@ -393,6 +396,7 @@
 				1BE340FE14D4897C00261AF5 /* RootViewController_iPhone.xib in Resources */,
 				1BE340FF14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib in Resources */,
 				1BE3410114D489BB00261AF5 /* PageCurlViewController_iPad.xib in Resources */,
+				1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

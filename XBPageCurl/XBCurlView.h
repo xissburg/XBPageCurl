@@ -35,6 +35,7 @@
     
     //Texture projected onto the back of the curling mesh for double-sided pages.
     GLuint backTexture;
+    GLuint backGradientTexture;
     
     //GPU program for the curling mesh.
     GLuint program;

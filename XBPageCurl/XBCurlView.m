@@ -110,6 +110,34 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     textureHeight = (GLuint)(self.frame.size.height*self.screenScale);
     frontTexture = [self generateTexture];
     
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"BackPageGradient" ofType:@"png"];
+    UIImage *backPageImage = [[[UIImage alloc] initWithContentsOfFile:path] autorelease];
+    backGradientTexture = [self generateTexture];
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, backGradientTexture);
+    
+    size_t width = CGImageGetWidth(backPageImage.CGImage);
+    size_t height = CGImageGetHeight(backPageImage.CGImage);
+    size_t bitsPerComponent = 8;
+    size_t bytesPerRow = width * 4;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
+    CGRect r = CGRectMake(0, 0, width, height);
+    CGContextClearRect(context, r);
+    CGContextSaveGState(context);
+    CGContextTranslateCTM(context, width, 0);
+    CGContextScaleCTM(context, -1, 1);
+    CGContextDrawImage(context, r, backPageImage.CGImage);
+    CGContextRestoreGState(context);  
+    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    CGContextRelease(context);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    
     return YES;
 }
 
@@ -553,6 +581,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 - (BOOL)setupCurlShader
 {
     if ((program = [self createProgramWithVertexShader:@"VertexShader.glsl" fragmentShader:@"FragmentShader.glsl"]) != 0) {
+        glUseProgram(program);
         positionHandle          = glGetAttribLocation(program, "a_position");
         texCoordHandle          = glGetAttribLocation(program, "a_texCoord");
         mvpHandle               = glGetUniformLocation(program, "u_mvpMatrix");
@@ -560,6 +589,8 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         cylinderPositionHandle  = glGetUniformLocation(program, "u_cylinderPosition");
         cylinderDirectionHandle = glGetUniformLocation(program, "u_cylinderDirection");
         cylinderRadiusHandle    = glGetUniformLocation(program, "u_cylinderRadius");
+        GLuint backGradientHandle = glGetUniformLocation(program, "s_gradient");
+        glUniform1i(backGradientHandle, 1);
         return YES;
     }
     
@@ -951,11 +982,14 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
     glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
     
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, backGradientTexture);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frontTexture);
     
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
-    /* Next draw the front faces (the buffers and the shader are already bound) */
+    /* Next draw the back faces (the buffers and the shader are already bound) */
     glCullFace(GL_FRONT);
     
     if (backTexture != 0) {

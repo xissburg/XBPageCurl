@@ -10,6 +10,7 @@ uniform float u_cylinderRadius;
 
 varying vec2 v_texCoord;
 varying vec3 v_normal;
+varying vec2 v_gradientTexCoord;
 
 #define M_PI 3.14159265358979323846264338327950288
 
@@ -36,6 +37,10 @@ void main()
     
     v_normal = mix(vec3(0.0, 0.0, 1.0), (center - v.xyz)/u_cylinderRadius, br1);
     v_normal = mix(v_normal, vec3(0.0, 0.0, -1.0), br2);
+    
+    vec2 vw = v.xy - u_cylinderPosition;
+    float vd = dot(vw, -n);
+    v_gradientTexCoord = vec2(-vd/u_cylinderRadius, 0.5);
 
     gl_Position = u_mvpMatrix * v;
     v_texCoord = a_texCoord;
