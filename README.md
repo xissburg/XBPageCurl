@@ -4,8 +4,7 @@ XBPageCurl is a free and open-source implementation of a page curl animation/tra
 
 It uses OpenGL ES 2.0 to draw a deformed mesh of triangles. Conceptually, it projects the vertices of the mesh on a virtual cylinder that rolls on the view. You can move, rotate and change the radius of the cylinder, with or without animation. This will make the mesh curl around the cylinder. The mesh deformation is performed in a vertex shader which makes it really fast.
 
-![Uncurled](http://xissburg.com/images/XBPageCurl0.png)  ![Curled](http://xissburg.com/images/XBPageCurl1.png)
-![CurledLandscape](http://xissburg.com/images/XBPageCurl2.png)
+![Uncurled](http://xissburg.com/images/XBPageCurlMap.png)  ![Curled](http://xissburg.com/images/XBPageCurlMapCurled.png)
 
 ## Concepts
 
