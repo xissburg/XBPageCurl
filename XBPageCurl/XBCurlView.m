@@ -935,8 +935,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     /* Render everything */
     [EAGLContext setCurrentContext:self.context];
-
-    glBindFramebuffer(GL_FRAMEBUFFER, self.antialiasing? sampleFramebuffer: framebuffer);
     
     /* Clear framebuffer */
     glClear(GL_COLOR_BUFFER_BIT);
@@ -982,9 +980,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
     glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
     
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, backGradientTexture);
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frontTexture);
     
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
