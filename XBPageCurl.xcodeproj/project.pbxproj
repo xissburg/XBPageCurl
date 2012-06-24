@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */; };
+		1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */; };
 		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
 		1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742B714CD038D00BCADCF /* CGPointAdditions.c */; };
 		1B8742C014CD07DA00BCADCF /* PageCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */; };
@@ -25,10 +27,10 @@
 		1B8BC4261429866F0048682B /* appleStore@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4061429866F0048682B /* appleStore@2x.png */; };
 		1B8BC4271429866F0048682B /* SimpleCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4081429866F0048682B /* SimpleCurlViewController.m */; };
 		1B8BC42C1429866F0048682B /* XBPageCurlAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4101429866F0048682B /* XBPageCurlAppDelegate.m */; };
-		1B8BC42D1429866F0048682B /* FragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4131429866F0048682B /* FragmentShader.glsl */; };
+		1B8BC42D1429866F0048682B /* BackFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4131429866F0048682B /* BackFragmentShader.glsl */; };
 		1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */; };
 		1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */; };
-		1B8BC4301429866F0048682B /* VertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4161429866F0048682B /* VertexShader.glsl */; };
+		1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4161429866F0048682B /* BackVertexShader.glsl */; };
 		1B8BC4311429866F0048682B /* XBAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4181429866F0048682B /* XBAnimation.m */; };
 		1B8BC4321429866F0048682B /* XBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC41A1429866F0048682B /* XBAnimationManager.m */; };
 		1B8BC4331429866F0048682B /* XBCurlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC41C1429866F0048682B /* XBCurlView.m */; };
@@ -57,6 +59,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontFragmentShader.glsl; sourceTree = "<group>"; };
+		1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontVertexShader.glsl; sourceTree = "<group>"; };
 		1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBSnappingPoint.h; sourceTree = "<group>"; };
 		1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBSnappingPoint.m; sourceTree = "<group>"; };
 		1B8742B714CD038D00BCADCF /* CGPointAdditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CGPointAdditions.c; sourceTree = "<group>"; };
@@ -84,10 +88,10 @@
 		1B8BC40E1429866F0048682B /* XBPageCurl-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XBPageCurl-Prefix.pch"; sourceTree = "<group>"; };
 		1B8BC40F1429866F0048682B /* XBPageCurlAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageCurlAppDelegate.h; sourceTree = "<group>"; };
 		1B8BC4101429866F0048682B /* XBPageCurlAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlAppDelegate.m; sourceTree = "<group>"; };
-		1B8BC4131429866F0048682B /* FragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FragmentShader.glsl; sourceTree = "<group>"; };
+		1B8BC4131429866F0048682B /* BackFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BackFragmentShader.glsl; sourceTree = "<group>"; };
 		1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageFragmentShader.glsl; sourceTree = "<group>"; };
 		1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageVertexShader.glsl; sourceTree = "<group>"; };
-		1B8BC4161429866F0048682B /* VertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = VertexShader.glsl; sourceTree = "<group>"; };
+		1B8BC4161429866F0048682B /* BackVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BackVertexShader.glsl; sourceTree = "<group>"; };
 		1B8BC4171429866F0048682B /* XBAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimation.h; sourceTree = "<group>"; };
 		1B8BC4181429866F0048682B /* XBAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimation.m; sourceTree = "<group>"; };
 		1B8BC4191429866F0048682B /* XBAnimationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimationManager.h; sourceTree = "<group>"; };
@@ -274,8 +278,10 @@
 				1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */,
 				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
 				1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */,
-				1B8BC4131429866F0048682B /* FragmentShader.glsl */,
-				1B8BC4161429866F0048682B /* VertexShader.glsl */,
+				1B8BC4131429866F0048682B /* BackFragmentShader.glsl */,
+				1B8BC4161429866F0048682B /* BackVertexShader.glsl */,
+				1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */,
+				1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -384,10 +390,10 @@
 				1B8BC4221429866F0048682B /* MainWindow_iPhone.xib in Resources */,
 				1B8BC4251429866F0048682B /* appleStore.png in Resources */,
 				1B8BC4261429866F0048682B /* appleStore@2x.png in Resources */,
-				1B8BC42D1429866F0048682B /* FragmentShader.glsl in Resources */,
+				1B8BC42D1429866F0048682B /* BackFragmentShader.glsl in Resources */,
 				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
 				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
-				1B8BC4301429866F0048682B /* VertexShader.glsl in Resources */,
+				1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */,
 				1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */,
 				1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */,
 				1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */,
@@ -397,6 +403,8 @@
 				1BE340FF14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib in Resources */,
 				1BE3410114D489BB00261AF5 /* PageCurlViewController_iPad.xib in Resources */,
 				1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */,
+				1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */,
+				1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

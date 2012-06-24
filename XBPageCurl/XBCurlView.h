@@ -38,29 +38,33 @@
     GLuint backGradientTexture;
     
     //GPU program for the curling mesh.
-    GLuint program;
+    GLuint frontProgram;
+    GLuint backProgram;
     
     //Vertex and index buffer for the curling mesh.
     GLuint vertexBuffer;
     GLuint indexBuffer;
     GLuint elementCount; //Number of entries in the index buffer
     
-    //Handles for the curl shader variables.
-    GLuint positionHandle, texCoordHandle, mvpHandle, samplerHandle;
-    GLuint cylinderPositionHandle, cylinderDirectionHandle, cylinderRadiusHandle;
+    //Handles for the curl shader uniforms.
+    GLuint frontMvpHandle, frontSamplerHandle;
+    GLuint frontCylinderPositionHandle, frontCylinderDirectionHandle, frontCylinderRadiusHandle;
+    
+    GLuint backMvpHandle, backSamplerHandle, backGradientSamplerHandle;
+    GLuint backCylinderPositionHandle, backCylinderDirectionHandle, backCylinderRadiusHandle;
     
     //Texture projected onto the two-triangle rectangle of the nextPage.
     GLuint nextPageTexture;
     
-    //Very simple GPU program for the nextPage.
+    //GPU program for the nextPage.
     GLuint nextPageProgram;
     
     //Vertex buffer for the two-triangle rectangle of the nextPage.
     //No need for an index buffer. It is drawn as a triangle-strip.
     GLuint nextPageVertexBuffer;
     
-    //Handles for the nextPageProgram variables.
-    GLuint nextPagePositionHandle, nextPageTexCoordHandle, nextPageMvpHandle, nextPageSamplerHandle;
+    //Handles for the nextPageProgram uniforms.
+    GLuint nextPageMvpHandle, nextPageSamplerHandle;
     GLuint nextPageCylinderPositionHandle, nextPageCylinderDirectionHandle, nextPageCylinderRadiusHandle;
     
     //Viewport/view/screen size.
@@ -83,6 +87,11 @@
     
     //Screen scale
     CGFloat _screenScale;
+    
+    //Vertex Array Objects
+    GLuint backVAO;
+    GLuint frontVAO;
+    GLuint nextPageVAO;
 }
 
 @property (nonatomic, readonly) BOOL antialiasing;

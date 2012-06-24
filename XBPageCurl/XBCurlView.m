@@ -85,10 +85,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
         return NO;
     }
     
-    if (![self setupShaders]) {
-        return NO;
-    }
-    
     self.animationManager = [XBAnimationManager animationManager];
 
     self.cylinderPosition = CGPointMake(0, 0);
@@ -98,45 +94,29 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     framebuffer = colorRenderbuffer = 0;
     sampleFramebuffer = sampleColorRenderbuffer = 0;
     vertexBuffer = indexBuffer = elementCount = 0;
-    frontTexture = 0;
+    frontTexture = backTexture = nextPageTexture = 0;
     
     if (![self createFramebuffer]) {
         return NO;
     }
     
-    [self setupMVP];
+    [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
+    [self createNextPageVertexBuffer];
+    
+    if (![self setupShaders]) {
+        return NO;
+    }
     
     textureWidth = (GLuint)(self.frame.size.width*self.screenScale);
     textureHeight = (GLuint)(self.frame.size.height*self.screenScale);
     frontTexture = [self generateTexture];
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"BackPageGradient" ofType:@"png"];
-    UIImage *backPageImage = [[[UIImage alloc] initWithContentsOfFile:path] autorelease];
-    backGradientTexture = [self generateTexture];
+    [self createBackGradientTexture];
+    [self setupMVP];
     
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, backGradientTexture);
-    
-    size_t width = CGImageGetWidth(backPageImage.CGImage);
-    size_t height = CGImageGetHeight(backPageImage.CGImage);
-    size_t bitsPerComponent = 8;
-    size_t bytesPerRow = width * 4;
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(NULL, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
-    CGColorSpaceRelease(colorSpace);
-    CGRect r = CGRectMake(0, 0, width, height);
-    CGContextClearRect(context, r);
-    CGContextSaveGState(context);
-    CGContextTranslateCTM(context, width, 0);
-    CGContextScaleCTM(context, -1, 1);
-    CGContextDrawImage(context, r, backPageImage.CGImage);
-    CGContextRestoreGState(context);  
-    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-    CGContextRelease(context);
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    [self createBackVAO];
+    [self createFrontVAO];
+    [self createNextPageVAO];
     
     return YES;
 }
@@ -164,8 +144,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
             return nil;
         }
         
-        [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
-        [self createNextPageVertexBuffer];
         [self setupInitialGLState];
     }
     return self;
@@ -182,6 +160,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [self destroyVertexBuffer];
     [self destroyNextPageVertexBuffer];
     [self destroyShaders];
+    [self destroyVAOs];
     [self destroyFramebuffer];
     //Keep this last one as the last one
     self.context = nil;
@@ -394,25 +373,22 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glViewport(0, 0, viewportWidth, viewportHeight);
     self.backgroundColor = [UIColor clearColor];
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glActiveTexture(GL_TEXTURE0);
     
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(positionHandle);
-    glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-    glEnableVertexAttribArray(texCoordHandle);
-    glUseProgram(program);
-    glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, mvp);
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
-    glUniform1i(samplerHandle, 0);
+    glUseProgram(frontProgram);
+    glUniformMatrix4fv(frontMvpHandle, 1, GL_FALSE, mvp);
+    glUniform1i(frontSamplerHandle, 0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glUseProgram(backProgram);
+    glUniformMatrix4fv(backMvpHandle, 1, GL_FALSE, mvp);
+    glUniform1i(backSamplerHandle, 0);
+    glUniform1i(backGradientSamplerHandle, 1);
     
-    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(nextPagePositionHandle);
     glUseProgram(nextPageProgram);
     glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+    glUniform1i(nextPageSamplerHandle, 0);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
 }
 
 
@@ -517,9 +493,81 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glDeleteBuffers(1, &nextPageVertexBuffer);
 }
 
+- (void)createBackVAO
+{
+    [self destroyBackVAO];
+    glGenVertexArraysOES(1, &backVAO);
+    glBindVertexArrayOES(backVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBindVertexArrayOES(0);
+}
+
+- (void)destroyBackVAO
+{
+    glDeleteVertexArraysOES(1, &backVAO);
+    backVAO = 0;
+}
+
+- (void)createFrontVAO
+{
+    [self destroyFrontVAO];
+    glGenVertexArraysOES(1, &frontVAO);
+    glBindVertexArrayOES(frontVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBindVertexArrayOES(0);
+}
+
+- (void)destroyFrontVAO
+{
+    glDeleteVertexArraysOES(1, &frontVAO);
+    frontVAO = 0;
+}
+
+- (void)createNextPageVAO
+{
+    [self destroyNextPageVAO];
+    glGenVertexArraysOES(1, &nextPageVAO);
+    glBindVertexArrayOES(nextPageVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+    glBindVertexArrayOES(0);
+}
+
+- (void)destroyNextPageVAO
+{
+    glDeleteVertexArraysOES(1, &nextPageVAO);
+    nextPageVAO = 0;
+}
+
+- (void)destroyVAOs
+{
+    [self destroyNextPageVAO];
+    [self destroyFrontVAO];
+    [self destroyBackVAO];
+}
+
 - (void)setupMVP
 {
     OrthoM4x4(mvp, 0.f, viewportWidth, 0.f, viewportHeight, -1000.f, 1000.f);
+    glUseProgram(nextPageProgram);
+    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
+    glUseProgram(frontProgram);
+    glUniformMatrix4fv(frontMvpHandle, 1, GL_FALSE, mvp);
+    glUseProgram(backProgram);
+    glUniformMatrix4fv(backMvpHandle, 1, GL_FALSE, mvp);
 }
 
 
@@ -580,17 +628,25 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 
 - (BOOL)setupCurlShader
 {
-    if ((program = [self createProgramWithVertexShader:@"VertexShader.glsl" fragmentShader:@"FragmentShader.glsl"]) != 0) {
-        glUseProgram(program);
-        positionHandle          = glGetAttribLocation(program, "a_position");
-        texCoordHandle          = glGetAttribLocation(program, "a_texCoord");
-        mvpHandle               = glGetUniformLocation(program, "u_mvpMatrix");
-        samplerHandle           = glGetUniformLocation(program, "s_tex");
-        cylinderPositionHandle  = glGetUniformLocation(program, "u_cylinderPosition");
-        cylinderDirectionHandle = glGetUniformLocation(program, "u_cylinderDirection");
-        cylinderRadiusHandle    = glGetUniformLocation(program, "u_cylinderRadius");
-        GLuint backGradientHandle = glGetUniformLocation(program, "s_gradient");
-        glUniform1i(backGradientHandle, 1);
+    if ((frontProgram = [self createProgramWithVertexShader:@"FrontVertexShader.glsl" fragmentShader:@"FrontFragmentShader.glsl"]) != 0 &&
+        (backProgram = [self createProgramWithVertexShader:@"BackVertexShader.glsl" fragmentShader:@"BackFragmentShader.glsl"]) != 0) {
+        glBindAttribLocation(frontProgram, 0, "a_position");
+        glBindAttribLocation(frontProgram, 1, "a_texCoord");
+        frontMvpHandle               = glGetUniformLocation(frontProgram, "u_mvpMatrix");
+        frontSamplerHandle           = glGetUniformLocation(frontProgram, "s_tex");
+        frontCylinderPositionHandle  = glGetUniformLocation(frontProgram, "u_cylinderPosition");
+        frontCylinderDirectionHandle = glGetUniformLocation(frontProgram, "u_cylinderDirection");
+        frontCylinderRadiusHandle    = glGetUniformLocation(frontProgram, "u_cylinderRadius");
+        
+        glBindAttribLocation(backProgram, 0, "a_position");
+        glBindAttribLocation(backProgram, 1, "a_texCoord");
+        backMvpHandle               = glGetUniformLocation(backProgram, "u_mvpMatrix");
+        backSamplerHandle           = glGetUniformLocation(backProgram, "s_tex");
+        backGradientSamplerHandle   = glGetUniformLocation(backProgram, "s_gradient");
+        backCylinderPositionHandle  = glGetUniformLocation(backProgram, "u_cylinderPosition");
+        backCylinderDirectionHandle = glGetUniformLocation(backProgram, "u_cylinderDirection");
+        backCylinderRadiusHandle    = glGetUniformLocation(backProgram, "u_cylinderRadius");
+        
         return YES;
     }
     
@@ -599,8 +655,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 
 - (void)destroyCurlShader
 {
-    glDeleteProgram(program);
-    program = 0;
+    glDeleteProgram(frontProgram);
+    frontProgram = 0;
+    glDeleteProgram(backProgram);
+    backProgram = 0;
 }
 
 - (BOOL)setupNextPageShader
@@ -611,32 +669,13 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     NSString *fsFilename = nextPageTexture != 0? @"NextPageFragmentShader.glsl": @"NextPageNoTextureFragmentShader.glsl";
     
     if ((nextPageProgram = [self createProgramWithVertexShader:vsFilename fragmentShader:fsFilename]) != 0) {
-        glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-        
-        if (nextPageTexture == 0) {
-            glDisableVertexAttribArray(nextPageTexCoordHandle);
-        }
-        
-        nextPagePositionHandle          = glGetAttribLocation(nextPageProgram, "a_position");
-        nextPageTexCoordHandle          = glGetAttribLocation(nextPageProgram, "a_texCoord");
+        glBindAttribLocation(nextPageProgram, 0, "a_position");
+        glBindAttribLocation(nextPageProgram, 1, "a_texCoord");
         nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
         nextPageSamplerHandle           = glGetUniformLocation(nextPageProgram, "s_tex");
         nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
         nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
         nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
-        
-        glUseProgram(nextPageProgram);
-        glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
-        glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-        glEnableVertexAttribArray(nextPagePositionHandle);
-        
-        //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
-        if (nextPageTexture != 0) {
-            glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-            glEnableVertexAttribArray(nextPageTexCoordHandle);
-            glBindTexture(GL_TEXTURE_2D, nextPageTexture);
-            glUniform1i(nextPageSamplerHandle, 0);
-        }
         
         return YES;
     }
@@ -700,9 +739,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, frontTexture); // Keep the frontTexture bound
     
     CGContextRelease(context);
 }
@@ -812,17 +852,19 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [EAGLContext setCurrentContext:self.context];
     
     if (image == nil) {
-        [self destroyNextPageTexture];
-        [self setupNextPageShader];
+        if (nextPageTexture != 0) {
+            [self destroyNextPageTexture];
+            [self setupNextPageShader];
+        }
         return;
     }
-    
+
     if (nextPageTexture == 0) {
         nextPageTexture = [self generateTexture];
+        [self setupNextPageShader];
     }
     
     [self drawImage:image onTexture:nextPageTexture];
-    [self setupNextPageShader];
 }
 
 - (void)drawViewOnNextPage:(UIView *)view
@@ -830,17 +872,19 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [EAGLContext setCurrentContext:self.context];
     
     if (view == nil) {
-        [self destroyNextPageTexture];
-        [self setupNextPageShader];
+        if (nextPageTexture != 0) {
+            [self destroyNextPageTexture];
+            [self setupNextPageShader];
+        }
         return;
     }
     
     if (nextPageTexture == 0) {
         nextPageTexture = [self generateTexture];
+        [self setupNextPageShader];
     }
     
     [self drawView:view onTexture:nextPageTexture];
-    [self setupNextPageShader];
 }
          
 - (void)destroyNextPageTexture
@@ -854,8 +898,39 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glDeleteTextures(1, &frontTexture);
     frontTexture = 0;
     
+    glDeleteTextures(1, &backGradientTexture);
+    backGradientTexture = 0;
+    
     [self destroyNextPageTexture];
     [self destroyBackTexture];
+}
+
+- (void)createBackGradientTexture
+{
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"BackPageGradient" ofType:@"png"];
+    UIImage *backPageImage = [[[UIImage alloc] initWithContentsOfFile:path] autorelease];
+    backGradientTexture = [self generateTexture];
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, backGradientTexture);
+    
+    size_t width = CGImageGetWidth(backPageImage.CGImage);
+    size_t height = CGImageGetHeight(backPageImage.CGImage);
+    size_t bitsPerComponent = 8;
+    size_t bytesPerRow = width * 4;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
+    CGRect r = CGRectMake(0, 0, width, height);
+    CGContextClearRect(context, r);
+    CGContextSaveGState(context);
+    CGContextTranslateCTM(context, width, 0);
+    CGContextScaleCTM(context, -1, 1);
+    CGContextDrawImage(context, r, backPageImage.CGImage);
+    CGContextRestoreGState(context);  
+    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+    CGContextRelease(context);
 }
 
 
@@ -955,44 +1030,48 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
     glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
     
-    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-    glVertexAttribPointer(nextPagePositionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    
     //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
     if (nextPageTexture != 0) {
-        glVertexAttribPointer(nextPageTexCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
         glBindTexture(GL_TEXTURE_2D, nextPageTexture);
     }
-        
+     
+    glBindVertexArrayOES(nextPageVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     /* Draw the previousPage if any */
     /* TODO */
     
     /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
-    glUseProgram(program);
+    glUseProgram(frontProgram);
     
-    glUniform2f(cylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-    glUniform2f(cylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-    glUniform1f(cylinderRadiusHandle, _cylinderRadius);
+    glUniform2f(frontCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+    glUniform2f(frontCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+    glUniform1f(frontCylinderRadiusHandle, _cylinderRadius);
     
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glVertexAttribPointer(positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glVertexAttribPointer(texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
+    if (backTexture != 0 || nextPageTexture != 0) { // In this case the frontTexture should already be bound, since it's the only texture around
+        glBindTexture(GL_TEXTURE_2D, frontTexture);
+    }
     
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
-    
+    glBindVertexArrayOES(frontVAO);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
     
-    /* Next draw the back faces (the buffers and the shader are already bound) */
+    /* Next draw the back faces (the vertex buffer is already bound) */
     glCullFace(GL_FRONT);
+    
+    glUseProgram(backProgram);
+    
+    glUniform2f(backCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
+    glUniform2f(backCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
+    glUniform1f(backCylinderRadiusHandle, _cylinderRadius);
     
     if (backTexture != 0) {
         glBindTexture(GL_TEXTURE_2D, backTexture);
-        glUniform1i(samplerHandle, 0);
     }
     
+    glBindVertexArrayOES(backVAO);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+    
+    glBindVertexArrayOES(0);
     
     //Disable blending for now
     if (!self.pageOpaque) {
