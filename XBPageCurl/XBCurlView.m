@@ -87,7 +87,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     self.animationManager = [XBAnimationManager animationManager];
 
-    self.cylinderPosition = CGPointMake(0, 0);
+    self.cylinderPosition = CGPointMake(self.bounds.size.width, self.bounds.size.height/2);
     self.cylinderAngle = M_PI_2;
     self.cylinderRadius = 32;
     
