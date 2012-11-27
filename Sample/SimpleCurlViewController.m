@@ -88,7 +88,6 @@
 {
     [self.curlView uncurlAnimatedWithDuration:kDuration];
     isCurled = NO;
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)backButtonAction:(id)sender
