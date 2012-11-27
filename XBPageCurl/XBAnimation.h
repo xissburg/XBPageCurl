@@ -38,7 +38,7 @@
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion interpolator:(double (^)(double t))interpolator;
 
 /**
- * Steps the animation forward using its interpolator. The dt parameter is the elapsed time seconds.
+ * Steps the animation forward using its interpolator. The dt parameter is the elapsed time in seconds.
  */
 - (BOOL)step:(NSTimeInterval)dt;
 

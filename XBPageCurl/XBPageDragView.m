@@ -24,6 +24,7 @@
 
 - (void)dealloc
 {
+    [self.pageCurlView stopAnimating];
     self.viewToCurl = nil;
     self.pageCurlView = nil;
     self.bottomSnappingPoint = nil;

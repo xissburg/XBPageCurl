@@ -137,7 +137,8 @@
  * (for example, before adding it as subview and changing the cylinder properties). stopAnimating should
  * be called whenever you don't need to animate this anymore (for example, after removing it from superview),
  * otherwise your XBCurlView instance won't be deallocated because, internally, the CADisplayLink retains its
- * target which is the XBCurlView instance itself.
+ * target which is the XBCurlView instance itself. So, if you call startAnimating, you must call stopAnimating
+ * later.
  */
 - (void)startAnimating;
 - (void)stopAnimating;

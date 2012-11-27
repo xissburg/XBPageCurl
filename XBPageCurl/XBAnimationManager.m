@@ -13,19 +13,22 @@
 @interface XBAnimationManager ()
 
 @property (nonatomic, retain) NSMutableDictionary *animations;
+@property (nonatomic, retain) NSMutableArray *animationsToRemove;
+@property (nonatomic, assign) BOOL updateLock;
 
 @end
 
 
 @implementation XBAnimationManager
 
-@synthesize animations=_animations;
+@synthesize animations=_animations, animationsToRemove=_animationsToRemove;
 
 - (id)init
 {
     self = [super init];
     if (self) {
         _animations = [[NSMutableDictionary alloc] init];
+        _animationsToRemove = [[NSMutableArray alloc] init];
     }
     
     return self;
@@ -34,6 +37,7 @@
 - (void)dealloc
 {
     self.animations = nil;
+    self.animationsToRemove = nil;
     [super dealloc];
 }
 
@@ -57,7 +61,22 @@
 
 - (void)stopAnimationNamed:(NSString *)name
 {
-    [self.animations removeObjectForKey:name];
+    if (self.updateLock) {
+        [self.animationsToRemove addObject:name];
+    }
+    else {
+        [self.animations removeObjectForKey:name];
+    }
+}
+
+- (void)stopAllAnimations
+{
+    if (self.updateLock) {
+        [self.animationsToRemove addObjectsFromArray:[self.animations allKeys]];
+    }
+    else {
+        [self.animations removeAllObjects];
+    }
 }
 
 - (void)update:(double)dt
@@ -65,14 +84,18 @@
     //Step all animations
     NSMutableArray *finishedAnimationKeys = [NSMutableArray array];//animations to be removed
     
+    self.updateLock = YES;
     [self.animations enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         XBAnimation *animation = (XBAnimation *)obj;
         if ([animation step:dt] == NO) {
             [finishedAnimationKeys addObject:key];
         }
     }];
+    self.updateLock = NO;
     
     [self.animations removeObjectsForKeys:finishedAnimationKeys];
+    [self.animations removeObjectsForKeys:self.animationsToRemove];
+    [self.animationsToRemove removeAllObjects];
 }
 
 @end

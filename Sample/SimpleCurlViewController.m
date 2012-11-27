@@ -20,6 +20,7 @@
 
 - (void)dealloc 
 {
+    [self.curlView stopAnimating];
     self.messyView = nil;
     self.pickerView = nil;
     self.searchBar = nil;
@@ -34,6 +35,7 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
+    [self.curlView stopAnimating];
     self.messyView = nil;
     self.pickerView = nil;
     self.searchBar = nil;
@@ -86,6 +88,7 @@
 {
     [self.curlView uncurlAnimatedWithDuration:kDuration];
     isCurled = NO;
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)backButtonAction:(id)sender

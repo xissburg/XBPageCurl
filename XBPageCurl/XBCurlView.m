@@ -25,7 +25,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 @interface XBCurlView ()
 
 @property (nonatomic, retain) EAGLContext *context;
-@property (nonatomic, retain) CADisplayLink *displayLink;
+@property (nonatomic, assign) CADisplayLink *displayLink;
 @property (nonatomic, retain) XBAnimationManager *animationManager;
 @property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
@@ -224,9 +224,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGPoint p0 = self.cylinderPosition;
-    
+    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
-        self.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
+        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
+        weakSelf.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
     } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
@@ -247,9 +248,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 {
     double a0 = _cylinderAngle;
     double a1 = cylinderAngle;
-    
+    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
-        _cylinderAngle = (1 - t)*a0 + t*a1;
+        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
+        weakSelf->_cylinderAngle = (1 - t)*a0 + t*a1;
     } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
@@ -279,9 +281,10 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGFloat r = self.cylinderRadius;
-    
+    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
-        self.cylinderRadius = (1 - t)*r + t*cylinderRadius;
+        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
+        weakSelf.cylinderRadius = (1 - t)*r + t*cylinderRadius;
     } completion:completion interpolator:interpolator];
     
     [self.animationManager runAnimation:animation];
@@ -969,15 +972,17 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     CGRect frame = self.frame;
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
+    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
     [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
     [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
     [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
-        self.curlingView.hidden = NO;
-        [self removeFromSuperview];
+        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
+        weakSelf.curlingView.hidden = NO;
+        weakSelf.curlingView = nil;
+        [weakSelf removeFromSuperview];
         //Stop the rendering loop since the curlView was removed from its superview and hence won't appear
-        [self stopAnimating];
-        self.curlingView = nil;
+        [weakSelf stopAnimating];
     }];
     
     [self startAnimating];
@@ -995,9 +1000,11 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 
 - (void)stopAnimating
 {
-    [self.displayLink invalidate];
-    self.displayLink = nil;
     self.lastTimestamp = 0;
+    [self.animationManager stopAllAnimations];
+    CADisplayLink *displayLink = self.displayLink;
+    self.displayLink = nil;
+    [displayLink invalidate]; // Warning: self might be deallocated in this call
 }
 
 - (void)draw:(CADisplayLink *)sender
