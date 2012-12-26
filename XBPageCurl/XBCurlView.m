@@ -1028,7 +1028,11 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [self.animationManager stopAllAnimations];
     CADisplayLink *displayLink = self.displayLink;
     self.displayLink = nil;
-    [displayLink invalidate]; // Warning: self might be deallocated in this call
+    // WARNING: self might be deallocated at this point, because the displayLink retains self and since it is released right above,
+    // its retainCount might reach zero and in this case it will be deallocated and will also release its target (which is self),
+    // which might also get deallocated if it is not retained by anything else like a superview. Therefore, don't touch self after
+    // this line.
+    [displayLink invalidate]; 
 }
 
 - (void)draw:(CADisplayLink *)sender
