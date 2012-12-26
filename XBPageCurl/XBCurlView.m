@@ -30,6 +30,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 @property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
 @property (nonatomic, assign) NSTimeInterval lastTimestamp;
+@property (nonatomic, assign) BOOL wasAnimating;
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -65,6 +66,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 @synthesize cylinderAngle=_cylinderAngle;
 @synthesize screenScale=_screenScale;
 @synthesize lastTimestamp=_lastTimestamp;
+@synthesize wasAnimating=_wasAnimating;
 
 - (BOOL)initialize
 {
@@ -118,6 +120,9 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     [self createFrontVAO];
     [self createNextPageVAO];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActiveNotification:) name:UIApplicationWillResignActiveNotification object:[UIApplication sharedApplication]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:[UIApplication sharedApplication]];
+    
     return YES;
 }
 
@@ -165,6 +170,8 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     //Keep this last one as the last one
     self.context = nil;
     [EAGLContext setCurrentContext:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [super dealloc];
 }
@@ -304,6 +311,23 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
 {
     [super setOpaque:opaque];
     self.backgroundColor = self.backgroundColor;
+}
+
+
+#pragma mark - Notifications
+
+- (void)applicationWillResignActiveNotification:(NSNotification *)notification
+{
+    self.wasAnimating = self.displayLink != nil;
+    [self stopAnimating];
+    glFinish();
+}
+
+- (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
+{
+    if (self.wasAnimating) {
+        [self startAnimating];
+    }
 }
 
 
