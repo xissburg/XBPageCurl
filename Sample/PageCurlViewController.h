@@ -22,5 +22,6 @@
 - (IBAction)standardButtonAction:(id)sender;
 - (IBAction)satelliteButtonAction:(id)sender;
 - (IBAction)hybridButtonAction:(id)sender;
+- (IBAction)saveImageButtonAction:(id)sender;
 
 @end

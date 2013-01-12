@@ -7,6 +7,7 @@
 //
 
 #import "PageCurlViewController.h"
+#import <QuartzCore/QuartzCore.h>
 
 #define kDuration 0.3
 
@@ -95,6 +96,15 @@
 - (void)hybridButtonAction:(id)sender
 {
     self.mapView.mapType = MKMapTypeHybrid;
+}
+
+- (void)saveImageButtonAction:(id)sender
+{
+    UIImage *image = [self.pageDragView.pageCurlView imageFromFramebufferWithBackgroundView:self.backView];
+    // Force it to save a high quality PNG instead of a lossy JPEG
+    NSData *data = UIImagePNGRepresentation(image);
+    image = [UIImage imageWithData:data];
+    UIImageWriteToSavedPhotosAlbum(image, nil, nil, NULL);
 }
 
 @end

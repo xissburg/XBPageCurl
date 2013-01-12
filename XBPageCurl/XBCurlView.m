@@ -21,6 +21,7 @@ typedef struct _Vertex
 } Vertex;
 
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
+void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 @interface XBCurlView ()
 
@@ -416,6 +417,58 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frontTexture);
+}
+
+- (UIImage *)imageFromFramebuffer
+{
+    return [self imageFromFramebufferWithBackgroundView:nil];
+}
+
+- (UIImage *)imageFromFramebufferWithBackgroundView:(UIView *)backgroundView
+{
+    GLuint rttFramebuffer;
+    glGenFramebuffers(1, &rttFramebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, rttFramebuffer);
+    GLuint rttTexture;
+    glGenTextures(1, &rttTexture);
+    glBindTexture(GL_TEXTURE_2D, rttTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, viewportWidth, viewportHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rttTexture, 0);
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    [self draw:self.displayLink];
+    
+    size_t size = viewportHeight * viewportWidth * 4;
+    GLvoid *pixels = malloc(size);
+    glReadPixels(0, 0, viewportWidth, viewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    // Restore the original framebuffer binding
+    glBindFramebuffer(GL_FRAMEBUFFER, self.antialiasing? sampleFramebuffer: framebuffer);
+    glDeleteFramebuffers(1, &rttFramebuffer);
+    glDeleteTextures(1, &rttTexture);
+    
+    size_t bitsPerComponent = 8;
+    size_t bitsPerPixel = 32;
+    size_t bytesPerRow = viewportWidth * bitsPerPixel / bitsPerComponent;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault | kCGImageAlphaLast;
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, ImageProviderReleaseData);
+    CGImageRef cgImage = CGImageCreate(viewportWidth, viewportHeight, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    CGDataProviderRelease(provider);
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:UIImageOrientationDownMirrored];
+    CGImageRelease(cgImage);
+    CGColorSpaceRelease(colorSpace);
+    
+    if (backgroundView != nil) {
+        UIGraphicsBeginImageContextWithOptions(image.size, YES, 0);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [backgroundView.layer renderInContext:context];
+        CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), image.CGImage);
+        image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    }
+    
+    return image;
 }
 
 
@@ -1043,11 +1096,6 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     dt = MAX(0, MIN(dt, 0.2));
     [self.animationManager update:dt];
     
-    /* Render everything */
-    [EAGLContext setCurrentContext:self.context];
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, self.antialiasing? sampleFramebuffer: framebuffer);
-    
     /* Clear framebuffer */
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -1117,12 +1165,14 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     
     /* If antialiasing is enabled, draw on the multisampling buffers */
     if (_antialiasing) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
         glResolveMultisampleFramebufferAPPLE();
         
         GLenum attachments[] = {GL_COLOR_ATTACHMENT0};
         glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 1, attachments);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, sampleFramebuffer);
     }
     
     /* Finally, present, swap buffers, whatever */
@@ -1149,3 +1199,7 @@ void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloa
     out[3] = 0.f; out[7] = 0.f; out[11] = 0.f; out[15] = 1.f;
 }
 
+void ImageProviderReleaseData(void *info, const void *data, size_t size)
+{
+    free((void *)data);
+}

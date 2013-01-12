@@ -166,4 +166,15 @@
 - (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration;
 
+/**
+ * Return an UIImage instance with the current contents of the main framebuffer.
+ */
+- (UIImage *)imageFromFramebuffer;
+
+/**
+ * Return an UIImage instance with the current contents of the main framebuffer and a background view that can
+ * be seen through the transparent regions of the page.
+ */
+- (UIImage *)imageFromFramebufferWithBackgroundView:(UIView *)backgroundView;
+
 @end
