@@ -38,7 +38,6 @@
 {
     self.animations = nil;
     self.animationsToRemove = nil;
-    [super dealloc];
 }
 
 
@@ -46,7 +45,7 @@
 
 + (id)animationManager
 {
-    return [[[self alloc] init] autorelease];
+    return [[self alloc] init];
 }
 
 - (void)runAnimation:(XBAnimation *)animation
