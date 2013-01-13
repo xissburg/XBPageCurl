@@ -397,32 +397,24 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     }
 }
 
-
 #pragma mark - Framebuffer
 
 - (BOOL)createFramebuffer
 {
     [self destroyFramebuffer];
-
-    GLenum status = glGetError();
     
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
     glGenRenderbuffers(1, &colorRenderbuffer);
-    status = glGetError();
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    status = glGetError();
     
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderbuffer);
-    status = glGetError();
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &viewportWidth);
-    status = glGetError();
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &viewportHeight);
-    status = glGetError();
     
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         NSLog(@"Failed to create framebuffer: %x", status);
