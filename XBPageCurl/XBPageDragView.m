@@ -12,6 +12,8 @@
 
 @property (nonatomic, retain) XBPageCurlView *pageCurlView;
 @property (nonatomic, retain) XBSnappingPoint *bottomSnappingPoint;
+@property (nonatomic, retain) XBSnappingPoint *curledSnappingPoint;
+@property (strong,nonatomic) UIButton *uncurlButton;
 
 @end
 
@@ -21,6 +23,7 @@
 @synthesize pageIsCurled = _pageIsCurled;
 @synthesize pageCurlView = _pageCurlView;
 @synthesize bottomSnappingPoint = _bottomSnappingPoint;
+@synthesize curledSnappingPoint = _curledSnappingPoint;
 
 - (void)dealloc
 {
@@ -53,7 +56,6 @@
 }
 
 #pragma mark - Methods
-
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion
 {
     NSTimeInterval duration = animated? 0.3: 0;
@@ -64,6 +66,7 @@
         _pageIsCurled = NO;
         self.viewToCurl.hidden = NO;
         [self.pageCurlView removeFromSuperview];
+        [self.uncurlButton removeFromSuperview];
         [self.pageCurlView stopAnimating];
         if (completion != nil) {
             completion();
@@ -92,10 +95,25 @@
     point.angle = M_PI/8;
     point.radius = 80;
     [self.pageCurlView.snappingPoints addObject:point];
+    self.curledSnappingPoint = point;
     
     [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
 }
 
+-(void)uncurlTapped:(id)sender
+{
+    [self uncurlPageAnimated:YES completion:nil];
+}
+
+-(void)createUncurlButton
+{
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.backgroundColor = [UIColor clearColor];
+    [button addTarget:self action:@selector(uncurlTapped:) forControlEvents:UIControlEventTouchUpInside];
+    button.frame = CGRectMake(0,0,self.superview.frame.size.width, self.curledSnappingPoint.position.y);
+    [self.superview addSubview:button];
+    self.uncurlButton = button;
+}
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -131,7 +149,19 @@
     if (self.pageIsCurled) {
         UITouch *touch = [touches anyObject];
         CGPoint touchLocation = [touch locationInView:self.viewToCurl.superview];
-        [self.pageCurlView touchEndedAtPoint:touchLocation];
+        if (CGRectContainsPoint(self.frame, touchLocation)) {
+            XBCurlView *cv = self.pageCurlView;
+            XBSnappingPoint *sp = self.curledSnappingPoint;
+            CGFloat duration = 0.3;
+            [cv setCylinderPosition:sp.position animatedWithDuration:duration];
+            [cv setCylinderRadius:sp.radius animatedWithDuration:duration];
+            [cv setCylinderAngle:sp.angle animatedWithDuration:duration completion:^{
+                [self createUncurlButton];
+            }];
+            _pageIsCurled = YES;
+        } else {
+            [self.pageCurlView touchEndedAtPoint:touchLocation];
+        }
     }
 }
 
@@ -154,6 +184,8 @@
         self.viewToCurl.hidden = NO;
         [self.pageCurlView removeFromSuperview];
         [self.pageCurlView stopAnimating];
+    } else if (snappintPoint == self.curledSnappingPoint) {
+        [self createUncurlButton];
     }
 }
 
