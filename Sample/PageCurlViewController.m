@@ -11,6 +11,13 @@
 
 #define kDuration 0.3
 
+@interface PageCurlViewController () {
+@private
+    UIPanGestureRecognizer *panGestureRecognizer;
+}
+
+@end
+
 @implementation PageCurlViewController
 
 @synthesize mapView = _mapView;
@@ -29,6 +36,21 @@
 
 #pragma mark - View lifecycle
 
+- (void)panGestureRecognizerUpdated:(UIPanGestureRecognizer *)recognizer {
+    UIView *viewForPanning = ((XBPageDragView *)recognizer.view);
+    CGPoint point = [recognizer locationInView:viewForPanning];
+
+    if (!self.pageDragView.pageIsCurled) {
+        [self.pageDragView beginCurlWithTouchAt:point];
+    } else {
+        if (recognizer.state == UIGestureRecognizerStateEnded) {
+            [self.pageDragView endCurlWithTouchAt:point];
+        } else {
+            [self.pageDragView updateCurlWithTouchAt:point];
+        }
+    }
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -41,6 +63,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
+    if (panGestureRecognizer == nil) {
+        panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
+            action:@selector(panGestureRecognizerUpdated:)];
+        [self.view addGestureRecognizer:panGestureRecognizer];
+    }
+    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 

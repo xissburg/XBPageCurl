@@ -23,15 +23,92 @@ typedef struct _Vertex
 void OrthoM4x4(GLfloat *out, GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
 void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
-@interface XBCurlView ()
+@interface XBCurlView () {
+@private
+    EAGLContext *_context;
+    CADisplayLink *_displayLink;
+    
+    //OpenGL buffers.
+    GLuint framebuffer;
+    GLuint colorRenderbuffer;
+    GLuint sampleFramebuffer;
+    GLuint sampleColorRenderbuffer;
+    
+    //Texture size for all possible textures (front of page, back of page, nextPage).
+    GLuint textureWidth, textureHeight;
+    
+    //Texture projected onto the front of the curling mesh.
+    GLuint frontTexture;
+    
+    //Texture projected onto the back of the curling mesh for double-sided pages.
+    GLuint backTexture;
+    GLuint backGradientTexture;
+    
+    //GPU program for the curling mesh.
+    GLuint frontProgram;
+    GLuint backProgram;
+    
+    //Vertex and index buffer for the curling mesh.
+    GLuint vertexBuffer;
+    GLuint indexBuffer;
+    GLuint elementCount; //Number of entries in the index buffer
+    
+    //Handles for the curl shader uniforms.
+    GLuint frontMvpHandle, frontSamplerHandle;
+    GLuint frontCylinderPositionHandle, frontCylinderDirectionHandle, frontCylinderRadiusHandle;
+    
+    GLuint backMvpHandle, backSamplerHandle, backGradientSamplerHandle;
+    GLuint backCylinderPositionHandle, backCylinderDirectionHandle, backCylinderRadiusHandle;
+    
+    //Texture projected onto the two-triangle rectangle of the nextPage.
+    GLuint nextPageTexture;
+    
+    //GPU program for the nextPage.
+    GLuint nextPageProgram;
+    
+    //Vertex buffer for the two-triangle rectangle of the nextPage.
+    //No need for an index buffer. It is drawn as a triangle-strip.
+    GLuint nextPageVertexBuffer;
+    
+    //Handles for the nextPageProgram uniforms.
+    GLuint nextPageMvpHandle, nextPageSamplerHandle;
+    GLuint nextPageCylinderPositionHandle, nextPageCylinderDirectionHandle, nextPageCylinderRadiusHandle;
+    
+    //Viewport/view/screen size.
+    GLint viewportWidth, viewportHeight;
+    
+    //Model-View-Proj matrix.
+    GLfloat mvp[16];
+    
+    //Position of any point in the cylinder axis projected on the xy plane.
+    CGPoint _cylinderPosition;
+    //Angle for the cylinder axis.
+    CGFloat _cylinderAngle;
+    CGFloat _cylinderRadius;
+    
+    //Multisampling anti-aliasing flag. It can only be set at init time.
+    BOOL _antialiasing;
+    
+    //Resolution of the grid mesh
+    NSUInteger _horizontalResolution, _verticalResolution;
+    
+    //Screen scale
+    CGFloat _screenScale;
+    
+    //Vertex Array Objects
+    GLuint backVAO;
+    GLuint frontVAO;
+    GLuint nextPageVAO;
+}
 
-@property (nonatomic, retain) EAGLContext *context;
-@property (nonatomic, assign) CADisplayLink *displayLink;
-@property (nonatomic, retain) XBAnimationManager *animationManager;
-@property (nonatomic, retain) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
+
+@property (nonatomic) EAGLContext *context;
+@property (nonatomic) CADisplayLink *displayLink;
+@property (nonatomic) XBAnimationManager *animationManager;
+@property (nonatomic) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
-@property (nonatomic, assign) NSTimeInterval lastTimestamp;
-@property (nonatomic, assign) BOOL wasAnimating;
+@property (nonatomic) NSTimeInterval lastTimestamp;
+@property (nonatomic) BOOL wasAnimating;
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -60,14 +137,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 
 @implementation XBCurlView
-
-@synthesize context=_context, displayLink=_displayLink, antialiasing=_antialiasing;
-@synthesize horizontalResolution=_horizontalResolution, verticalResolution=_verticalResolution;
-@synthesize animationManager, curlingView, pageOpaque;
-@synthesize cylinderAngle=_cylinderAngle;
-@synthesize screenScale=_screenScale;
-@synthesize lastTimestamp=_lastTimestamp;
-@synthesize wasAnimating=_wasAnimating;
 
 - (BOOL)initialize
 {
@@ -146,7 +215,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         _verticalResolution = verticalResolution;
         
         if (![self initialize]) {
-            [self release];
             return nil;
         }
         
@@ -173,8 +241,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [EAGLContext setCurrentContext:nil];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [super dealloc];
 }
 
 
@@ -331,7 +397,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     }
 }
 
-
 #pragma mark - Framebuffer
 
 - (BOOL)createFramebuffer
@@ -340,12 +405,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    
+
     glGenRenderbuffers(1, &colorRenderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderbuffer);
     
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderbuffer);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &viewportWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &viewportHeight);
     
@@ -381,17 +446,34 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyFramebuffer
 {
+    GLenum status;
+    
+    status = glGetError();
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    
     glDeleteFramebuffers(1, &framebuffer);
     framebuffer = 0;
     
+    status = glGetError();
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
     glDeleteRenderbuffers(1, &colorRenderbuffer);
     colorRenderbuffer = 0;
     
+    status = glGetError();
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
     glDeleteFramebuffers(1, &sampleFramebuffer);
     sampleFramebuffer = 0;
     
+    status = glGetError();
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
     glDeleteRenderbuffers(1, &sampleColorRenderbuffer);
     sampleColorRenderbuffer = 0;
+
+    status = glGetError();
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 }
 
 - (void)setupInitialGLState
@@ -988,7 +1070,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)createBackGradientTexture
 {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"BackPageGradient" ofType:@"png"];
-    UIImage *backPageImage = [[[UIImage alloc] initWithContentsOfFile:path] autorelease];
+    UIImage *backPageImage = [[UIImage alloc] initWithContentsOfFile:path];
     backGradientTexture = [self generateTexture];
     
     glActiveTexture(GL_TEXTURE1);
@@ -1032,8 +1114,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     //Start the cylinder animation
     [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
     [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
+    XBCurlView __weak *_self = self;
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
-        [self stopAnimating];
+        XBCurlView *blockSelf = _self;
+        [blockSelf stopAnimating];
     }];
     
     //Setup the view hierarchy properly

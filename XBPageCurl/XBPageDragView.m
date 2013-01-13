@@ -10,17 +10,13 @@
 
 @interface XBPageDragView ()
 
-@property (nonatomic, retain) XBPageCurlView *pageCurlView;
-@property (nonatomic, retain) XBSnappingPoint *bottomSnappingPoint;
+@property (nonatomic, readwrite) BOOL pageIsCurled;
+@property (nonatomic) XBPageCurlView *pageCurlView;
+@property (nonatomic) XBSnappingPoint *bottomSnappingPoint;
 
 @end
 
 @implementation XBPageDragView
-
-@synthesize viewToCurl = _viewToCurl;
-@synthesize pageIsCurled = _pageIsCurled;
-@synthesize pageCurlView = _pageCurlView;
-@synthesize bottomSnappingPoint = _bottomSnappingPoint;
 
 - (void)dealloc
 {
@@ -28,7 +24,25 @@
     self.viewToCurl = nil;
     self.pageCurlView = nil;
     self.bottomSnappingPoint = nil;
-    [super dealloc];
+}
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self != nil) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self != nil) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
 }
 
 #pragma mark - Properties
@@ -39,8 +53,7 @@
         return;
     }
     
-    [_viewToCurl release];
-    _viewToCurl = [viewToCurl retain];
+    _viewToCurl = viewToCurl;
     
     [self.pageCurlView removeFromSuperview];
     self.pageCurlView = nil;
@@ -52,6 +65,10 @@
     [self refreshPageCurlView];
 }
 
+- (BOOL)pageIsCurled {
+    return _pageIsCurled;
+}
+
 #pragma mark - Methods
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion
@@ -59,12 +76,15 @@
     NSTimeInterval duration = animated? 0.3: 0;
     [self.pageCurlView setCylinderPosition:self.bottomSnappingPoint.position animatedWithDuration:duration];
     [self.pageCurlView setCylinderAngle:self.bottomSnappingPoint.angle animatedWithDuration:duration];
+    
+    XBPageDragView __weak *_self = self;
     [self.pageCurlView setCylinderRadius:self.bottomSnappingPoint.radius animatedWithDuration:duration completion:^{
-        self.hidden = NO;
-        _pageIsCurled = NO;
-        self.viewToCurl.hidden = NO;
-        [self.pageCurlView removeFromSuperview];
-        [self.pageCurlView stopAnimating];
+        XBPageDragView * blockSelf = _self;
+        blockSelf.hidden = NO;
+        blockSelf.pageIsCurled= NO;
+        blockSelf.viewToCurl.hidden = NO;
+        [blockSelf.pageCurlView removeFromSuperview];
+        [blockSelf.pageCurlView stopAnimating];
         if (completion != nil) {
             completion();
         }
@@ -74,20 +94,20 @@
 - (void)refreshPageCurlView
 {
     [self.pageCurlView removeFromSuperview];
-    self.pageCurlView = [[[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame] autorelease];
+    self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
     self.pageCurlView.delegate = self;
     self.pageCurlView.pageOpaque = YES;
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = YES;
     
-    XBSnappingPoint *point = [[[XBSnappingPoint alloc] init] autorelease];
+    XBSnappingPoint *point = [[XBSnappingPoint alloc] init];
     point.position = CGPointMake(self.viewToCurl.frame.size.width*0.875, self.viewToCurl.frame.size.height*0.06);
     point.angle = M_PI_4;
     point.radius = 30;
     [self.pageCurlView.snappingPoints addObject:point];
     self.bottomSnappingPoint = point;
     
-    point = [[[XBSnappingPoint alloc] init] autorelease];
+    point = [[XBSnappingPoint alloc] init];
     point.position = CGPointMake(self.viewToCurl.frame.size.width*0.5, self.viewToCurl.frame.size.height*0.67);
     point.angle = M_PI/8;
     point.radius = 80;
@@ -98,50 +118,41 @@
 
 #pragma mark - Touches
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    UITouch *touch = [touches anyObject];
-    CGPoint touchLocation = [touch locationInView:self.viewToCurl.superview];
+- (void)beginCurlWithTouchAt:(CGPoint)point {
+    CGFloat angle = M_PI_4;
+    [self beginCurlingWithCylinderAtPoint:point /* need to offset this to cylinder center? */
+        angle:angle
+        radius:self.bottomSnappingPoint.radius];
+}
+
+- (void)updateCurlWithTouchAt:(CGPoint)point {
+    if (self.pageIsCurled) {
+        [self.pageCurlView touchMovedToPoint:point];
+    }
+}
+
+- (void)endCurlWithTouchAt:(CGPoint)point {
+    if (self.pageIsCurled) {
+        [self.pageCurlView touchEndedAtPoint:point];
+    }
+}
+
+- (void)beginCurlingWithCylinderAtPoint:(CGPoint)point angle:(CGFloat)angle radius:(CGFloat)radius {
+    self.hidden = YES;
+    _pageIsCurled = YES;
+    [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
+    self.pageCurlView.cylinderPosition = point;
+    self.pageCurlView.cylinderAngle = angle;
+    self.pageCurlView.cylinderRadius = radius;
+
+    [self.pageCurlView touchBeganAtPoint:point];
     
-    if (CGRectContainsPoint(self.frame, touchLocation)) {
-        self.hidden = YES;
-        _pageIsCurled = YES;
-        [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
-        self.pageCurlView.cylinderPosition = self.bottomSnappingPoint.position;
-        self.pageCurlView.cylinderAngle = self.bottomSnappingPoint.angle;
-        self.pageCurlView.cylinderRadius = self.bottomSnappingPoint.radius;
-        [self.pageCurlView touchBeganAtPoint:touchLocation];
-        [self.viewToCurl.superview addSubview:self.pageCurlView];
-        self.viewToCurl.hidden = YES;
-        [self.pageCurlView startAnimating];
-    }
-}
+    // Monkey the view hierarchy
+    [self.viewToCurl.superview addSubview:self.pageCurlView];
+    self.viewToCurl.hidden = YES;
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    if (self.pageIsCurled) {
-        UITouch *touch = [touches anyObject];
-        CGPoint touchLocation = [touch locationInView:self.viewToCurl.superview];
-        [self.pageCurlView touchMovedToPoint:touchLocation];
-    }
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    if (self.pageIsCurled) {
-        UITouch *touch = [touches anyObject];
-        CGPoint touchLocation = [touch locationInView:self.viewToCurl.superview];
-        [self.pageCurlView touchEndedAtPoint:touchLocation];
-    }
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    if (self.pageIsCurled) {
-        UITouch *touch = [touches anyObject];
-        CGPoint touchLocation = [touch locationInView:self.viewToCurl.superview];
-        [self.pageCurlView touchEndedAtPoint:touchLocation];
-    }
+    // Start the rendering
+    [self.pageCurlView startAnimating];
 }
 
 #pragma mark - XBPageCurlViewDelegate

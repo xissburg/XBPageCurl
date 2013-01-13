@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "XBPageCurlView.h"
 
-@interface XBPageDragView : UIView <XBPageCurlViewDelegate>
+@interface XBPageDragView : UIView <XBPageCurlViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, retain) IBOutlet UIView *viewToCurl;
 @property (nonatomic, readonly) BOOL pageIsCurled;
@@ -17,5 +17,9 @@
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion;
 - (void)refreshPageCurlView;
+
+- (void)beginCurlWithTouchAt:(CGPoint)point;
+- (void)updateCurlWithTouchAt:(CGPoint)point;
+- (void)endCurlWithTouchAt:(CGPoint)point;
 
 @end
