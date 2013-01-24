@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
-#import "XBPageDragView.h"
+#import "XBPageCurlContainerView.h"
 
 @interface PageCurlViewController : UIViewController
 
 @property (nonatomic, retain) IBOutlet MKMapView *mapView;
 @property (nonatomic, retain) IBOutlet UIView *frontView;
 @property (nonatomic, retain) IBOutlet UIView *backView;
-@property (nonatomic, retain) IBOutlet XBPageDragView *pageDragView;
+@property (nonatomic, retain) IBOutlet XBPageCurlContainerView *pageCurlContainerView;
 
 - (IBAction)buttonAction:(id)sender;
 - (IBAction)backButtonAction:(id)sender;

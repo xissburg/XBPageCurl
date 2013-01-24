@@ -65,7 +65,11 @@
     
     NSTimeInterval duration = animated? kDuration: 0;
     [self setCylinderPosition:c animatedWithDuration:duration];
-    [self setCylinderAngle:angle animatedWithDuration:duration];
+    
+    // @todo Add option to set angle based on vector heading from start of drag
+    // so the curls up from wherever you starterd
+    //[self setCylinderAngle:angle animatedWithDuration:duration];
+    
     [self setCylinderRadius:r animatedWithDuration:duration];
 }
 
@@ -122,39 +126,15 @@
         
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
         [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
+        
+        XBPageCurlView __weak *_self = self;
         [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
-            if ([self.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [self.delegate pageCurlView:self didSnapToPoint:closestSnappingPoint];
+            XBPageCurlView *blockSelf = _self;
+            if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+                [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:closestSnappingPoint];
             }
         }];
     }
-}
-
-
-#pragma mark - Touch handling
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    UITouch *touch = [touches anyObject];
-    CGPoint p = [touch locationInView:self];
-    [self touchBeganAtPoint:p];
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    CGPoint p = [[touches anyObject] locationInView:self];
-    [self touchMovedToPoint:p];
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    CGPoint p = [[touches anyObject] locationInView:self];
-    [self touchEndedAtPoint:p];
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [self touchesEnded:touches withEvent:event];
 }
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "PageCurlViewController.h"
+#import "XBPageCurlContainerView.h"
 #import <QuartzCore/QuartzCore.h>
 
 #define kDuration 0.3
@@ -20,36 +21,15 @@
 
 @implementation PageCurlViewController
 
-@synthesize mapView = _mapView;
-@synthesize frontView = _frontView;
-@synthesize backView = _backView;
-@synthesize pageDragView = _pageDragView;
-
 - (void)dealloc
 {
     self.mapView = nil;
     self.frontView = nil;
     self.backView = nil;
-    self.pageDragView = nil;
-    [super dealloc];
+    self.pageCurlContainerView = nil;
 }
 
 #pragma mark - View lifecycle
-
-- (void)panGestureRecognizerUpdated:(UIPanGestureRecognizer *)recognizer {
-    UIView *viewForPanning = ((XBPageDragView *)recognizer.view);
-    CGPoint point = [recognizer locationInView:viewForPanning];
-
-    if (!self.pageDragView.pageIsCurled) {
-        [self.pageDragView beginCurlWithTouchAt:point];
-    } else {
-        if (recognizer.state == UIGestureRecognizerStateEnded) {
-            [self.pageDragView endCurlWithTouchAt:point];
-        } else {
-            [self.pageDragView updateCurlWithTouchAt:point];
-        }
-    }
-}
 
 - (void)viewDidUnload
 {
@@ -57,7 +37,7 @@
     self.mapView = nil;
     self.frontView = nil;
     self.backView = nil;
-    self.pageDragView = nil;
+    self.pageCurlContainerView = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -78,7 +58,7 @@
     [super viewDidAppear:animated];
     // If the viewController was pushed in a landscape orientation its frame was that of a portrait view yet, then we have to reset the
     // page curl view's mesh here.
-    [self.pageDragView refreshPageCurlView];
+//    [self.pageCurlContainerView refreshPageCurlView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -89,21 +69,39 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return !self.pageDragView.pageIsCurled;
+    return !self.pageCurlContainerView.pageIsCurled;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     // After a rotation we have to reset the viewToCurl for the curling mesh to be updated.
-    [self.pageDragView refreshPageCurlView];
+    [self.pageCurlContainerView refreshPageCurlView];
 }
+
+#pragma marc - Gestures
+
+- (void)panGestureRecognizerUpdated:(UIPanGestureRecognizer *)recognizer {
+    UIView *viewForPanning = ((XBPageCurlContainerView *)recognizer.view);
+    CGPoint point = [recognizer locationInView:viewForPanning];
+
+    if (!self.pageCurlContainerView.pageIsCurled) {
+        [self.pageCurlContainerView beginCurlWithTouchAt:point];
+    } else {
+        if (recognizer.state == UIGestureRecognizerStateEnded) {
+            [self.pageCurlContainerView endCurlWithTouchAt:point];
+        } else {
+            [self.pageCurlContainerView updateCurlWithTouchAt:point];
+        }
+    }
+}
+
 
 #pragma mark - Buttons Actions
 
 - (IBAction)buttonAction:(id)sender
 {
-    if (self.pageDragView.pageIsCurled) {
-        [self.pageDragView uncurlPageAnimated:YES completion:nil];
+    if (self.pageCurlContainerView.pageIsCurled) {
+        [self.pageCurlContainerView uncurlPageAnimated:YES completion:nil];
     }
 }
 
@@ -129,11 +127,13 @@
 
 - (void)saveImageButtonAction:(id)sender
 {
-    UIImage *image = [self.pageDragView.pageCurlView imageFromFramebufferWithBackgroundView:self.backView];
+/*
+    UIImage *image = [self.pageCurlContainerView.pageCurlView imageFromFramebufferWithBackgroundView:self.backView];
     // Force it to save a high quality PNG instead of a lossy JPEG
     NSData *data = UIImagePNGRepresentation(image);
     image = [UIImage imageWithData:data];
     UIImageWriteToSavedPhotosAlbum(image, nil, nil, NULL);
+*/
 }
 
 @end

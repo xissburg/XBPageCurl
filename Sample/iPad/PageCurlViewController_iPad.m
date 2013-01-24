@@ -15,7 +15,6 @@
 - (void)dealloc
 {
     self.webView = nil;
-    [super dealloc];
 }
 
 #pragma mark - View lifecycle
@@ -28,6 +27,7 @@
 
 - (void)viewDidUnload
 {
+    [self setPageCurlContainerView:nil];
     [super viewDidUnload];
     self.webView = nil;
 }

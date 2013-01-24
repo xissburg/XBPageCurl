@@ -1,22 +1,23 @@
 //
-//  XBPageDragView.m
+//  XBPageCurlContainerView.m
 //  XBPageCurl
 //
-//  Created by xiss burg on 6/7/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Created by Marc Palmer on 13/01/2013.
+//
 //
 
-#import "XBPageDragView.h"
+#import "XBPageCurlContainerView.h"
 
-@interface XBPageDragView ()
+@interface XBPageCurlContainerView ()
 
 @property (nonatomic, readwrite) BOOL pageIsCurled;
 @property (nonatomic) XBPageCurlView *pageCurlView;
 @property (nonatomic) XBSnappingPoint *bottomSnappingPoint;
+@property (nonatomic) IBOutlet UIView *viewToCurl;
 
 @end
 
-@implementation XBPageDragView
+@implementation XBPageCurlContainerView
 
 - (void)dealloc
 {
@@ -43,6 +44,7 @@
 }
 
 - (void)initialize {
+    self.viewToCurl = self.subviews[0];
 }
 
 #pragma mark - Properties
@@ -77,14 +79,15 @@
     [self.pageCurlView setCylinderPosition:self.bottomSnappingPoint.position animatedWithDuration:duration];
     [self.pageCurlView setCylinderAngle:self.bottomSnappingPoint.angle animatedWithDuration:duration];
     
-    XBPageDragView __weak *_self = self;
+    XBPageCurlContainerView __weak *_self = self;
     [self.pageCurlView setCylinderRadius:self.bottomSnappingPoint.radius animatedWithDuration:duration completion:^{
-        XBPageDragView * blockSelf = _self;
-        blockSelf.hidden = NO;
-        blockSelf.pageIsCurled= NO;
-        blockSelf.viewToCurl.hidden = NO;
-        [blockSelf.pageCurlView removeFromSuperview];
-        [blockSelf.pageCurlView stopAnimating];
+        XBPageCurlContainerView * blockSelf = _self;
+        if (blockSelf) {
+            blockSelf.pageIsCurled= NO;
+            blockSelf.viewToCurl.hidden = NO;
+            [blockSelf.pageCurlView removeFromSuperview]; // @todo can we just hide it?
+            [blockSelf.pageCurlView stopAnimating];
+        }
         if (completion != nil) {
             completion();
         }
@@ -93,9 +96,12 @@
 
 - (void)refreshPageCurlView
 {
+    // @todo make sure we don't do a paint too early, set up but don't paint unti needed
+    
     [self.pageCurlView removeFromSuperview];
     self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
     self.pageCurlView.delegate = self;
+    // @todo expose these properties
     self.pageCurlView.pageOpaque = YES;
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = YES;
@@ -141,7 +147,6 @@
 }
 
 - (void)beginCurlingWithCylinderAtPoint:(CGPoint)point angle:(CGFloat)angle radius:(CGFloat)radius {
-    self.hidden = YES;
     _pageIsCurled = YES;
     [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
     self.pageCurlView.cylinderPosition = point;
@@ -151,7 +156,9 @@
     [self.pageCurlView touchBeganAtPoint:point];
     
     // Monkey the view hierarchy
-    [self.viewToCurl.superview addSubview:self.pageCurlView];
+    [self addSubview:self.pageCurlView];
+    
+    // @todo parameterise this
     self.viewToCurl.hidden = YES;
 
     // Start the rendering
@@ -163,7 +170,6 @@
 - (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappintPoint
 {
     if (snappintPoint == self.bottomSnappingPoint) {
-        self.hidden = NO;
         _pageIsCurled = NO;
         self.viewToCurl.hidden = NO;
         [self.pageCurlView removeFromSuperview];
