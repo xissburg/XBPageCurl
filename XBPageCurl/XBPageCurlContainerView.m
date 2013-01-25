@@ -8,7 +8,10 @@
 
 #import "XBPageCurlContainerView.h"
 
-@interface XBPageCurlContainerView ()
+@interface XBPageCurlContainerView () {
+@private
+    NSMutableArray *snappingPoints;
+}
 
 @property (nonatomic, readwrite) BOOL pageIsCurled;
 @property (nonatomic) XBPageCurlView *pageCurlView;
@@ -31,6 +34,8 @@
     self = [super initWithFrame:frame];
     if (self != nil) {
         [self initialize];
+        self.pageOpaque = YES;
+        self.snappingEnabled = YES;
     }
     return self;
 }
@@ -44,7 +49,10 @@
 }
 
 - (void)initialize {
-    self.viewToCurl = self.subviews[0];
+    snappingPoints = [NSMutableArray new];
+    if ([self.subviews count]) {
+        self.viewToCurl = self.subviews[0];
+    }
 }
 
 #pragma mark - Properties
@@ -94,35 +102,44 @@
     }];
 }
 
-- (void)refreshPageCurlView
-{
-    // @todo make sure we don't do a paint too early, set up but don't paint unti needed
-    
-    [self.pageCurlView removeFromSuperview];
-    self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
-    self.pageCurlView.delegate = self;
-    // @todo expose these properties
-    self.pageCurlView.pageOpaque = YES;
-    self.pageCurlView.opaque = NO;
-    self.pageCurlView.snappingEnabled = YES;
-    
-    XBSnappingPoint *point = [[XBSnappingPoint alloc] init];
-    point.position = CGPointMake(self.viewToCurl.frame.size.width*0.875, self.viewToCurl.frame.size.height*0.06);
-    point.angle = M_PI_4;
-    point.radius = 30;
-    [self.pageCurlView.snappingPoints addObject:point];
-    self.bottomSnappingPoint = point;
-    
-    point = [[XBSnappingPoint alloc] init];
-    point.position = CGPointMake(self.viewToCurl.frame.size.width*0.5, self.viewToCurl.frame.size.height*0.67);
-    point.angle = M_PI/8;
-    point.radius = 80;
-    [self.pageCurlView.snappingPoints addObject:point];
-    
+- (void)refreshPageCurlView {
+    [self resetPageCurlView];
+    [self redrawPageCurlView];
+}
+
+- (void)redrawPageCurlView {
     [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
 }
 
-#pragma mark - Touches
+- (void)resetPageCurlView
+{
+    [self.pageCurlView removeFromSuperview];
+    self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
+    self.pageCurlView.delegate = self;
+
+    [self prepare];
+}
+
+- (void)addSnappingPointWithPosition:(CGPoint)position angle:(CGFloat)angle radius:(CGFloat)radius {
+    [snappingPoints addObject:[[XBSnappingPoint alloc] initWithPosition:position angle:angle radius:radius]];
+}
+
+- (void)clearSnappingPoints {
+    [snappingPoints removeAllObjects];
+}
+
+- (void)prepare {
+    self.pageCurlView.pageOpaque = self.pageOpaque;
+    self.pageCurlView.opaque = NO;
+    self.pageCurlView.snappingEnabled = self.snappingEnabled;
+    
+    for (XBSnappingPoint *p in snappingPoints) {
+        [self.pageCurlView.snappingPoints addObject:p];
+    }
+}
+
+
+#pragma mark - Curl lifecycle
 
 - (void)beginCurlWithTouchAt:(CGPoint)point {
     CGFloat angle = M_PI_4;
@@ -136,24 +153,28 @@
 
 - (void)updateCurlWithTouchAt:(CGPoint)point {
     if (self.pageIsCurled) {
-        [self.pageCurlView touchMovedToPoint:point];
+        [self.pageCurlView moveCurlToPoint:point];
     }
 }
 
 - (void)endCurlWithTouchAt:(CGPoint)point {
     if (self.pageIsCurled) {
-        [self.pageCurlView touchEndedAtPoint:point];
+        [self.pageCurlView endCurlingAtPoint:point];
     }
 }
 
+#pragma mark - Internals
+
 - (void)beginCurlingWithCylinderAtPoint:(CGPoint)point angle:(CGFloat)angle radius:(CGFloat)radius {
     _pageIsCurled = YES;
-    [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
+
+    [self redrawPageCurlView];
+
     self.pageCurlView.cylinderPosition = point;
     self.pageCurlView.cylinderAngle = angle;
     self.pageCurlView.cylinderRadius = radius;
 
-    [self.pageCurlView touchBeganAtPoint:point];
+    [self.pageCurlView beginCurlingAtPoint:point];
     
     // Monkey the view hierarchy
     [self addSubview:self.pageCurlView];

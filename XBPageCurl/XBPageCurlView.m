@@ -24,7 +24,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.snappingPoints = [NSMutableArray array];
-        self.snappingEnabled = NO;
+        self.snappingEnabled = YES;
     }
     return self;
 }
@@ -35,6 +35,40 @@
 }
 
 #pragma mark - Methods
+
+- (XBSnappingPoint *)snappingPointNearestToPoint:(CGPoint)v {
+    XBSnappingPoint *closestSnappingPoint;
+    
+    CGFloat d = FLT_MAX;
+    //Find the snapping point closest to the cylinder axis
+    for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
+        //Compute the distance between the snappingPoint.position and the cylinder axis
+        CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
+        if (dSq < d) {
+            closestSnappingPoint = snappingPoint;
+            d = dSq;
+        }
+    }
+    return closestSnappingPoint;
+}
+
+- (void)snapToPoint:(XBSnappingPoint *)snappingPoint {
+    if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
+        [self.delegate pageCurlView:self willSnapToPoint:snappingPoint];
+    }
+    
+    // @todo shouldn't these animate too?
+    [self setCylinderPosition:snappingPoint.position animatedWithDuration:kDuration];
+    [self setCylinderAngle:snappingPoint.angle animatedWithDuration:kDuration];
+    
+    XBPageCurlView __weak *_self = self;
+    [self setCylinderRadius:snappingPoint.radius animatedWithDuration:kDuration completion:^{
+        XBPageCurlView *blockSelf = _self;
+        if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+            [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:snappingPoint];
+        }
+    }];
+}
 
 - (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
 {
@@ -73,7 +107,7 @@
     [self setCylinderRadius:r animatedWithDuration:duration];
 }
 
-- (void)touchBeganAtPoint:(CGPoint)p
+- (void)beginCurlingAtPoint:(CGPoint)p
 {
     p.y = self.bounds.size.height - p.y;
     
@@ -96,45 +130,25 @@
     [self updateCylinderStateWithPoint:p animated:YES];
 }
 
-- (void)touchMovedToPoint:(CGPoint)p
+- (void)moveCurlToPoint:(CGPoint)p
 {
     p.y = self.bounds.size.height - p.y;
     [self updateCylinderStateWithPoint:p animated:NO];
 }
 
-- (void)touchEndedAtPoint:(CGPoint)p
+- (void)endCurlingAtPoint:(CGPoint)p
 {
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
-        CGFloat d = FLT_MAX;
         CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
-        //Find the snapping point closest to the cylinder axis
-        for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
-            //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
-            if (dSq < d) {
-                closestSnappingPoint = snappingPoint;
-                d = dSq;
-            }
-        }
         
+        closestSnappingPoint = [self snappingPointNearestToPoint:v];
+
         NSAssert(closestSnappingPoint != nil, @"There is always a closest point in a non-empty set of points hence closestSnappingPoint should not be nil.");
         
-        if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
-            [self.delegate pageCurlView:self willSnapToPoint:closestSnappingPoint];
-        }
-        
-        [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
-        [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
-        
-        XBPageCurlView __weak *_self = self;
-        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
-            XBPageCurlView *blockSelf = _self;
-            if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:closestSnappingPoint];
-            }
-        }];
+        [self snapToPoint:closestSnappingPoint];
     }
 }
+
 
 @end

@@ -15,4 +15,6 @@
 @property (nonatomic, assign) CGFloat radius;
 @property (nonatomic, assign) int tag;
 
+- (id)initWithPosition:(CGPoint)position angle:(CGFloat)angle radius:(CGFloat)radius;
+
 @end

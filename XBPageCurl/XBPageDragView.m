@@ -130,13 +130,13 @@
 
 - (void)updateCurlWithTouchAt:(CGPoint)point {
     if (self.pageIsCurled) {
-        [self.pageCurlView touchMovedToPoint:point];
+        [self.pageCurlView moveCurlToPoint:point];
     }
 }
 
 - (void)endCurlWithTouchAt:(CGPoint)point {
     if (self.pageIsCurled) {
-        [self.pageCurlView touchEndedAtPoint:point];
+        [self.pageCurlView endCurlingAtPoint:point];
     }
 }
 
@@ -148,7 +148,7 @@
     self.pageCurlView.cylinderAngle = angle;
     self.pageCurlView.cylinderRadius = radius;
 
-    [self.pageCurlView touchBeganAtPoint:point];
+    [self.pageCurlView beginCurlingAtPoint:point];
     
     // Monkey the view hierarchy
     [self.viewToCurl.superview addSubview:self.pageCurlView];

@@ -49,6 +49,15 @@
             action:@selector(panGestureRecognizerUpdated:)];
         [self.view addGestureRecognizer:panGestureRecognizer];
     }
+
+    self.pageCurlContainerView.snappingEnabled = YES;
+    self.pageCurlContainerView.pageOpaque = NO;
+    
+    [self.pageCurlContainerView clearSnappingPoints];
+    [self.pageCurlContainerView addSnappingPointWithPosition:
+        CGPointMake(self.view.bounds.size.width, self.view.bounds.size.height/2)
+        angle:M_PI_4 radius:30.0f];
+    [self.pageCurlContainerView prepare];
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
