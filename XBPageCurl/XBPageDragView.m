@@ -100,19 +100,6 @@
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = YES;
     
-    XBSnappingPoint *point = [[XBSnappingPoint alloc] init];
-    point.position = CGPointMake(self.viewToCurl.frame.size.width*0.875, self.viewToCurl.frame.size.height*0.06);
-    point.angle = M_PI_4;
-    point.radius = 30;
-    [self.pageCurlView.snappingPoints addObject:point];
-    self.bottomSnappingPoint = point;
-    
-    point = [[XBSnappingPoint alloc] init];
-    point.position = CGPointMake(self.viewToCurl.frame.size.width*0.5, self.viewToCurl.frame.size.height*0.67);
-    point.angle = M_PI/8;
-    point.radius = 80;
-    [self.pageCurlView.snappingPoints addObject:point];
-    
     [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
 }
 

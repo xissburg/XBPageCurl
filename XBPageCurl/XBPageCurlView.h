@@ -12,11 +12,24 @@
 
 @class XBPageCurlView;
 
+typedef enum {
+    XBCurlAngleUpdateModeFollow,
+    XBCurlAngleUpdateModeDelegate
+} XBPageCurlUpdateAngleMode;
+
+typedef enum {
+    XBCurlAngleInitialModeFromTop =     0x01,
+    XBCurlAngleInitialModeFromBottom =  0x02,
+    XBCurlAngleInitialModeFromLeft =    0x04,
+    XBCurlAngleInitialModeFromRight =   0x08
+} XBPageCurlInitialAngleMode;
+
 @protocol XBPageCurlViewDelegate <NSObject>
 
 @optional
 - (void)pageCurlView:(XBPageCurlView *)pageCurlView willSnapToPoint:(XBSnappingPoint *)snappintPoint;
 - (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappintPoint;
+- (CGFloat)pageCurlView:(XBPageCurlView *)pageCurlView angleForPoint:(CGPoint)cylinderPoint;
 
 @end
 
@@ -32,6 +45,10 @@
 @property (nonatomic, assign) id<XBPageCurlViewDelegate> delegate;
 @property (nonatomic, assign) BOOL snappingEnabled;
 @property (nonatomic, retain) NSMutableArray *snappingPoints;
+@property (nonatomic, assign) XBPageCurlUpdateAngleMode curlAngleMode;
+@property (nonatomic, assign) XBPageCurlInitialAngleMode initialCurlAngleMode;
+@property (nonatomic, assign) XBPageCurlInitialAngleMode activeCurlAngleMode;
+@property (nonatomic, readonly) CGFloat initialAngle;
 
 
 - (void)beginCurlingAtPoint:(CGPoint)p;

@@ -52,11 +52,13 @@
 
     self.pageCurlContainerView.snappingEnabled = YES;
     self.pageCurlContainerView.pageOpaque = NO;
+//    self.pageCurlContainerView.curlAngleMode = XBCurlAngleUpdateModeDelegate;
+    self.pageCurlContainerView.initialCurlAngleMode = XBCurlAngleInitialModeFromLeft | XBCurlAngleInitialModeFromRight;
     
     [self.pageCurlContainerView clearSnappingPoints];
     [self.pageCurlContainerView addSnappingPointWithPosition:
-        CGPointMake(self.view.bounds.size.width, self.view.bounds.size.height/2)
-        angle:M_PI_4 radius:30.0f];
+        CGPointMake(self.view.bounds.size.width*2, self.view.bounds.size.height)
+        angle:M_PI radius:60.0f];
     [self.pageCurlContainerView prepare];
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];

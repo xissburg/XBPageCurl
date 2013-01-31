@@ -446,34 +446,17 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyFramebuffer
 {
-    GLenum status;
-    
-    status = glGetError();
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    
     glDeleteFramebuffers(1, &framebuffer);
     framebuffer = 0;
     
-    status = glGetError();
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
     glDeleteRenderbuffers(1, &colorRenderbuffer);
     colorRenderbuffer = 0;
     
-    status = glGetError();
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
     glDeleteFramebuffers(1, &sampleFramebuffer);
     sampleFramebuffer = 0;
     
-    status = glGetError();
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
     glDeleteRenderbuffers(1, &sampleColorRenderbuffer);
     sampleColorRenderbuffer = 0;
-
-    status = glGetError();
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 }
 
 - (void)setupInitialGLState

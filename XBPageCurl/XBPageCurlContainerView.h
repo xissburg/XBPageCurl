@@ -14,6 +14,8 @@
 @property (nonatomic, readonly) BOOL pageIsCurled;
 @property (nonatomic) BOOL snappingEnabled;
 @property (nonatomic) BOOL pageOpaque;
+@property (nonatomic) XBPageCurlUpdateAngleMode curlAngleMode;
+@property (nonatomic) XBPageCurlInitialAngleMode initialCurlAngleMode;
 
 - (void)addSnappingPointWithPosition:(CGPoint)position angle:(CGFloat)angle radius:(CGFloat)radius;
 - (void)clearSnappingPoints;

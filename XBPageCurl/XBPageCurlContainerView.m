@@ -13,7 +13,7 @@
     NSMutableArray *snappingPoints;
 }
 
-@property (nonatomic, readwrite) BOOL pageIsCurled;
+@property (nonatomic) BOOL pageIsCurled;
 @property (nonatomic) XBPageCurlView *pageCurlView;
 @property (nonatomic) XBSnappingPoint *bottomSnappingPoint;
 @property (nonatomic) IBOutlet UIView *viewToCurl;
@@ -132,6 +132,9 @@
     self.pageCurlView.pageOpaque = self.pageOpaque;
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = self.snappingEnabled;
+    self.pageCurlView.curlAngleMode = self.curlAngleMode;
+    self.pageCurlView.initialCurlAngleMode = self.initialCurlAngleMode;
+
     
     for (XBSnappingPoint *p in snappingPoints) {
         [self.pageCurlView.snappingPoints addObject:p];
@@ -142,12 +145,7 @@
 #pragma mark - Curl lifecycle
 
 - (void)beginCurlWithTouchAt:(CGPoint)point {
-    CGFloat angle = M_PI_4;
-//    if (point.x < (self.frame.size.width/2)) {
-        angle = (2*M_PI)-M_PI_2;
-//    }
     [self beginCurlingWithCylinderAtPoint:point /* need to offset this to cylinder center? */
-        angle:angle
         radius:self.bottomSnappingPoint.radius];
 }
 
@@ -161,17 +159,17 @@
     if (self.pageIsCurled) {
         [self.pageCurlView endCurlingAtPoint:point];
     }
+    _pageIsCurled = NO;
 }
 
 #pragma mark - Internals
 
-- (void)beginCurlingWithCylinderAtPoint:(CGPoint)point angle:(CGFloat)angle radius:(CGFloat)radius {
+- (void)beginCurlingWithCylinderAtPoint:(CGPoint)point radius:(CGFloat)radius {
     _pageIsCurled = YES;
 
     [self redrawPageCurlView];
 
-    self.pageCurlView.cylinderPosition = point;
-    self.pageCurlView.cylinderAngle = angle;
+//    self.pageCurlView.cylinderPosition = point;
     self.pageCurlView.cylinderRadius = radius;
 
     [self.pageCurlView beginCurlingAtPoint:point];
@@ -197,5 +195,11 @@
         [self.pageCurlView stopAnimating];
     }
 }
+
+- (CGFloat)pageCurlView:(XBPageCurlView *)pageCurlView angleForPoint:(CGPoint)cylinderPoint {
+    // @todo remove this
+    return pageCurlView.initialAngle;
+}
+
 
 @end

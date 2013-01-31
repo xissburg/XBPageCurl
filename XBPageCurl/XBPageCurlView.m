@@ -13,11 +13,10 @@
 
 @interface XBPageCurlView ()
 @property (nonatomic, readwrite) CGFloat cylinderAngle;
+@property (nonatomic, readwrite) CGFloat initialAngle;
 @end
 
 @implementation XBPageCurlView
-
-@synthesize delegate, snappingPoints, snappingEnabled;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -25,6 +24,8 @@
     if (self) {
         self.snappingPoints = [NSMutableArray array];
         self.snappingEnabled = YES;
+        self.curlAngleMode = XBCurlAngleUpdateModeFollow;
+        self.initialCurlAngleMode = XBCurlAngleInitialModeFromBottom;
     }
     return self;
 }
@@ -70,7 +71,17 @@
     }];
 }
 
+- (void)initializeCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
+{
+    [self updateCylinderStateWithPoint:p animated:animated initializing:YES];
+}
+
 - (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
+{
+    [self updateCylinderStateWithPoint:p animated:animated initializing:NO];
+}
+
+- (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated initializing:(BOOL)initializing
 {
     CGPoint v = CGPointSub(p, startPickingPosition);
     CGFloat l = CGPointLength(v);
@@ -95,16 +106,55 @@
     
     CGPoint vn = CGPointMul(v, 1.f/l); //Normalized
     CGPoint c = CGPointAdd(startPickingPosition, CGPointMul(vn, d));
-    CGFloat angle = atan2f(-vn.x, vn.y);
     
     NSTimeInterval duration = animated? kDuration: 0;
     [self setCylinderPosition:c animatedWithDuration:duration];
     
-    // @todo Add option to set angle based on vector heading from start of drag
-    // so the curls up from wherever you starterd
-    //[self setCylinderAngle:angle animatedWithDuration:duration];
-    
+    CGFloat angle;
+    if (initializing == NO) {
+        switch (self.curlAngleMode) {
+            case XBCurlAngleUpdateModeDelegate:
+                // Let app decide
+                if ([self.delegate respondsToSelector:@selector(pageCurlView:angleForPoint:)]) {
+                    angle = [self.delegate pageCurlView:self angleForPoint:p];
+                    break;
+                }
+            case XBCurlAngleUpdateModeFollow: {
+                // Calculate the angle based on difference between this point and last
+                float xValue = vn.x;
+                if (self.activeCurlAngleMode == XBCurlAngleInitialModeFromRight) {
+                    xValue = -vn.x;
+                }
+                float yValue = vn.y;
+                if (self.activeCurlAngleMode == XBCurlAngleInitialModeFromTop) {
+                    yValue = -vn.y;
+                }
+                angle = atan2f(xValue, yValue);
+                break;
+            }
+        }
+    } else {
+        angle = self.initialAngle;
+    }
+
+    NSLog(@"Angle: %f", angle);
+    [self setCylinderAngle:angle animatedWithDuration:duration];
+
     [self setCylinderRadius:r animatedWithDuration:duration];
+}
+
+- (CGFloat)initialCurlAnglModeToAngle:(XBPageCurlInitialAngleMode)mode {
+    switch (mode) {
+        case XBCurlAngleInitialModeFromBottom:
+            return M_PI*2;
+        case XBCurlAngleInitialModeFromTop:
+            return M_PI;
+        case XBCurlAngleInitialModeFromLeft:
+            return M_PI+M_PI_2;
+        case XBCurlAngleInitialModeFromRight:
+            return M_PI_2;
+    }
+    return 0.0;
 }
 
 - (void)beginCurlingAtPoint:(CGPoint)p
@@ -126,8 +176,40 @@
         startPickingPosition.x = self.bounds.size.width;
         startPickingPosition.y = p.y;
     }
-    
-    [self updateCylinderStateWithPoint:p animated:YES];
+
+    CGFloat angle;
+    switch (self.initialCurlAngleMode) {
+        case XBCurlAngleInitialModeFromBottom:
+        case XBCurlAngleInitialModeFromTop:
+        case XBCurlAngleInitialModeFromLeft:
+        case XBCurlAngleInitialModeFromRight:
+            angle = [self initialCurlAnglModeToAngle:self.initialCurlAngleMode];
+            self.activeCurlAngleMode = self.initialCurlAngleMode;
+            break;
+        default: {
+            // It must be multiple, establish nearest edge of the supported edges
+            BOOL leftAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromLeft) ? YES : NO;
+            BOOL rightAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromRight) ? YES : NO;
+            //BOOL topAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromTop) ? YES : NO;
+            //BOOL bottomAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromBottom) ? YES : NO;
+            BOOL xNearLeft = p.x < (self.bounds.size.width / 2) ? YES : NO;
+            //BOOL yNearTop = p.y < (self.bounds.size.height / 2) ? YES : NO;
+
+            XBPageCurlInitialAngleMode leftRightMode;
+//            XBPageCurlInitialAngleMode topBottomMode;
+            
+            if (leftAllowed && rightAllowed) {
+                leftRightMode = xNearLeft ? XBCurlAngleInitialModeFromLeft : XBCurlAngleInitialModeFromRight;
+            }
+            
+            angle = [self initialCurlAnglModeToAngle:leftRightMode];
+            self.activeCurlAngleMode = leftRightMode;
+            break;
+        }
+    }
+
+    self.initialAngle = angle;
+    [self initializeCylinderStateWithPoint:p animated:YES];
 }
 
 - (void)moveCurlToPoint:(CGPoint)p
@@ -148,6 +230,7 @@
         
         [self snapToPoint:closestSnappingPoint];
     }
+    self.initialAngle = 0.0;
 }
 
 

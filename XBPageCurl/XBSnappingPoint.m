@@ -11,13 +11,13 @@
 @implementation XBSnappingPoint
 
 - (id)initWithPosition:(CGPoint)position angle:(CGFloat)angle radius:(CGFloat)radius {
-    id _self = [super init];
-    if (_self != nil) {
+    self = [super init];
+    if (self != nil) {
         _position = position;
         _angle = angle;
         _radius = radius;
     }
-    return _self;
+    return self;
 }
 
 
