@@ -150,7 +150,7 @@
         case XBCurlAngleInitialModeFromTop:
             return M_PI;
         case XBCurlAngleInitialModeFromLeft:
-            return M_PI+M_PI_2;
+            return -M_PI_2;
         case XBCurlAngleInitialModeFromRight:
             return M_PI_2;
     }
@@ -177,6 +177,8 @@
         startPickingPosition.y = p.y;
     }
 
+    NSLog(@"beingCurlingAtPoint with picking position: %4.3f, %4.3f", startPickingPosition.x, startPickingPosition.y);
+    
     CGFloat angle;
     switch (self.initialCurlAngleMode) {
         case XBCurlAngleInitialModeFromBottom:

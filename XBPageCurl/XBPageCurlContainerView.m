@@ -34,7 +34,7 @@
     self = [super initWithFrame:frame];
     if (self != nil) {
         [self initialize];
-        self.pageOpaque = YES;
+        self.pageOpaque = NO;
         self.snappingEnabled = YES;
     }
     return self;
@@ -51,6 +51,7 @@
 - (void)initialize {
     snappingPoints = [NSMutableArray new];
     if ([self.subviews count]) {
+        self.opaque = NO;
         self.viewToCurl = self.subviews[0];
     }
 }
@@ -91,6 +92,7 @@
     [self.pageCurlView setCylinderRadius:self.bottomSnappingPoint.radius animatedWithDuration:duration completion:^{
         XBPageCurlContainerView * blockSelf = _self;
         if (blockSelf) {
+            NSLog(@"Showing original view in uncurl");
             blockSelf.pageIsCurled= NO;
             blockSelf.viewToCurl.hidden = NO;
             [blockSelf.pageCurlView removeFromSuperview]; // @todo can we just hide it?
@@ -103,19 +105,29 @@
 }
 
 - (void)refreshPageCurlView {
+    NSLog(@"Refreshing page curl view");
     [self resetPageCurlView];
     [self redrawPageCurlView];
 }
 
 - (void)redrawPageCurlView {
+    NSLog(@"Redrawing view to curl");
+    if (self.pageCurlView == nil) {
+        [self resetPageCurlView];
+    }
     [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
 }
 
 - (void)resetPageCurlView
 {
+    NSLog(@"Resetting page curl view");
     [self.pageCurlView removeFromSuperview];
     self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
     self.pageCurlView.delegate = self;
+
+    // Monkey the view hierarchy
+    [self addSubview:self.pageCurlView];
+    self.pageCurlView.hidden = YES;
 
     [self prepare];
 }
@@ -145,6 +157,7 @@
 #pragma mark - Curl lifecycle
 
 - (void)beginCurlWithTouchAt:(CGPoint)point {
+    [self redrawPageCurlView];
     [self beginCurlingWithCylinderAtPoint:point /* need to offset this to cylinder center? */
         radius:self.bottomSnappingPoint.radius];
 }
@@ -159,6 +172,10 @@
     if (self.pageIsCurled) {
         [self.pageCurlView endCurlingAtPoint:point];
     }
+    NSLog(@"Showing original view in endCurlWith");
+    self.viewToCurl.hidden = NO;
+    NSLog(@"Hiding curl view in endCurlWith");
+    self.pageCurlView.hidden = YES;
     _pageIsCurled = NO;
 }
 
@@ -167,18 +184,15 @@
 - (void)beginCurlingWithCylinderAtPoint:(CGPoint)point radius:(CGFloat)radius {
     _pageIsCurled = YES;
 
-    [self redrawPageCurlView];
-
 //    self.pageCurlView.cylinderPosition = point;
     self.pageCurlView.cylinderRadius = radius;
 
     [self.pageCurlView beginCurlingAtPoint:point];
     
-    // Monkey the view hierarchy
-    [self addSubview:self.pageCurlView];
-    
-    // @todo parameterise this
-    self.viewToCurl.hidden = YES;
+//    NSLog(@"Hiding original view in beingCurling");
+//    self.viewToCurl.hidden = YES;
+    NSLog(@"Showing curl view in beingCurling");
+    self.pageCurlView.hidden = NO;
 
     // Start the rendering
     [self.pageCurlView startAnimating];
@@ -190,6 +204,7 @@
 {
     if (snappintPoint == self.bottomSnappingPoint) {
         _pageIsCurled = NO;
+        NSLog(@"Showing original view");
         self.viewToCurl.hidden = NO;
         [self.pageCurlView removeFromSuperview];
         [self.pageCurlView stopAnimating];
@@ -200,6 +215,7 @@
     // @todo remove this
     return pageCurlView.initialAngle;
 }
+
 
 
 @end

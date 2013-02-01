@@ -107,9 +107,6 @@
 
 - (void)beginCurlWithTouchAt:(CGPoint)point {
     CGFloat angle = M_PI_4;
-//    if (point.x < (self.frame.size.width/2)) {
-        angle = (2*M_PI)-M_PI_2;
-//    }
     [self beginCurlingWithCylinderAtPoint:point /* need to offset this to cylinder center? */
         angle:angle
         radius:self.bottomSnappingPoint.radius];

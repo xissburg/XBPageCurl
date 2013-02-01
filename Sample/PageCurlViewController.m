@@ -50,15 +50,17 @@
         [self.view addGestureRecognizer:panGestureRecognizer];
     }
 
-    self.pageCurlContainerView.snappingEnabled = YES;
+    self.pageCurlContainerView.snappingEnabled =YES;
     self.pageCurlContainerView.pageOpaque = NO;
-//    self.pageCurlContainerView.curlAngleMode = XBCurlAngleUpdateModeDelegate;
+    // @todo this is broken at the moment because it is setting the curl view delegate
+    // but the delegate is already set to the container view, need a separate delegate
+    //self.pageCurlContainerView.curlAngleMode = XBCurlAngleUpdateModeDelegate;
     self.pageCurlContainerView.initialCurlAngleMode = XBCurlAngleInitialModeFromLeft | XBCurlAngleInitialModeFromRight;
     
     [self.pageCurlContainerView clearSnappingPoints];
     [self.pageCurlContainerView addSnappingPointWithPosition:
-        CGPointMake(self.view.bounds.size.width*2, self.view.bounds.size.height)
-        angle:M_PI radius:60.0f];
+        CGPointMake(self.view.bounds.size.width*2, self.view.bounds.size.height/2)
+        angle:M_PI+M_PI_2 radius:60.0f];
     [self.pageCurlContainerView prepare];
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
@@ -69,7 +71,7 @@
     [super viewDidAppear:animated];
     // If the viewController was pushed in a landscape orientation its frame was that of a portrait view yet, then we have to reset the
     // page curl view's mesh here.
-//    [self.pageCurlContainerView refreshPageCurlView];
+    [self.pageCurlContainerView refreshPageCurlView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
