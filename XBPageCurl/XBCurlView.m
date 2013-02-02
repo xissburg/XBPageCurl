@@ -122,7 +122,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self createNextPageVAO];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActiveNotification:) name:UIApplicationWillResignActiveNotification object:[UIApplication sharedApplication]];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:[UIApplication sharedApplication]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
     
     return YES;
 }
@@ -324,7 +324,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glFinish();
 }
 
-- (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
+- (void)applicationDidBecomeActiveNotification:(NSNotification *)notification
 {
     if (self.wasAnimating) {
         [self startAnimating];
