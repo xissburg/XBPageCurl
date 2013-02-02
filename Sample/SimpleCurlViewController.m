@@ -27,7 +27,6 @@
     self.textView = nil;
     self.curlView = nil;
     self.backView = nil;
-    [super dealloc];
 }
 
 #pragma mark - View lifecycle
@@ -54,7 +53,7 @@
 {
     [super viewDidAppear:animated];
     CGRect r = self.messyView.frame;
-    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    self.curlView = [[XBCurlView alloc] initWithFrame:r];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -72,7 +71,7 @@
 {
     // After a rotation we have to recreate the XBCurlView because the page mesh must be recreated in the right dimensions.
     CGRect r = self.messyView.frame;
-    self.curlView = [[[XBCurlView alloc] initWithFrame:r] autorelease];
+    self.curlView = [[XBCurlView alloc] initWithFrame:r];
 }
 
 - (IBAction)curlButtonAction:(id)sender

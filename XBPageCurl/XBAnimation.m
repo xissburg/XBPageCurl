@@ -28,12 +28,12 @@
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double t))update completion:(void (^)(void))completion
 {
-    return [[[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:XBAnimationInterpolatorEaseInOut] autorelease];
+    return [[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:XBAnimationInterpolatorEaseInOut];
 }
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update completion:(void (^)(void))completion interpolator:(double (^)(double))interpolator
 {
-    return [[[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:interpolator] autorelease];
+    return [[self alloc] initWithName:name duration:duration update:update completion:completion interpolator:interpolator];
 }
 
 - (id)initWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
@@ -66,7 +66,6 @@
     self.update = nil;
     self.interpolator = nil;
     self.completion = nil;
-    [super dealloc];
 }
 
 - (BOOL)step:(NSTimeInterval)dt

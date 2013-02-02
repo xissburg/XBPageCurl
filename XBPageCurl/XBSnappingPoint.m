@@ -10,11 +10,21 @@
 
 @implementation XBSnappingPoint
 
-@synthesize position, angle, radius, tag;
+- (id)initWithPosition:(CGPoint)position angle:(CGFloat)angle radius:(CGFloat)radius {
+    self = [super init];
+    if (self != nil) {
+        _position = position;
+        _angle = angle;
+        _radius = radius;
+    }
+    return self;
+}
+
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: 0x%p> {\n\tposition = %@,\n\tangle = %f,\n\tradius = %f,\n\ttag = %d\n}", NSStringFromClass([self class]), self, NSStringFromCGPoint(position), angle, radius, tag];
+    return [NSString stringWithFormat:@"<%@: 0x%p> {\n\tposition = %@,\n\tangle = %f,\n\tradius = %f,\n\ttag = %d\n}",
+        NSStringFromClass([self class]), self, NSStringFromCGPoint(_position), _angle, _radius, _tag];
 }
 
 @end

@@ -12,5 +12,6 @@
 @interface PageCurlViewController_iPad : PageCurlViewController
 
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
+@property (retain, nonatomic) IBOutlet XBPageCurlContainerView *pageCurlContainerView;
 
 @end

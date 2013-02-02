@@ -11,16 +11,21 @@
 
 #define kDuration 0.3
 
-@implementation XBPageCurlView
+@interface XBPageCurlView ()
+@property (nonatomic, readwrite) CGFloat cylinderAngle;
+@property (nonatomic, readwrite) CGFloat initialAngle;
+@end
 
-@synthesize delegate, snappingPoints, snappingEnabled;
+@implementation XBPageCurlView
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         self.snappingPoints = [NSMutableArray array];
-        self.snappingEnabled = NO;
+        self.snappingEnabled = YES;
+        self.curlAngleMode = XBCurlAngleUpdateModeFollow;
+        self.initialCurlAngleMode = XBCurlAngleInitialModeFromBottom;
     }
     return self;
 }
@@ -28,12 +33,55 @@
 - (void)dealloc
 {
     self.snappingPoints = nil;
-    [super dealloc];
 }
 
 #pragma mark - Methods
 
+- (XBSnappingPoint *)snappingPointNearestToPoint:(CGPoint)v {
+    XBSnappingPoint *closestSnappingPoint;
+    
+    CGFloat d = FLT_MAX;
+    //Find the snapping point closest to the cylinder axis
+    for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
+        //Compute the distance between the snappingPoint.position and the cylinder axis
+        CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
+        if (dSq < d) {
+            closestSnappingPoint = snappingPoint;
+            d = dSq;
+        }
+    }
+    return closestSnappingPoint;
+}
+
+- (void)snapToPoint:(XBSnappingPoint *)snappingPoint {
+    if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
+        [self.delegate pageCurlView:self willSnapToPoint:snappingPoint];
+    }
+    
+    // @todo shouldn't these animate too?
+    [self setCylinderPosition:snappingPoint.position animatedWithDuration:kDuration];
+    [self setCylinderAngle:snappingPoint.angle animatedWithDuration:kDuration];
+    
+    XBPageCurlView __weak *_self = self;
+    [self setCylinderRadius:snappingPoint.radius animatedWithDuration:kDuration completion:^{
+        XBPageCurlView *blockSelf = _self;
+        if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+            [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:snappingPoint];
+        }
+    }];
+}
+
+- (void)initializeCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
+{
+    [self updateCylinderStateWithPoint:p animated:animated initializing:YES];
+}
+
 - (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
+{
+    [self updateCylinderStateWithPoint:p animated:animated initializing:NO];
+}
+
+- (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated initializing:(BOOL)initializing
 {
     CGPoint v = CGPointSub(p, startPickingPosition);
     CGFloat l = CGPointLength(v);
@@ -58,19 +106,62 @@
     
     CGPoint vn = CGPointMul(v, 1.f/l); //Normalized
     CGPoint c = CGPointAdd(startPickingPosition, CGPointMul(vn, d));
-    CGFloat angle = atan2f(-vn.x, vn.y);
     
     NSTimeInterval duration = animated? kDuration: 0;
     [self setCylinderPosition:c animatedWithDuration:duration];
+    
+    CGFloat angle;
+    if (initializing == NO) {
+        switch (self.curlAngleMode) {
+            case XBCurlAngleUpdateModeDelegate:
+                // Let app decide
+                if ([self.delegate respondsToSelector:@selector(pageCurlView:angleForPoint:)]) {
+                    angle = [self.delegate pageCurlView:self angleForPoint:p];
+                    break;
+                }
+            case XBCurlAngleUpdateModeFollow: {
+                // Calculate the angle based on difference between this point and last
+                float xValue = vn.x;
+                if (self.activeCurlAngleMode == XBCurlAngleInitialModeFromRight) {
+                    xValue = -vn.x;
+                }
+                float yValue = vn.y;
+                if (self.activeCurlAngleMode == XBCurlAngleInitialModeFromTop) {
+                    yValue = -vn.y;
+                }
+                angle = atan2f(xValue, yValue);
+                break;
+            }
+        }
+    } else {
+        angle = self.initialAngle;
+    }
+
+    NSLog(@"Angle: %f", angle);
     [self setCylinderAngle:angle animatedWithDuration:duration];
+
     [self setCylinderRadius:r animatedWithDuration:duration];
 }
 
-- (void)touchBeganAtPoint:(CGPoint)p
+- (CGFloat)initialCurlAnglModeToAngle:(XBPageCurlInitialAngleMode)mode {
+    switch (mode) {
+        case XBCurlAngleInitialModeFromBottom:
+            return M_PI*2;
+        case XBCurlAngleInitialModeFromTop:
+            return M_PI;
+        case XBCurlAngleInitialModeFromLeft:
+            return -M_PI_2;
+        case XBCurlAngleInitialModeFromRight:
+            return M_PI_2;
+    }
+    return 0.0;
+}
+
+- (void)beginCurlingAtPoint:(CGPoint)p
 {
     p.y = self.bounds.size.height - p.y;
     
-    CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
+    CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     CGPoint vp = CGPointRotateCW(v);
     CGPoint p0 = p;
     CGPoint p1 = CGPointAdd(p0, CGPointMul(vp, 12345.6));
@@ -85,73 +176,64 @@
         startPickingPosition.x = self.bounds.size.width;
         startPickingPosition.y = p.y;
     }
+
+    NSLog(@"beingCurlingAtPoint with picking position: %4.3f, %4.3f", startPickingPosition.x, startPickingPosition.y);
     
-    [self updateCylinderStateWithPoint:p animated:YES];
+    CGFloat angle;
+    switch (self.initialCurlAngleMode) {
+        case XBCurlAngleInitialModeFromBottom:
+        case XBCurlAngleInitialModeFromTop:
+        case XBCurlAngleInitialModeFromLeft:
+        case XBCurlAngleInitialModeFromRight:
+            angle = [self initialCurlAnglModeToAngle:self.initialCurlAngleMode];
+            self.activeCurlAngleMode = self.initialCurlAngleMode;
+            break;
+        default: {
+            // It must be multiple, establish nearest edge of the supported edges
+            BOOL leftAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromLeft) ? YES : NO;
+            BOOL rightAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromRight) ? YES : NO;
+            //BOOL topAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromTop) ? YES : NO;
+            //BOOL bottomAllowed = (self.initialCurlAngleMode & XBCurlAngleInitialModeFromBottom) ? YES : NO;
+            BOOL xNearLeft = p.x < (self.bounds.size.width / 2) ? YES : NO;
+            //BOOL yNearTop = p.y < (self.bounds.size.height / 2) ? YES : NO;
+
+            XBPageCurlInitialAngleMode leftRightMode;
+//            XBPageCurlInitialAngleMode topBottomMode;
+            
+            if (leftAllowed && rightAllowed) {
+                leftRightMode = xNearLeft ? XBCurlAngleInitialModeFromLeft : XBCurlAngleInitialModeFromRight;
+            }
+            
+            angle = [self initialCurlAnglModeToAngle:leftRightMode];
+            self.activeCurlAngleMode = leftRightMode;
+            break;
+        }
+    }
+
+    self.initialAngle = angle;
+    [self initializeCylinderStateWithPoint:p animated:YES];
 }
 
-- (void)touchMovedToPoint:(CGPoint)p
+- (void)moveCurlToPoint:(CGPoint)p
 {
     p.y = self.bounds.size.height - p.y;
     [self updateCylinderStateWithPoint:p animated:NO];
 }
 
-- (void)touchEndedAtPoint:(CGPoint)p
+- (void)endCurlingAtPoint:(CGPoint)p
 {
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
-        CGFloat d = FLT_MAX;
-        CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
-        //Find the snapping point closest to the cylinder axis
-        for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
-            //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, _cylinderPosition, v);
-            if (dSq < d) {
-                closestSnappingPoint = snappingPoint;
-                d = dSq;
-            }
-        }
+        CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
         
+        closestSnappingPoint = [self snappingPointNearestToPoint:v];
+
         NSAssert(closestSnappingPoint != nil, @"There is always a closest point in a non-empty set of points hence closestSnappingPoint should not be nil.");
         
-        if ([self.delegate respondsToSelector:@selector(pageCurlView:willSnapToPoint:)]) {
-            [self.delegate pageCurlView:self willSnapToPoint:closestSnappingPoint];
-        }
-        
-        [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
-        [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
-        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
-            if ([self.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [self.delegate pageCurlView:self didSnapToPoint:closestSnappingPoint];
-            }
-        }];
+        [self snapToPoint:closestSnappingPoint];
     }
+    self.initialAngle = 0.0;
 }
 
-
-#pragma mark - Touch handling
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    UITouch *touch = [touches anyObject];
-    CGPoint p = [touch locationInView:self];
-    [self touchBeganAtPoint:p];
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    CGPoint p = [[touches anyObject] locationInView:self];
-    [self touchMovedToPoint:p];
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    CGPoint p = [[touches anyObject] locationInView:self];
-    [self touchEndedAtPoint:p];
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [self touchesEnded:touches withEvent:event];
-}
 
 @end

@@ -56,6 +56,7 @@
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
+		49CC2FE016A34665007914F5 /* XBPageCurlContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 49CC2FDF16A34665007914F5 /* XBPageCurlContainerView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -126,6 +127,8 @@
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
 		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
+		49CC2FDE16A34665007914F5 /* XBPageCurlContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageCurlContainerView.h; sourceTree = "<group>"; };
+		49CC2FDF16A34665007914F5 /* XBPageCurlContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlContainerView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,6 +269,8 @@
 				1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */,
 				1B8742BB14CD04CC00BCADCF /* CGPointAdditions.h */,
 				1B8742B714CD038D00BCADCF /* CGPointAdditions.c */,
+				49CC2FDE16A34665007914F5 /* XBPageCurlContainerView.h */,
+				49CC2FDF16A34665007914F5 /* XBPageCurlContainerView.m */,
 			);
 			path = XBPageCurl;
 			sourceTree = "<group>";
@@ -439,6 +444,7 @@
 				1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */,
 				1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */,
 				1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */,
+				49CC2FE016A34665007914F5 /* XBPageCurlContainerView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,6 +500,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -508,7 +515,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -519,6 +526,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -526,7 +534,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -546,7 +554,7 @@
 				GCC_PREFIX_HEADER = "Sample/XBPageCurl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -567,7 +575,7 @@
 				GCC_PREFIX_HEADER = "Sample/XBPageCurl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
