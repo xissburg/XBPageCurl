@@ -24,7 +24,6 @@
     self.frontView = nil;
     self.backView = nil;
     self.pageDragView = nil;
-    [super dealloc];
 }
 
 #pragma mark - View lifecycle
