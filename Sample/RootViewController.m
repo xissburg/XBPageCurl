@@ -27,7 +27,6 @@
 {
     self.tableView = nil;
     self.dataArray = nil;
-    [super dealloc];
 }
 
 #pragma mark - View lifecycle
@@ -67,7 +66,7 @@
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
@@ -96,7 +95,6 @@
     
     UIViewController *viewController = [[viewControllerClass alloc] initWithNibName:className bundle:nil];
     [self.navigationController pushViewController:viewController animated:YES];
-    [viewController release];
 }
 
 @end

@@ -10,17 +10,13 @@
 
 @interface XBPageDragView ()
 
-@property (nonatomic, retain) XBPageCurlView *pageCurlView;
-@property (nonatomic, retain) XBSnappingPoint *bottomSnappingPoint;
+@property (nonatomic, readwrite) BOOL pageIsCurled;
+@property (nonatomic) XBPageCurlView *pageCurlView;
+@property (nonatomic) XBSnappingPoint *bottomSnappingPoint;
 
 @end
 
 @implementation XBPageDragView
-
-@synthesize viewToCurl = _viewToCurl;
-@synthesize pageIsCurled = _pageIsCurled;
-@synthesize pageCurlView = _pageCurlView;
-@synthesize bottomSnappingPoint = _bottomSnappingPoint;
 
 - (void)dealloc
 {
@@ -28,7 +24,6 @@
     self.viewToCurl = nil;
     self.pageCurlView = nil;
     self.bottomSnappingPoint = nil;
-    [super dealloc];
 }
 
 #pragma mark - Properties
@@ -39,8 +34,7 @@
         return;
     }
     
-    [_viewToCurl release];
-    _viewToCurl = [viewToCurl retain];
+    _viewToCurl = viewToCurl;
     
     [self.pageCurlView removeFromSuperview];
     self.pageCurlView = nil;
@@ -52,6 +46,10 @@
     [self refreshPageCurlView];
 }
 
+- (BOOL)pageIsCurled {
+    return _pageIsCurled;
+}
+
 #pragma mark - Methods
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion
@@ -59,12 +57,15 @@
     NSTimeInterval duration = animated? 0.3: 0;
     [self.pageCurlView setCylinderPosition:self.bottomSnappingPoint.position animatedWithDuration:duration];
     [self.pageCurlView setCylinderAngle:self.bottomSnappingPoint.angle animatedWithDuration:duration];
+    
+    XBPageDragView __weak *_self = self;
     [self.pageCurlView setCylinderRadius:self.bottomSnappingPoint.radius animatedWithDuration:duration completion:^{
-        self.hidden = NO;
-        _pageIsCurled = NO;
-        self.viewToCurl.hidden = NO;
-        [self.pageCurlView removeFromSuperview];
-        [self.pageCurlView stopAnimating];
+        XBPageDragView * blockSelf = _self;
+        blockSelf.hidden = NO;
+        blockSelf.pageIsCurled= NO;
+        blockSelf.viewToCurl.hidden = NO;
+        [blockSelf.pageCurlView removeFromSuperview];
+        [blockSelf.pageCurlView stopAnimating];
         if (completion != nil) {
             completion();
         }
@@ -74,20 +75,20 @@
 - (void)refreshPageCurlView
 {
     [self.pageCurlView removeFromSuperview];
-    self.pageCurlView = [[[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame] autorelease];
+    self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
     self.pageCurlView.delegate = self;
     self.pageCurlView.pageOpaque = YES;
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = YES;
     
-    XBSnappingPoint *point = [[[XBSnappingPoint alloc] init] autorelease];
+    XBSnappingPoint *point = [[XBSnappingPoint alloc] init];
     point.position = CGPointMake(self.viewToCurl.frame.size.width*0.875, self.viewToCurl.frame.size.height*0.06);
     point.angle = M_PI_4;
     point.radius = 30;
     [self.pageCurlView.snappingPoints addObject:point];
     self.bottomSnappingPoint = point;
     
-    point = [[[XBSnappingPoint alloc] init] autorelease];
+    point = [[XBSnappingPoint alloc] init];
     point.position = CGPointMake(self.viewToCurl.frame.size.width*0.5, self.viewToCurl.frame.size.height*0.67);
     point.angle = M_PI/8;
     point.radius = 80;
