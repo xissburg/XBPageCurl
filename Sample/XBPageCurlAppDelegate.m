@@ -21,7 +21,7 @@
         _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPhone" bundle:nil];
     }
     
-    UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:self.rootViewController] autorelease];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:self.rootViewController];
     
     [self.window setRootViewController:navigationController];
     [self.window makeKeyAndVisible];
@@ -32,7 +32,6 @@
 {
     self.rootViewController = nil;
     self.window = nil;
-    [super dealloc];
 }
 
 @end

@@ -11,6 +11,10 @@
 
 #define kDuration 0.3
 
+@interface XBPageCurlView ()
+@property (nonatomic, readwrite) CGFloat cylinderAngle;
+@end
+
 @implementation XBPageCurlView
 
 @synthesize delegate, snappingPoints, snappingEnabled;
@@ -28,7 +32,6 @@
 - (void)dealloc
 {
     self.snappingPoints = nil;
-    [super dealloc];
 }
 
 #pragma mark - Methods
@@ -70,7 +73,7 @@
 {
     p.y = self.bounds.size.height - p.y;
     
-    CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
+    CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     CGPoint vp = CGPointRotateCW(v);
     CGPoint p0 = p;
     CGPoint p1 = CGPointAdd(p0, CGPointMul(vp, 12345.6));
@@ -100,11 +103,11 @@
     if (self.snappingEnabled && self.snappingPoints.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
         CGFloat d = FLT_MAX;
-        CGPoint v = CGPointMake(cosf(_cylinderAngle), sinf(_cylinderAngle));
+        CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
         //Find the snapping point closest to the cylinder axis
         for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
             //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, _cylinderPosition, v);
+            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
             if (dSq < d) {
                 closestSnappingPoint = snappingPoint;
                 d = dSq;
@@ -119,9 +122,12 @@
         
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
         [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
+        
+        XBPageCurlView __weak *_self = self;
         [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
-            if ([self.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [self.delegate pageCurlView:self didSnapToPoint:closestSnappingPoint];
+            XBPageCurlView *blockSelf = _self;
+            if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+                [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:closestSnappingPoint];
             }
         }];
     }
