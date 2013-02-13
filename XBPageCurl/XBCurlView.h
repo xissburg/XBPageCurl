@@ -13,7 +13,6 @@
 #import "XBAnimation.h"
 #import "XBAnimationManager.h"
 
-
 /**
  * A view that renders a curled version of an image or a UIView instance using OpenGL.
  */
@@ -29,9 +28,9 @@
 
 /**
  * Initializers
- * The horizontalResolution: and verticalResolution arguments determine how many rows anc colums of quads (two triangles) the page
- * curling 3D mesh should have. By default, it uses 1/10th of the view size, which is good enough for most situations. You should
- * only use a higher resolution if you want to use a very low cylinder radius, below 20.
+ * The horizontalResolution: and verticalResolution arguments determine how many rows and colums of quads (two triangles) the 3D
+ * page mesh should have. By default, it has 1/10th of the view size, which is good enough for most situations. You should only 
+ * use a higher resolution if your cylinder radius goes under ~20.
  */
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
@@ -85,19 +84,19 @@
 - (void)drawViewOnNextPage:(UIView *)view;
 
 /**
- * The following methods allow you to curl a view without much code. Just choose the cylinder properties and go. Later you can uncurl it.
- * It adds and removes itself to/from the target view automatically.
+ * The following methods allow you to curl a view without much code. Just choose the cylinder properties and go. You can uncurl 
+ * it afterwards. It adds and removes itself to/from the target view automatically.
  */
 - (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration;
 
 /**
- * Return an UIImage instance with the current contents of the main framebuffer.
+ * Returns an UIImage instance with the current contents of the main framebuffer.
  */
 - (UIImage *)imageFromFramebuffer;
 
 /**
- * Return an UIImage instance with the current contents of the main framebuffer and a background view that can
+ * Returns an UIImage instance with the current contents of the main framebuffer and a background view that can
  * be seen through the transparent regions of the page.
  */
 - (UIImage *)imageFromFramebufferWithBackgroundView:(UIView *)backgroundView;

@@ -9,37 +9,26 @@
 #import "XBAnimationManager.h"
 #import "XBAnimation.h"
 
-
 @interface XBAnimationManager ()
 
-@property (nonatomic, retain) NSMutableDictionary *animations;
-@property (nonatomic, retain) NSMutableArray *animationsToRemove;
+@property (nonatomic, strong) NSMutableDictionary *animations;
+@property (nonatomic, strong) NSMutableArray *animationsToRemove;
 @property (nonatomic, assign) BOOL updateLock;
 
 @end
 
-
 @implementation XBAnimationManager
-
-@synthesize animations=_animations, animationsToRemove=_animationsToRemove;
 
 - (id)init
 {
     self = [super init];
     if (self) {
-        _animations = [[NSMutableDictionary alloc] init];
-        _animationsToRemove = [[NSMutableArray alloc] init];
+        self.animations = [[NSMutableDictionary alloc] init];
+        self.animationsToRemove = [[NSMutableArray alloc] init];
     }
     
     return self;
 }
-
-- (void)dealloc
-{
-    self.animations = nil;
-    self.animationsToRemove = nil;
-}
-
 
 #pragma mark - Methods
 
@@ -50,7 +39,7 @@
 
 - (void)runAnimation:(XBAnimation *)animation
 {
-    [self.animations setObject:animation forKey:animation.name];
+    self.animations[animation.name] = animation;
 }
 
 - (void)stopAnimation:(XBAnimation *)animation

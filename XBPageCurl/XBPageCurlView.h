@@ -25,13 +25,11 @@
  * Adds user interaction to XBCurlView. Allows the user to drag the page with his finger and also supports the placement of 
  * snapping points that the cylinder will stick to after the user releases his finger off the screen.
  */
-@interface XBPageCurlView : XBCurlView {
-    CGPoint startPickingPosition;
-}
+@interface XBPageCurlView : XBCurlView
 
 @property (nonatomic, assign) id<XBPageCurlViewDelegate> delegate;
 @property (nonatomic, assign) BOOL snappingEnabled;
-@property (nonatomic, retain) NSMutableArray *snappingPoints;
+@property (nonatomic, strong) NSMutableArray *snappingPoints;
 
 - (void)touchBeganAtPoint:(CGPoint)p;
 - (void)touchMovedToPoint:(CGPoint)p;

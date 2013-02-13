@@ -25,9 +25,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 @interface XBCurlView () {
 @private
-    EAGLContext *_context;
-    CADisplayLink *_displayLink;
-    
     //OpenGL buffers.
     GLuint framebuffer;
     GLuint colorRenderbuffer;
@@ -52,6 +49,11 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     GLuint vertexBuffer;
     GLuint indexBuffer;
     GLuint elementCount; //Number of entries in the index buffer
+    
+    //Vertex Array Objects
+    GLuint backVAO;
+    GLuint frontVAO;
+    GLuint nextPageVAO;
     
     //Handles for the curl shader uniforms.
     GLuint frontMvpHandle, frontSamplerHandle;
@@ -79,35 +81,15 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     //Model-View-Proj matrix.
     GLfloat mvp[16];
-    
-    //Position of any point in the cylinder axis projected on the xy plane.
-    CGPoint _cylinderPosition;
-    //Angle for the cylinder axis.
-    CGFloat _cylinderAngle;
-    CGFloat _cylinderRadius;
-    
-    //Multisampling anti-aliasing flag. It can only be set at init time.
-    BOOL _antialiasing;
-    
-    //Resolution of the grid mesh
-    NSUInteger _horizontalResolution, _verticalResolution;
-    
-    //Screen scale
-    CGFloat _screenScale;
-    
-    //Vertex Array Objects
-    GLuint backVAO;
-    GLuint frontVAO;
-    GLuint nextPageVAO;
 }
 
-@property (nonatomic) EAGLContext *context;
-@property (nonatomic) CADisplayLink *displayLink;
-@property (nonatomic) XBAnimationManager *animationManager;
-@property (nonatomic) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
+@property (nonatomic, strong) EAGLContext *context;
+@property (nonatomic, strong) CADisplayLink *displayLink;
+@property (nonatomic, strong) XBAnimationManager *animationManager;
+@property (nonatomic, strong) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
-@property (nonatomic) NSTimeInterval lastTimestamp;
-@property (nonatomic) BOOL wasAnimating;
+@property (nonatomic, assign) NSTimeInterval lastTimestamp;
+@property (nonatomic, assign) BOOL wasAnimating;
 
 - (BOOL)createFramebuffer;
 - (void)destroyFramebuffer;
@@ -150,9 +132,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     layer.backgroundColor = [UIColor clearColor].CGColor;
     layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
     
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
-    if (_context == nil || [EAGLContext setCurrentContext:self.context] == NO) {
+    if (self.context == nil || [EAGLContext setCurrentContext:self.context] == NO) {
         return NO;
     }
     
@@ -227,8 +209,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [EAGLContext setCurrentContext:self.context];
     [self.displayLink invalidate];
     self.displayLink = nil;
-    self.animationManager = nil;
-    self.curlingView = nil;
     [self destroyTextures];
     [self destroyVertexBuffer];
     [self destroyNextPageVertexBuffer];
@@ -241,7 +221,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
 
 #pragma mark - Overrides
 
@@ -260,9 +239,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
     if (CGRectContainsPoint(self.frame, point)) {
-        CGPoint p = CGPointMake(point.x*self.screenScale, (self.bounds.size.height - point.y)*self.screenScale);
-        CGPoint v = CGPointMake(-sinf(_cylinderAngle), cosf(_cylinderAngle));
-        CGPoint w = CGPointSub(p, CGPointSub(_cylinderPosition, CGPointMul(v, _cylinderRadius)));
+        CGPoint v = CGPointMake(-sinf(self.cylinderAngle), cosf(self.cylinderAngle));
+        CGPoint w = CGPointSub(point, CGPointSub(self.cylinderPosition, CGPointMul(v, self.cylinderRadius)));
         CGFloat dot = CGPointDot(v, w);
         return dot > 0;
     }
@@ -270,19 +248,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     return NO;
 }
 
-
 #pragma mark - Properties
-
-//CylinderPosition
-- (CGPoint)cylinderPosition
-{
-    return CGPointMake(_cylinderPosition.x/self.screenScale, _cylinderPosition.y/self.screenScale);
-}
-
-- (void)setCylinderPosition:(CGPoint)cylinderPosition
-{
-    _cylinderPosition = CGPointMake(cylinderPosition.x*self.screenScale, cylinderPosition.y*self.screenScale);
-}
 
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
 {
@@ -297,16 +263,13 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGPoint p0 = self.cylinderPosition;
-    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
+    __weak XBCurlView *weakSelf = self;
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
-        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
         weakSelf.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
     } completion:completion interpolator:interpolator];
-    
     [self.animationManager runAnimation:animation];
 }
 
-//CylinderAngle
 - (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration
 {
     [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:nil];
@@ -321,24 +284,11 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     double a0 = _cylinderAngle;
     double a1 = cylinderAngle;
-    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
+    __weak XBCurlView *weakSelf = self;
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
-        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
-        weakSelf->_cylinderAngle = (1 - t)*a0 + t*a1;
+        weakSelf.cylinderAngle = (1 - t)*a0 + t*a1;
     } completion:completion interpolator:interpolator];
-    
     [self.animationManager runAnimation:animation];
-}
-
-//CylinderRadius
-- (CGFloat)cylinderRadius
-{
-    return _cylinderRadius/self.screenScale;
-}
-
-- (void)setCylinderRadius:(CGFloat)cylinderRadius
-{
-    _cylinderRadius = cylinderRadius*self.screenScale;
 }
 
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
@@ -354,12 +304,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
 {
     CGFloat r = self.cylinderRadius;
-    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
+    __weak XBCurlView *weakSelf = self;
     XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
-        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
         weakSelf.cylinderRadius = (1 - t)*r + t*cylinderRadius;
     } completion:completion interpolator:interpolator];
-    
     [self.animationManager runAnimation:animation];
 }
 
@@ -379,7 +327,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     self.backgroundColor = self.backgroundColor;
 }
 
-
 #pragma mark - Notifications
 
 - (void)applicationWillResignActiveNotification:(NSNotification *)notification
@@ -395,7 +342,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [self startAnimating];
     }
 }
-
 
 #pragma mark - Framebuffer
 
@@ -535,7 +481,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     return image;
 }
-
 
 #pragma mark - Vertexbuffers
 
@@ -715,7 +660,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glUniformMatrix4fv(backMvpHandle, 1, GL_FALSE, mvp);
 }
 
-
 #pragma mark - Shaders
 
 - (GLuint)loadShader:(NSString *)filename type:(GLenum)type 
@@ -848,7 +792,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self destroyCurlShader];
     [self destroyNextPageShader];
 }
-
 
 #pragma mark - Textures
 
@@ -1097,10 +1040,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     //Start the cylinder animation
     [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
     [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
-    XBCurlView __weak *_self = self;
+    __weak XBCurlView *weakSelf = self;
     [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
-        XBCurlView *blockSelf = _self;
-        [blockSelf stopAnimating];
+        [weakSelf stopAnimating];
     }];
     
     //Setup the view hierarchy properly
@@ -1116,12 +1058,11 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     CGRect frame = self.frame;
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
-    NSValue *selfValue = [NSValue valueWithNonretainedObject:self];
+    __weak XBCurlView *weakSelf = self;
     [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
     [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
     [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
-        XBCurlView *weakSelf = selfValue.nonretainedObjectValue;
         weakSelf.curlingView.hidden = NO;
         weakSelf.curlingView = nil;
         [weakSelf removeFromSuperview];
@@ -1178,9 +1119,13 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     /* Draw the nextPage */
     glUseProgram(nextPageProgram);
     
-    glUniform2f(nextPageCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-    glUniform2f(nextPageCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-    glUniform1f(nextPageCylinderRadiusHandle, _cylinderRadius);
+    CGPoint glCylinderPosition = CGPointMake(self.cylinderPosition.x*self.screenScale, (self.bounds.size.height - self.cylinderPosition.y)*self.screenScale);
+    CGFloat glCylinderAngle = M_PI - self.cylinderAngle;
+    CGFloat glCylinderRadius = self.cylinderRadius*self.screenScale;
+    
+    glUniform2f(nextPageCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
+    glUniform2f(nextPageCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
+    glUniform1f(nextPageCylinderRadiusHandle, glCylinderRadius);
     
     //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
     if (nextPageTexture != 0) {
@@ -1196,9 +1141,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
     glUseProgram(frontProgram);
     
-    glUniform2f(frontCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-    glUniform2f(frontCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-    glUniform1f(frontCylinderRadiusHandle, _cylinderRadius);
+    glUniform2f(frontCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
+    glUniform2f(frontCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
+    glUniform1f(frontCylinderRadiusHandle, glCylinderRadius);
     
     if (backTexture != 0 || nextPageTexture != 0) { // In this case the frontTexture should already be bound, since it's the only texture around
         glBindTexture(GL_TEXTURE_2D, frontTexture);
@@ -1212,9 +1157,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     glUseProgram(backProgram);
     
-    glUniform2f(backCylinderPositionHandle, _cylinderPosition.x, _cylinderPosition.y);
-    glUniform2f(backCylinderDirectionHandle, cosf(_cylinderAngle), sinf(_cylinderAngle));
-    glUniform1f(backCylinderRadiusHandle, _cylinderRadius);
+    glUniform2f(backCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
+    glUniform2f(backCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
+    glUniform1f(backCylinderRadiusHandle, glCylinderRadius);
     
     if (backTexture != 0) {
         glBindTexture(GL_TEXTURE_2D, backTexture);
@@ -1231,7 +1176,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     }
     
     /* If antialiasing is enabled, draw on the multisampling buffers */
-    if (_antialiasing) {
+    if (self.antialiasing) {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, framebuffer);
         glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer);
         glResolveMultisampleFramebufferAPPLE();

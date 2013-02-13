@@ -11,16 +11,9 @@
 /**
  * XBAnimation
  * Simple class for animations. It has a name, a duration and an update block that implements the animation behavior.
- * An interpolator block can also be set, which determines the rate that the input value is changed. Linear is the default.
+ * An interpolator block must also be set, which determines the rate that the input value is changed. Linear is the default.
  */
-@interface XBAnimation : NSObject {
-@private
-    NSTimeInterval _duration;
-    NSTimeInterval _elapsedTime;
-    void (^_update)(double t);
-    double (^_interpolator)(double t);
-    void (^_completion)(void);
-}
+@interface XBAnimation : NSObject
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, readonly) NSTimeInterval duration;
@@ -43,7 +36,6 @@
 - (BOOL)step:(NSTimeInterval)dt;
 
 @end
-
 
 /**
  * Default interpolators.

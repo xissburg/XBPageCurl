@@ -10,6 +10,6 @@
 
 @interface SimpleCurlViewController_iPad : SimpleCurlViewController
 
-@property (nonatomic, retain) IBOutlet UIWebView *webView;
+@property (nonatomic, weak) IBOutlet UIWebView *webView;
 
 @end

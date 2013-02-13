@@ -7,31 +7,20 @@
 //
 
 #import "XBPageCurlAppDelegate.h"
+#import "RootViewController.h"
 
 @implementation XBPageCurlAppDelegate
 
-@synthesize window=_window, rootViewController=_rootViewController;
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad) {
-        _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPad" bundle:nil];
-    }
-    else {
-        _rootViewController = [[RootViewController alloc] initWithNibName:@"RootViewController_iPhone" bundle:nil];
-    }
+    NSString *nibName = UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? @"RootViewController_iPad": @"RootViewController_iPhone";
+    RootViewController *rootViewController = [[RootViewController alloc] initWithNibName:nibName bundle:nil];
+
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:rootViewController];
     
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:self.rootViewController];
-    
-    [self.window setRootViewController:navigationController];
+    self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];
     return YES;
-}
-
-- (void)dealloc
-{
-    self.rootViewController = nil;
-    self.window = nil;
 }
 
 @end

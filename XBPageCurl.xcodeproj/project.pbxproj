@@ -360,7 +360,7 @@
 		1B8816981401E4F000D579EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 1B88169B1401E4F000D579EF /* Build configuration list for PBXProject "XBPageCurl" */;
 			compatibilityVersion = "Xcode 3.2";

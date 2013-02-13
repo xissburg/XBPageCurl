@@ -8,18 +8,15 @@
 
 #import "XBAnimation.h"
 
-
 @interface XBAnimation ()
 
+@property (nonatomic, assign) NSTimeInterval elapsedTime;
 @property (nonatomic, copy) void (^update)(double t);
 @property (nonatomic, copy) void (^completion)(void);
 
 @end
 
-
 @implementation XBAnimation
-
-@synthesize name=_name, duration=_duration, update=_update, interpolator=_interpolator, completion=_completion;
 
 + (id)animationWithName:(NSString *)name duration:(NSTimeInterval)duration update:(void (^)(double))update
 {
@@ -51,28 +48,20 @@
     self = [super init];
     if (self) {
         self.name = name;
+        self.update = [update copy];
+        self.interpolator = [interpolator copy];
+        self.completion = [completion copy];
+        self.elapsedTime = 0;
         _duration = duration;
-        _update = [update copy];
-        _interpolator = [interpolator copy];
-        _completion = [completion copy];
-        _elapsedTime = 0;
     }
     return self;
 }
 
-- (void)dealloc
-{
-    self.name = nil;
-    self.update = nil;
-    self.interpolator = nil;
-    self.completion = nil;
-}
-
 - (BOOL)step:(NSTimeInterval)dt
 {
-    _elapsedTime += dt;
+    self.elapsedTime += dt;
     
-    if (_elapsedTime > _duration || _duration == 0) {
+    if (self.elapsedTime > self.duration || self.duration == 0) {
         self.update(1.0);
         if (self.completion != nil) {
             self.completion();
@@ -80,7 +69,7 @@
         return NO;
     }
     
-    double t = self.interpolator(_elapsedTime/_duration);
+    double t = self.interpolator(self.elapsedTime/self.duration);
     self.update(t);
     
     return YES;
@@ -88,28 +77,23 @@
 
 @end
 
-
 /*
  * Default interpolators implementation.
  */
 
-double (^XBAnimationInterpolatorLinear)(double t) = ^(double t)
-{
+double (^XBAnimationInterpolatorLinear)(double t) = ^(double t) {
     return t;
 };
 
-double (^XBAnimationInterpolatorEaseInOut)(double t) = ^(double t)
-{    
+double (^XBAnimationInterpolatorEaseInOut)(double t) = ^(double t) {    
     return 0.5 * (1 - cos(t*M_PI));
 };
 
-double (^XBAnimationInterpolatorEaseIn)(double t) = ^(double t)
-{    
+double (^XBAnimationInterpolatorEaseIn)(double t) = ^(double t) {    
     return t*t;
 };
 
-double (^XBAnimationInterpolatorEaseOut)(double t) = ^(double t)
-{    
+double (^XBAnimationInterpolatorEaseOut)(double t) = ^(double t) {    
     double t1 = t - 1;
     return 1 - t1*t1;
 };

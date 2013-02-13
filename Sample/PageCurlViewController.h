@@ -12,10 +12,10 @@
 
 @interface PageCurlViewController : UIViewController
 
-@property (nonatomic, retain) IBOutlet MKMapView *mapView;
-@property (nonatomic, retain) IBOutlet UIView *frontView;
-@property (nonatomic, retain) IBOutlet UIView *backView;
-@property (nonatomic, retain) IBOutlet XBPageDragView *pageDragView;
+@property (nonatomic, weak) IBOutlet MKMapView *mapView;
+@property (nonatomic, weak) IBOutlet UIView *frontView;
+@property (nonatomic, weak) IBOutlet UIView *backView;
+@property (nonatomic, weak) IBOutlet XBPageDragView *pageDragView;
 
 - (IBAction)buttonAction:(id)sender;
 - (IBAction)backButtonAction:(id)sender;

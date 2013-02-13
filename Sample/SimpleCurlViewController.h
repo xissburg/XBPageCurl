@@ -10,16 +10,14 @@
 #import "XBCurlView.h"
 
 
-@interface SimpleCurlViewController : UIViewController <UITextFieldDelegate> {
-    UIDatePicker *pickerView;
-}
+@interface SimpleCurlViewController : UIViewController <UITextFieldDelegate>
 
-@property (nonatomic, retain) XBCurlView *curlView;
-@property (nonatomic, retain) IBOutlet UIView *messyView;
-@property (nonatomic, retain) IBOutlet UIView *backView;
-@property (nonatomic, retain) IBOutlet UIDatePicker *pickerView;
-@property (nonatomic, retain) IBOutlet UISearchBar *searchBar;
-@property (nonatomic, retain) IBOutlet UITextView *textView;
+@property (nonatomic, strong) XBCurlView *curlView;
+@property (nonatomic, weak) IBOutlet UIView *messyView;
+@property (nonatomic, weak) IBOutlet UIView *backView;
+@property (nonatomic, weak) IBOutlet UIDatePicker *pickerView;
+@property (nonatomic, weak) IBOutlet UISearchBar *searchBar;
+@property (nonatomic, weak) IBOutlet UITextView *textView;
 
 - (IBAction)curlButtonAction:(id)sender;
 - (IBAction)uncurlButtonAction:(id)sender;

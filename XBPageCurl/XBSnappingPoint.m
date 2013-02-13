@@ -10,11 +10,9 @@
 
 @implementation XBSnappingPoint
 
-@synthesize position, angle, radius, tag;
-
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: 0x%p> {\n\tposition = %@,\n\tangle = %f,\n\tradius = %f,\n\ttag = %d\n}", NSStringFromClass([self class]), self, NSStringFromCGPoint(position), angle, radius, tag];
+    return [NSString stringWithFormat:@"<%@: 0x%p> {\n\tposition = %@,\n\tangle = %f,\n\tradius = %f,\n\ttag = %d\n}", NSStringFromClass([self class]), self, NSStringFromCGPoint(self.position), self.angle, self.radius, self.tag];
 }
 
 @end

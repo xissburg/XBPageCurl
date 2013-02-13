@@ -12,12 +12,13 @@
 #define kDuration 0.3
 
 @interface XBPageCurlView ()
-@property (nonatomic, readwrite) CGFloat cylinderAngle;
+
+@property (nonatomic, assign) CGFloat cylinderAngle;
+@property (nonatomic, assign) CGPoint startPickingPosition;
+
 @end
 
 @implementation XBPageCurlView
-
-@synthesize delegate, snappingPoints, snappingEnabled;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -29,16 +30,11 @@
     return self;
 }
 
-- (void)dealloc
-{
-    self.snappingPoints = nil;
-}
-
 #pragma mark - Methods
 
 - (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
 {
-    CGPoint v = CGPointSub(p, startPickingPosition);
+    CGPoint v = CGPointSub(p, self.startPickingPosition);
     CGFloat l = CGPointLength(v);
     
     if (fabs(l) < FLT_EPSILON) {
@@ -60,7 +56,7 @@
     }
     
     CGPoint vn = CGPointMul(v, 1.f/l); //Normalized
-    CGPoint c = CGPointAdd(startPickingPosition, CGPointMul(vn, d));
+    CGPoint c = CGPointAdd(self.startPickingPosition, CGPointMul(vn, d));
     CGFloat angle = atan2f(-vn.x, vn.y);
     
     NSTimeInterval duration = animated? kDuration: 0;
@@ -71,8 +67,6 @@
 
 - (void)touchBeganAtPoint:(CGPoint)p
 {
-    p.y = self.bounds.size.height - p.y;
-    
     CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     CGPoint vp = CGPointRotateCW(v);
     CGPoint p0 = p;
@@ -82,11 +76,10 @@
     CGPoint x = CGPointZero;
     
     if (CGPointIntersectSegments(p0, p1, q0, q1, &x)) {
-        startPickingPosition = x;
+        self.startPickingPosition = x;
     }
     else {
-        startPickingPosition.x = self.bounds.size.width;
-        startPickingPosition.y = p.y;
+        self.startPickingPosition = CGPointMake(self.bounds.size.width, p.y);
     }
     
     [self updateCylinderStateWithPoint:p animated:YES];
@@ -94,7 +87,6 @@
 
 - (void)touchMovedToPoint:(CGPoint)p
 {
-    p.y = self.bounds.size.height - p.y;
     [self updateCylinderStateWithPoint:p animated:NO];
 }
 
@@ -123,11 +115,10 @@
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
         [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
         
-        XBPageCurlView __weak *_self = self;
+        __weak XBPageCurlView *weakSelf = self;
         [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
-            XBPageCurlView *blockSelf = _self;
-            if ([blockSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
-                [blockSelf.delegate pageCurlView:blockSelf didSnapToPoint:closestSnappingPoint];
+            if ([weakSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
+                [weakSelf.delegate pageCurlView:weakSelf didSnapToPoint:closestSnappingPoint];
             }
         }];
     }

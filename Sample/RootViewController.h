@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface RootViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
-    UITableView *_tableView;
-}
+@interface RootViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
-@property (nonatomic, retain) IBOutlet UITableView *tableView;
+@property (nonatomic, weak) IBOutlet UITableView *tableView;
 
 @end

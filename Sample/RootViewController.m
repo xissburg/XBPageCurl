@@ -11,23 +11,14 @@
 #define kNameKey @"name"
 #define kNibNameKey @"nib"
 
-
 @interface RootViewController ()
 
-@property (nonatomic, retain) NSMutableArray *dataArray;
+@property (nonatomic, copy) NSArray *demosArray;
 
 @end
 
 
 @implementation RootViewController
-
-@synthesize tableView=_tableView, dataArray;
-
-- (void)dealloc
-{
-    self.tableView = nil;
-    self.dataArray = nil;
-}
 
 #pragma mark - View lifecycle
 
@@ -35,16 +26,13 @@
 {
     [super viewDidLoad];
     self.title = @"XBPageCurl Demos";
-    self.dataArray = [NSMutableArray array];
-    [self.dataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Simple Curl", kNameKey, @"SimpleCurlViewController", kNibNameKey, nil]];
-    [self.dataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Page Curl", kNameKey, @"PageCurlViewController", kNibNameKey, nil]];
+    self.demosArray = @[@{kNameKey : @"Simple Curl", kNibNameKey : @"SimpleCurlViewController"}, @{kNameKey: @"Page Curl", kNibNameKey : @"PageCurlViewController"}];
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    self.tableView = nil;
-    self.dataArray = nil;
+    self.demosArray = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -52,30 +40,27 @@
     return YES;
 }
 
-
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.dataArray.count;
+    return self.demosArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     static NSString *cellIdentifier = @"cell";
-
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
-    NSDictionary *item = [self.dataArray objectAtIndex:indexPath.row];
-    cell.textLabel.text = [item objectForKey:kNameKey];
+    NSDictionary *demo = self.demosArray[indexPath.row];
+    cell.textLabel.text = demo[kNameKey];
 
     return cell;
 }
-
 
 #pragma mark - UITableViewDelegate
 
@@ -83,8 +68,8 @@
 {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    NSDictionary *item = [self.dataArray objectAtIndex:indexPath.row];
-    NSString *baseClassName = [item objectForKey:kNibNameKey];
+    NSDictionary *item = self.demosArray[indexPath.row];
+    NSString *baseClassName = item[kNibNameKey];
     NSString *postfix = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad? @"_iPad": @"_iPhone";
     NSString *className = [baseClassName stringByAppendingString:postfix];
     Class viewControllerClass = NSClassFromString(className);

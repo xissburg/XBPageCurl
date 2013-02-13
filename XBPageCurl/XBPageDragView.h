@@ -11,9 +11,9 @@
 
 @interface XBPageDragView : UIView <XBPageCurlViewDelegate>
 
-@property (nonatomic, retain) IBOutlet UIView *viewToCurl;
+@property (nonatomic, strong) IBOutlet UIView *viewToCurl;
 @property (nonatomic, readonly) BOOL pageIsCurled;
-@property (nonatomic, retain, readonly) XBPageCurlView *pageCurlView;
+@property (nonatomic, readonly) XBPageCurlView *pageCurlView;
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion;
 - (void)refreshPageCurlView;

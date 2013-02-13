@@ -13,29 +13,7 @@
 
 @implementation PageCurlViewController
 
-@synthesize mapView = _mapView;
-@synthesize frontView = _frontView;
-@synthesize backView = _backView;
-@synthesize pageDragView = _pageDragView;
-
-- (void)dealloc
-{
-    self.mapView = nil;
-    self.frontView = nil;
-    self.backView = nil;
-    self.pageDragView = nil;
-}
-
 #pragma mark - View lifecycle
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    self.mapView = nil;
-    self.frontView = nil;
-    self.backView = nil;
-    self.pageDragView = nil;
-}
 
 - (void)viewWillAppear:(BOOL)animated
 {

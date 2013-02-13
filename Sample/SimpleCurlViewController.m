@@ -16,17 +16,9 @@
     BOOL isCurled;
 }
 
-@synthesize messyView, pickerView, searchBar, textView, curlView, backView;
-
 - (void)dealloc 
 {
     [self.curlView stopAnimating];
-    self.messyView = nil;
-    self.pickerView = nil;
-    self.searchBar = nil;
-    self.textView = nil;
-    self.curlView = nil;
-    self.backView = nil;
 }
 
 #pragma mark - View lifecycle
@@ -35,12 +27,6 @@
 {
     [super viewDidUnload];
     [self.curlView stopAnimating];
-    self.messyView = nil;
-    self.pickerView = nil;
-    self.searchBar = nil;
-    self.textView = nil;
-    self.curlView = nil;
-    self.backView = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -79,7 +65,7 @@
     CGRect r = self.messyView.frame;
     self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
     self.curlView.pageOpaque = YES; //The page to be curled has no transparency
-    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/6, r.size.height/2) cylinderAngle:M_PI/2.4 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 160: 70 animatedWithDuration:kDuration];
+    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:kDuration];
     isCurled = YES;
 }
 
