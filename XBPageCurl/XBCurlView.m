@@ -1078,6 +1078,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)startAnimating
 {
+    [EAGLContext setCurrentContext:self.context];
     [self.displayLink invalidate];
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
@@ -1094,6 +1095,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     // which might also get deallocated if it is not retained by anything else like a superview. Therefore, don't touch self after
     // this line.
     [displayLink invalidate]; 
+    [EAGLContext setCurrentContext:nil];
 }
 
 - (void)draw:(CADisplayLink *)sender
