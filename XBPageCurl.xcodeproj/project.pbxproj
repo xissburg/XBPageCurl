@@ -56,6 +56,7 @@
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
+		1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -126,6 +127,7 @@
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
 		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
+		1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +161,7 @@
 		1B8816961401E4F000D579EF = {
 			isa = PBXGroup;
 			children = (
+				1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */,
 				1B8BC3F61429866F0048682B /* Sample */,
 				1B8BC4111429866F0048682B /* XBPageCurl */,
 				1B8C27201415C6510081F180 /* Tests */,
@@ -405,6 +408,7 @@
 				1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */,
 				1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */,
 				1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */,
+				1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

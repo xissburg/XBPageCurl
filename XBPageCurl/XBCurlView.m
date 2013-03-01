@@ -138,7 +138,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         return NO;
     }
     
-    self.animationManager = [XBAnimationManager animationManager];
+    self.animationManager = [[XBAnimationManager alloc] init];
 
     self.cylinderPosition = CGPointMake(self.bounds.size.width, self.bounds.size.height/2);
     self.cylinderAngle = M_PI_2;

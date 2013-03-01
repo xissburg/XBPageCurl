@@ -32,11 +32,6 @@
 
 #pragma mark - Methods
 
-+ (id)animationManager
-{
-    return [[self alloc] init];
-}
-
 - (void)runAnimation:(XBAnimation *)animation
 {
     self.animations[animation.name] = animation;

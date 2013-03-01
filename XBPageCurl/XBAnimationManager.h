@@ -17,8 +17,6 @@
  */
 @interface XBAnimationManager : NSObject
 
-+ (id)animationManager;
-
 - (void)runAnimation:(XBAnimation *)animation;
 - (void)stopAnimation:(XBAnimation *)animation;
 - (void)stopAnimationNamed:(NSString *)name;
