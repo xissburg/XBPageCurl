@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */; };
 		1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */; };
+		1B35689016E92D7C00A877E6 /* MultipleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B35688F16E92D7C00A877E6 /* MultipleViewController.m */; };
+		1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */; };
 		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
 		1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742B714CD038D00BCADCF /* CGPointAdditions.c */; };
 		1B8742C014CD07DA00BCADCF /* PageCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */; };
@@ -62,6 +64,9 @@
 /* Begin PBXFileReference section */
 		1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontFragmentShader.glsl; sourceTree = "<group>"; };
 		1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontVertexShader.glsl; sourceTree = "<group>"; };
+		1B35688E16E92D7C00A877E6 /* MultipleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultipleViewController.h; sourceTree = "<group>"; };
+		1B35688F16E92D7C00A877E6 /* MultipleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultipleViewController.m; sourceTree = "<group>"; };
+		1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MultipleViewController_iPhone.xib; sourceTree = "<group>"; };
 		1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBSnappingPoint.h; sourceTree = "<group>"; };
 		1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBSnappingPoint.m; sourceTree = "<group>"; };
 		1B8742B714CD038D00BCADCF /* CGPointAdditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CGPointAdditions.c; sourceTree = "<group>"; };
@@ -204,6 +209,8 @@
 				1B8BC4081429866F0048682B /* SimpleCurlViewController.m */,
 				1BE3410414D4A9ED00261AF5 /* PageCurlViewController.h */,
 				1BE3410514D4A9ED00261AF5 /* PageCurlViewController.m */,
+				1B35688E16E92D7C00A877E6 /* MultipleViewController.h */,
+				1B35688F16E92D7C00A877E6 /* MultipleViewController.m */,
 				1B8BC3F91429866F0048682B /* iPad */,
 				1B8BC3FE1429866F0048682B /* iPhone */,
 				1B8BC4351429875B0048682B /* Supporting Files */,
@@ -238,6 +245,7 @@
 				1BE340FC14D4897C00261AF5 /* RootViewController_iPhone.xib */,
 				1BE340FD14D4897C00261AF5 /* SimpleCurlViewController_iPhone.xib */,
 				1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */,
+				1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */,
 			);
 			path = iPhone;
 			sourceTree = "<group>";
@@ -409,6 +417,7 @@
 				1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */,
 				1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */,
 				1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */,
+				1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,6 +452,7 @@
 				1BE3410614D4A9ED00261AF5 /* PageCurlViewController.m in Sources */,
 				1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */,
 				1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */,
+				1B35689016E92D7C00A877E6 /* MultipleViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

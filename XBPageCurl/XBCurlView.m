@@ -86,7 +86,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, strong) XBAnimationManager *animationManager;
-@property (nonatomic, strong) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
+@property (nonatomic, weak) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
 @property (nonatomic, assign) NSTimeInterval lastTimestamp;
 @property (nonatomic, assign) BOOL wasAnimating;
@@ -318,6 +318,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     if (color == NULL) {
         color = (CGFloat[]){1, 1, 1};
     }
+    [EAGLContext setCurrentContext:self.context];
     glClearColor(color[0], color[1], color[2], self.opaque? 1.0: 0.0);
 }
 
@@ -333,6 +334,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     self.wasAnimating = self.displayLink != nil;
     [self stopAnimating];
+    [EAGLContext setCurrentContext:self.context];
     glFinish();
 }
 
@@ -347,6 +349,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (BOOL)createFramebuffer
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyFramebuffer];
     
     glGenFramebuffers(1, &framebuffer);
@@ -392,6 +395,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyFramebuffer
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteFramebuffers(1, &framebuffer);
     framebuffer = 0;
     
@@ -407,6 +411,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)setupInitialGLState
 {
+    [EAGLContext setCurrentContext:self.context];
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, viewportWidth, viewportHeight);
@@ -437,6 +442,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (UIImage *)imageFromFramebufferWithBackgroundView:(UIView *)backgroundView
 {
+    [EAGLContext setCurrentContext:self.context];
     GLuint rttFramebuffer;
     glGenFramebuffers(1, &rttFramebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, rttFramebuffer);
@@ -486,6 +492,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyVertexBuffer];
     
     GLsizeiptr verticesSize = (xRes+1)*(yRes+1)*sizeof(Vertex);
@@ -535,6 +542,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyVertexBuffer
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteBuffers(1, &indexBuffer);
     vertexBuffer = indexBuffer = 0;
@@ -542,6 +550,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)createNextPageVertexBuffer
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyNextPageVertexBuffer];
     
     GLsizeiptr verticesSize = 4*sizeof(Vertex);
@@ -585,6 +594,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)createBackVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyBackVAO];
     glGenVertexArraysOES(1, &backVAO);
     glBindVertexArrayOES(backVAO);
@@ -599,12 +609,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyBackVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteVertexArraysOES(1, &backVAO);
     backVAO = 0;
 }
 
 - (void)createFrontVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyFrontVAO];
     glGenVertexArraysOES(1, &frontVAO);
     glBindVertexArrayOES(frontVAO);
@@ -619,12 +631,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyFrontVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteVertexArraysOES(1, &frontVAO);
     frontVAO = 0;
 }
 
 - (void)createNextPageVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyNextPageVAO];
     glGenVertexArraysOES(1, &nextPageVAO);
     glBindVertexArrayOES(nextPageVAO);
@@ -638,6 +652,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyNextPageVAO
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteVertexArraysOES(1, &nextPageVAO);
     nextPageVAO = 0;
 }
@@ -651,6 +666,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)setupMVP
 {
+    [EAGLContext setCurrentContext:self.context];
     OrthoM4x4(mvp, 0.f, viewportWidth, 0.f, viewportHeight, -1000.f, 1000.f);
     glUseProgram(nextPageProgram);
     glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
@@ -664,6 +680,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (GLuint)loadShader:(NSString *)filename type:(GLenum)type 
 {
+    [EAGLContext setCurrentContext:self.context];
     GLuint shader = glCreateShader(type);
     
     if (shader == 0) {
@@ -694,6 +711,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (GLuint)createProgramWithVertexShader:(NSString *)vertexShaderFilename fragmentShader:(NSString *)fragmentShaderFilename
 {
+    [EAGLContext setCurrentContext:self.context];
     GLuint vertexShader = [self loadShader:vertexShaderFilename type:GL_VERTEX_SHADER];
     GLuint fragmentShader = [self loadShader:fragmentShaderFilename type:GL_FRAGMENT_SHADER];
     GLuint prog = glCreateProgram();
@@ -744,6 +762,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyCurlShader
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteProgram(frontProgram);
     frontProgram = 0;
     glDeleteProgram(backProgram);
@@ -774,6 +793,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyNextPageShader
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteProgram(nextPageProgram);
     nextPageProgram = 0;
 }
@@ -797,6 +817,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (GLuint)generateTexture
 {
+    [EAGLContext setCurrentContext:self.context];
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -810,7 +831,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 }
 
 - (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock
-{    
+{
+    [EAGLContext setCurrentContext:self.context];
     size_t bitsPerComponent = 8;
     size_t bytesPerRow = textureWidth * 4;
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -931,6 +953,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)destroyBackTexture
 {
+    [EAGLContext setCurrentContext:self.context];
     glDeleteTextures(1, &backTexture);
     backTexture = 0;
 }
@@ -1055,6 +1078,11 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration
 {
+    [self uncurlAnimatedWithDuration:duration completion:nil];
+}
+
+- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
     CGRect frame = self.frame;
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
@@ -1064,21 +1092,21 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
         weakSelf.curlingView.hidden = NO;
-        weakSelf.curlingView = nil;
         [weakSelf removeFromSuperview];
         //Stop the rendering loop since the curlView was removed from its superview and hence won't appear
         [weakSelf stopAnimating];
+        if (completion) {
+            completion();
+        }
     }];
     
     [self startAnimating];
 }
 
-
 #pragma mark - Animation and updating
 
 - (void)startAnimating
 {
-    [EAGLContext setCurrentContext:self.context];
     [self.displayLink invalidate];
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
@@ -1094,17 +1122,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     // its retainCount might reach zero and in this case it will be deallocated and will also release its target (which is self),
     // which might also get deallocated if it is not retained by anything else like a superview. Therefore, don't touch self after
     // this line.
-    [displayLink invalidate]; 
-    [EAGLContext setCurrentContext:nil];
+    [displayLink invalidate];
 }
 
 - (void)draw:(CADisplayLink *)sender
 {
-    /* Update all animations */
-    NSTimeInterval dt = self.lastTimestamp>0? sender.timestamp - self.lastTimestamp: 0;
-    self.lastTimestamp = sender.timestamp;
-    dt = MAX(0, MIN(dt, 0.2));
-    [self.animationManager update:dt];
+    [EAGLContext setCurrentContext:self.context];
     
     /* Clear framebuffer */
     glClear(GL_COLOR_BUFFER_BIT);
@@ -1192,6 +1215,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     /* Finally, present, swap buffers, whatever */
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
+    /* Update all animations */
+    NSTimeInterval dt = self.lastTimestamp > 0? sender.timestamp - self.lastTimestamp: 0;
+    self.lastTimestamp = sender.timestamp;
+    dt = MAX(0, MIN(dt, 0.2));
+    [self.animationManager update:dt];
+    // WARNING: self might be deallocated at this point, because the animations that finish invoke their completion blocks which might in
+    // turn do anything such as releasing this instance and subsequently deallocating it. Hence, do not touch self after this line.
+    
 #ifdef DEBUG
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
@@ -1201,7 +1232,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 }
 
 @end
-
 
 #pragma mark - Functions
 

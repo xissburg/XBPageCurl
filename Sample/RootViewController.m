@@ -25,8 +25,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title = @"XBPageCurl Demos";
-    self.demosArray = @[@{kNameKey : @"Simple Curl", kNibNameKey : @"SimpleCurlViewController"}, @{kNameKey: @"Page Curl", kNibNameKey : @"PageCurlViewController"}];
+    self.title = @"Curl Demos";
+    self.demosArray = @[@{kNameKey : @"Simple Curl", kNibNameKey : @"SimpleCurlViewController"}, @{kNameKey: @"Page Curl", kNibNameKey : @"PageCurlViewController"}, @{kNameKey: @"Multiple Views", kNibNameKey: @"MultipleViewController"}];
 }
 
 - (void)viewDidUnload

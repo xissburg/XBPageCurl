@@ -89,6 +89,7 @@
  */
 - (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration;
 - (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration;
+- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion;
 
 /**
  * Returns an UIImage instance with the current contents of the main framebuffer.
