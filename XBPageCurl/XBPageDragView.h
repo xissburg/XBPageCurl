@@ -14,6 +14,7 @@
 @property (nonatomic, strong) IBOutlet UIView *viewToCurl;
 @property (nonatomic, readonly) BOOL pageIsCurled;
 @property (nonatomic, readonly) XBPageCurlView *pageCurlView;
+@property (nonatomic, readonly) XBSnappingPoint *cornerSnappingPoint;
 
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion;
 - (void)refreshPageCurlView;

@@ -10,6 +10,7 @@
 #import "CGPointAdditions.h"
 
 #define kDuration 0.3
+#define CLAMP(x, a, b) MAX(a, MIN(x, b))
 
 @interface XBPageCurlView ()
 
@@ -26,6 +27,8 @@
     if (self) {
         self.snappingPoints = [NSMutableArray array];
         self.snappingEnabled = NO;
+        self.minimumCylinderAngle = -FLT_MAX;
+        self.maximumCylinderAngle = FLT_MAX;
     }
     return self;
 }
@@ -61,7 +64,7 @@
     
     NSTimeInterval duration = animated? kDuration: 0;
     [self setCylinderPosition:c animatedWithDuration:duration];
-    [self setCylinderAngle:angle animatedWithDuration:duration];
+    [self setCylinderAngle:CLAMP(angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:duration];
     [self setCylinderRadius:r animatedWithDuration:duration];
 }
 
@@ -113,7 +116,7 @@
         }
         
         [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
-        [self setCylinderAngle:closestSnappingPoint.angle animatedWithDuration:kDuration];
+        [self setCylinderAngle:CLAMP(closestSnappingPoint.angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:kDuration];
         
         __weak XBPageCurlView *weakSelf = self;
         [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{

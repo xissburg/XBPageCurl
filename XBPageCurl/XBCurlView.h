@@ -19,7 +19,7 @@
 @interface XBCurlView : UIView 
 
 @property (nonatomic, readonly) BOOL antialiasing;
-@property (nonatomic, assign) BOOL pageOpaque; // Wether the page texture is opaque
+@property (nonatomic, assign) BOOL pageOpaque; // Whether the page texture is opaque
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
 @property (nonatomic, assign) CGPoint cylinderPosition;
