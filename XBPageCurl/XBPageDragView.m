@@ -60,11 +60,11 @@
 - (void)uncurlPageAnimated:(BOOL)animated completion:(void (^)(void))completion
 {
     NSTimeInterval duration = animated? 0.3: 0;
-    [self.pageCurlView setCylinderPosition:self.cornerSnappingPoint.position animatedWithDuration:duration];
-    [self.pageCurlView setCylinderAngle:self.cornerSnappingPoint.angle animatedWithDuration:duration];
+    [self.pageCurlView.page setCylinderPosition:self.cornerSnappingPoint.position animatedWithDuration:duration];
+    [self.pageCurlView.page setCylinderAngle:self.cornerSnappingPoint.angle animatedWithDuration:duration];
     
     __weak XBPageDragView *weakSelf = self;
-    [self.pageCurlView setCylinderRadius:self.cornerSnappingPoint.radius animatedWithDuration:duration completion:^{
+    [self.pageCurlView.page setCylinderRadius:self.cornerSnappingPoint.radius animatedWithDuration:duration completion:^{
         weakSelf.hidden = NO;
         weakSelf.pageIsCurled= NO;
         weakSelf.viewToCurl.hidden = NO;
@@ -81,7 +81,7 @@
     [self.pageCurlView removeFromSuperview];
     self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
     self.pageCurlView.delegate = self;
-    self.pageCurlView.pageOpaque = YES;
+    self.pageCurlView.page.opaque = YES;
     self.pageCurlView.opaque = NO;
     self.pageCurlView.snappingEnabled = YES;
     
@@ -93,7 +93,7 @@
     point.radius = 80;
     [self.pageCurlView.snappingPoints addObject:point];
     
-    [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
+    [self.pageCurlView.page drawViewOnFrontOfPage:self.viewToCurl];
 }
 
 #pragma mark - Touches
@@ -106,10 +106,10 @@
     if (CGRectContainsPoint(self.frame, touchLocation)) {
         self.hidden = YES;
         _pageIsCurled = YES;
-        [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
-        self.pageCurlView.cylinderPosition = self.cornerSnappingPoint.position;
-        self.pageCurlView.cylinderAngle = self.cornerSnappingPoint.angle;
-        self.pageCurlView.cylinderRadius = self.cornerSnappingPoint.radius;
+        [self.pageCurlView.page drawViewOnFrontOfPage:self.viewToCurl];
+        self.pageCurlView.page.cylinderPosition = self.cornerSnappingPoint.position;
+        self.pageCurlView.page.cylinderAngle = self.cornerSnappingPoint.angle;
+        self.pageCurlView.page.cylinderRadius = self.cornerSnappingPoint.radius;
         [self.pageCurlView touchBeganAtPoint:touchLocation];
         [self.viewToCurl.superview addSubview:self.pageCurlView];
         self.viewToCurl.hidden = YES;

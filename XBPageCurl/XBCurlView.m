@@ -10,10 +10,6 @@
 #import "CGPointAdditions.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define kCylinderPositionAnimationName @"cylinderPosition"
-#define kCylinderDirectionAnimationName @"cylinderDirection"
-#define kCylinderRadiusAnimationName @"cylinderRadius"
-
 typedef struct _Vertex
 {
     GLfloat x, y, z;
@@ -25,67 +21,46 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 @interface XBCurlView () {
 @private
-    //OpenGL buffers.
+    // OpenGL buffers.
     GLuint framebuffer;
     GLuint colorRenderbuffer;
     GLuint sampleFramebuffer;
     GLuint sampleColorRenderbuffer;
     
-    //Texture size for all possible textures (front of page, back of page, nextPage).
-    GLuint textureWidth, textureHeight;
-    
-    //Texture projected onto the front of the curling mesh.
-    GLuint frontTexture;
-    
-    //Texture projected onto the back of the curling mesh for double-sided pages.
-    GLuint backTexture;
+    // Gradient texture that is stretched along the back of the page.
     GLuint backGradientTexture;
     
-    //GPU program for the curling mesh.
+    // Vertex and index buffer for the curling mesh.
+    GLuint vertexBuffer;
+    GLuint indexBuffer;
+    GLuint elementCount; // Number of entries in the index buffer.
+    
+    // Vertex Array Objects
+    GLuint backVAO;
+    GLuint frontVAO;
+    
+    // GPU program for the curling mesh.
     GLuint frontProgram;
     GLuint backProgram;
     
-    //Vertex and index buffer for the curling mesh.
-    GLuint vertexBuffer;
-    GLuint indexBuffer;
-    GLuint elementCount; //Number of entries in the index buffer
-    
-    //Vertex Array Objects
-    GLuint backVAO;
-    GLuint frontVAO;
-    GLuint nextPageVAO;
-    
-    //Handles for the curl shader uniforms.
+    // Handles for the curl shader uniforms.
     GLuint frontMvpHandle, frontSamplerHandle;
     GLuint frontCylinderPositionHandle, frontCylinderDirectionHandle, frontCylinderRadiusHandle;
     
     GLuint backMvpHandle, backSamplerHandle, backGradientSamplerHandle;
     GLuint backCylinderPositionHandle, backCylinderDirectionHandle, backCylinderRadiusHandle;
     
-    //Texture projected onto the two-triangle rectangle of the nextPage.
-    GLuint nextPageTexture;
-    
-    //GPU program for the nextPage.
-    GLuint nextPageProgram;
-    
-    //Vertex buffer for the two-triangle rectangle of the nextPage.
-    //No need for an index buffer. It is drawn as a triangle-strip.
-    GLuint nextPageVertexBuffer;
-    
-    //Handles for the nextPageProgram uniforms.
-    GLuint nextPageMvpHandle, nextPageSamplerHandle;
-    GLuint nextPageCylinderPositionHandle, nextPageCylinderDirectionHandle, nextPageCylinderRadiusHandle;
-    
-    //Viewport/view/screen size.
+    // Viewport/view/screen size.
     GLint viewportWidth, viewportHeight;
     
-    //Model-View-Proj matrix.
+    // Model-View-Proj matrix.
     GLfloat mvp[16];
 }
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, strong) XBAnimationManager *animationManager;
+@property (nonatomic, strong) NSMutableArray *pageArray;
 @property (nonatomic, weak) UIView *curlingView; //UIView being curled only used in curlView: and uncurlAnimatedWithDuration: methods
 @property (nonatomic, readonly) CGFloat screenScale;
 @property (nonatomic, assign) NSTimeInterval lastTimestamp;
@@ -95,23 +70,17 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)destroyFramebuffer;
 - (void)createVertexBufferWithXRes:(GLuint)xRes yRes:(GLuint)yRes;
 - (void)destroyVertexBuffer;
-- (void)createNextPageVertexBuffer;
-- (void)destroyNextPageVertexBuffer;
-- (void)destroyNextPageTexture;
-- (void)destroyNextPageShader;
 - (void)destroyBackTexture;
 - (BOOL)setupShaders;
 - (void)destroyShaders;
 - (void)setupMVP;
 - (GLuint)generateTexture;
 - (void)destroyTextures;
-
 - (void)drawImage:(UIImage *)image onTexture:(GLuint)texture;
 - (void)drawImage:(UIImage *)image onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal;
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture;
 - (void)drawView:(UIView *)view onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal;
 - (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock;
-
 - (void)draw:(CADisplayLink *)sender;
 
 @end
@@ -125,7 +94,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     _screenScale = [[UIScreen mainScreen] scale];
     [self setContentScaleFactor:self.screenScale];
     
-    self.pageOpaque = YES;
     self.opaque = YES;
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
     layer.opaque = YES;
@@ -139,37 +107,27 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     }
     
     self.animationManager = [[XBAnimationManager alloc] init];
-
-    self.cylinderPosition = CGPointMake(self.bounds.size.width, self.bounds.size.height/2);
-    self.cylinderAngle = M_PI_2;
-    self.cylinderRadius = 32;
+    self.pageArray = [[NSMutableArray alloc] init];
     
     framebuffer = colorRenderbuffer = 0;
     sampleFramebuffer = sampleColorRenderbuffer = 0;
     vertexBuffer = indexBuffer = elementCount = 0;
-    frontTexture = backTexture = nextPageTexture = 0;
     
     if (![self createFramebuffer]) {
         return NO;
     }
     
     [self createVertexBufferWithXRes:self.horizontalResolution yRes:self.verticalResolution];
-    [self createNextPageVertexBuffer];
     
     if (![self setupShaders]) {
         return NO;
     }
-    
-    textureWidth = (GLuint)(self.frame.size.width*self.screenScale);
-    textureHeight = (GLuint)(self.frame.size.height*self.screenScale);
-    frontTexture = [self generateTexture];
     
     [self createBackGradientTexture];
     [self setupMVP];
     
     [self createBackVAO];
     [self createFrontVAO];
-    [self createNextPageVAO];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActiveNotification:) name:UIApplicationWillResignActiveNotification object:[UIApplication sharedApplication]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
@@ -211,7 +169,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     self.displayLink = nil;
     [self destroyTextures];
     [self destroyVertexBuffer];
-    [self destroyNextPageVertexBuffer];
     [self destroyShaders];
     [self destroyVAOs];
     [self destroyFramebuffer];
@@ -238,78 +195,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
-    if (CGRectContainsPoint(self.frame, point)) {
-        CGPoint v = CGPointMake(-sinf(self.cylinderAngle), cosf(self.cylinderAngle));
-        CGPoint w = CGPointSub(point, CGPointSub(self.cylinderPosition, CGPointMul(v, self.cylinderRadius)));
-        CGFloat dot = CGPointDot(v, w);
-        return dot > 0;
-    }
-    
-    return NO;
+    return [self pageAtPoint:point] != nil;
 }
 
 #pragma mark - Properties
-
-- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration
-{
-    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration completion:nil];
-}
-
-- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
-{
-    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
-}
-
-- (void)setCylinderPosition:(CGPoint)cylinderPosition animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
-{
-    CGPoint p0 = self.cylinderPosition;
-    __weak XBCurlView *weakSelf = self;
-    XBAnimation *animation = [XBAnimation animationWithName:kCylinderPositionAnimationName duration:duration update:^(double t) {
-        weakSelf.cylinderPosition = CGPointMake((1 - t)*p0.x + t*cylinderPosition.x, (1 - t)*p0.y + t*cylinderPosition.y);
-    } completion:completion interpolator:interpolator];
-    [self.animationManager runAnimation:animation];
-}
-
-- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration
-{
-    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration completion:nil];
-}
-
-- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
-{
-    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
-}
-
-- (void)setCylinderAngle:(CGFloat)cylinderAngle animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
-{
-    double a0 = _cylinderAngle;
-    double a1 = cylinderAngle;
-    __weak XBCurlView *weakSelf = self;
-    XBAnimation *animation = [XBAnimation animationWithName:kCylinderDirectionAnimationName duration:duration update:^(double t) {
-        weakSelf.cylinderAngle = (1 - t)*a0 + t*a1;
-    } completion:completion interpolator:interpolator];
-    [self.animationManager runAnimation:animation];
-}
-
-- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
-{
-    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:nil];
-}
-
-- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
-{
-    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration interpolator:XBAnimationInterpolatorEaseInOut completion:completion];
-}
-
-- (void)setCylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double t))interpolator completion:(void (^)(void))completion
-{
-    CGFloat r = self.cylinderRadius;
-    __weak XBCurlView *weakSelf = self;
-    XBAnimation *animation = [XBAnimation animationWithName:kCylinderRadiusAnimationName duration:duration update:^(double t) {
-        weakSelf.cylinderRadius = (1 - t)*r + t*cylinderRadius;
-    } completion:completion interpolator:interpolator];
-    [self.animationManager runAnimation:animation];
-}
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
@@ -326,6 +215,31 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [super setOpaque:opaque];
     self.backgroundColor = self.backgroundColor;
+}
+
+#pragma mark - Pages
+
+- (XBPage *)pageWithFrame:(CGRect)frame
+{
+    XBPage *page = [[XBPage alloc] initWithContext:self.context animationManager:self.animationManager frame:frame];
+    [self.pageArray addObject:page];
+    return page;
+}
+
+- (void)removePage:(XBPage *)page
+{
+    [self.pageArray removeObject:page];
+}
+
+- (XBPage *)pageAtPoint:(CGPoint)point
+{
+    for (XBPage *page in self.pageArray) {
+        if ([page pointInside:point]) {
+            return page;
+        }
+    }
+    
+    return nil;
 }
 
 #pragma mark - Notifications
@@ -412,8 +326,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)setupInitialGLState
 {
     [EAGLContext setCurrentContext:self.context];
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glViewport(0, 0, viewportWidth, viewportHeight);
     self.backgroundColor = [UIColor clearColor];
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -427,12 +342,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glUniform1i(backSamplerHandle, 0);
     glUniform1i(backGradientSamplerHandle, 1);
     
-    glUseProgram(nextPageProgram);
-    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
-    glUniform1i(nextPageSamplerHandle, 0);
-    
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
 }
 
 - (UIImage *)imageFromFramebuffer
@@ -451,7 +361,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glBindTexture(GL_TEXTURE_2D, rttTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, viewportWidth, viewportHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rttTexture, 0);
-    glBindTexture(GL_TEXTURE_2D, frontTexture);
     [self draw:self.displayLink];
     
     size_t size = viewportHeight * viewportWidth * 4;
@@ -548,50 +457,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     vertexBuffer = indexBuffer = 0;
 }
 
-- (void)createNextPageVertexBuffer
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self destroyNextPageVertexBuffer];
-    
-    GLsizeiptr verticesSize = 4*sizeof(Vertex);
-    Vertex *vertices = malloc(verticesSize);
-    
-    vertices[0].x = 0;
-    vertices[0].y = 0;
-    vertices[0].z = -1;
-    vertices[0].u = 0;
-    vertices[0].v = 0;
-    
-    vertices[1].x = viewportWidth;
-    vertices[1].y = 0;
-    vertices[1].z = -1;
-    vertices[1].u = 1;
-    vertices[1].v = 0;
-    
-    vertices[2].x = 0;
-    vertices[2].y = viewportHeight;
-    vertices[2].z = -1;
-    vertices[2].u = 0;
-    vertices[2].v = 1;
-    
-    vertices[3].x = viewportWidth;
-    vertices[3].y = viewportHeight;
-    vertices[3].z = -1;
-    vertices[3].u = 1;
-    vertices[3].v = 1;
-    
-    glGenBuffers(1, &nextPageVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, verticesSize, (GLvoid *)vertices, GL_STATIC_DRAW);
-    
-    free(vertices);
-}
-
-- (void)destroyNextPageVertexBuffer
-{
-    glDeleteBuffers(1, &nextPageVertexBuffer);
-}
-
 - (void)createBackVAO
 {
     [EAGLContext setCurrentContext:self.context];
@@ -636,30 +501,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     frontVAO = 0;
 }
 
-- (void)createNextPageVAO
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self destroyNextPageVAO];
-    glGenVertexArraysOES(1, &nextPageVAO);
-    glBindVertexArrayOES(nextPageVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, nextPageVertexBuffer);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, x));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, u));
-    glBindVertexArrayOES(0);
-}
-
-- (void)destroyNextPageVAO
-{
-    [EAGLContext setCurrentContext:self.context];
-    glDeleteVertexArraysOES(1, &nextPageVAO);
-    nextPageVAO = 0;
-}
-
 - (void)destroyVAOs
 {
-    [self destroyNextPageVAO];
     [self destroyFrontVAO];
     [self destroyBackVAO];
 }
@@ -668,8 +511,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [EAGLContext setCurrentContext:self.context];
     OrthoM4x4(mvp, 0.f, viewportWidth, 0.f, viewportHeight, -1000.f, 1000.f);
-    glUseProgram(nextPageProgram);
-    glUniformMatrix4fv(nextPageMvpHandle, 1, GL_FALSE, mvp);
     glUseProgram(frontProgram);
     glUniformMatrix4fv(frontMvpHandle, 1, GL_FALSE, mvp);
     glUseProgram(backProgram);
@@ -769,38 +610,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     backProgram = 0;
 }
 
-- (BOOL)setupNextPageShader
-{
-    [self destroyNextPageShader];
-    
-    NSString *vsFilename = nextPageTexture != 0? @"NextPageVertexShader.glsl": @"NextPageNoTextureVertexShader.glsl";
-    NSString *fsFilename = nextPageTexture != 0? @"NextPageFragmentShader.glsl": @"NextPageNoTextureFragmentShader.glsl";
-    
-    if ((nextPageProgram = [self createProgramWithVertexShader:vsFilename fragmentShader:fsFilename]) != 0) {
-        glBindAttribLocation(nextPageProgram, 0, "a_position");
-        glBindAttribLocation(nextPageProgram, 1, "a_texCoord");
-        nextPageMvpHandle               = glGetUniformLocation(nextPageProgram, "u_mvpMatrix");
-        nextPageSamplerHandle           = glGetUniformLocation(nextPageProgram, "s_tex");
-        nextPageCylinderPositionHandle  = glGetUniformLocation(nextPageProgram, "u_cylinderPosition");
-        nextPageCylinderDirectionHandle = glGetUniformLocation(nextPageProgram, "u_cylinderDirection");
-        nextPageCylinderRadiusHandle    = glGetUniformLocation(nextPageProgram, "u_cylinderRadius");
-        
-        return YES;
-    }
-    
-    return NO;
-}
-
-- (void)destroyNextPageShader
-{
-    [EAGLContext setCurrentContext:self.context];
-    glDeleteProgram(nextPageProgram);
-    nextPageProgram = 0;
-}
-
 - (BOOL)setupShaders
 {
-    if ([self setupCurlShader] && [self setupNextPageShader]) {
+    if ([self setupCurlShader]) {
         return YES;
     }
     
@@ -810,7 +622,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)destroyShaders
 {
     [self destroyCurlShader];
-    [self destroyNextPageShader];
 }
 
 #pragma mark - Textures
@@ -828,192 +639,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     return tex;
-}
-
-- (void)drawOnTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height drawBlock:(void (^)(CGContextRef context))drawBlock
-{
-    [EAGLContext setCurrentContext:self.context];
-    size_t bitsPerComponent = 8;
-    size_t bytesPerRow = textureWidth * 4;
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(NULL, textureWidth, textureHeight, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
-    CGColorSpaceRelease(colorSpace);
-    
-    CGRect r = CGRectMake(0, 0, width, height);
-    CGContextClearRect(context, r);
-    CGContextSaveGState(context);
-    
-    drawBlock(context);
-    
-    CGContextRestoreGState(context);
-    
-    GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, frontTexture); // Keep the frontTexture bound
-    
-    CGContextRelease(context);
-}
-
-- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture
-{
-    [self drawImage:image onTexture:texture flipHorizontal:NO];
-}
-
-- (void)drawImage:(UIImage *)image onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal
-{
-    GLuint width = CGImageGetWidth(image.CGImage);
-    GLuint height = CGImageGetHeight(image.CGImage);
-    
-    [self drawOnTexture:texture width:width height:height drawBlock:^(CGContextRef context) {
-        if (flipHorizontal) {
-            CGContextTranslateCTM(context, width, height);
-            CGContextScaleCTM(context, -1, -1);
-        }
-        else {
-            CGContextTranslateCTM(context, 0, height);
-            CGContextScaleCTM(context, 1, -1);
-        }
-        
-        CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
-    }];
-}
-
-- (void)drawView:(UIView *)view onTexture:(GLuint)texture
-{
-    [self drawView:view onTexture:texture flipHorizontal:NO];
-}
-
-- (void)drawView:(UIView *)view onTexture:(GLuint)texture flipHorizontal:(BOOL)flipHorizontal
-{
-    [self drawOnTexture:texture width:view.bounds.size.width height:view.bounds.size.height drawBlock:^(CGContextRef context) {
-        if (flipHorizontal) {
-            CGContextTranslateCTM(context, view.bounds.size.width*self.screenScale, 0);
-            CGContextScaleCTM(context, -self.screenScale, self.screenScale);
-        }
-        else {
-            CGContextScaleCTM(context, self.screenScale, self.screenScale);
-        }
-
-        [view.layer renderInContext:context];
-    }];
-}
-
-- (void)drawImageOnFrontOfPage:(UIImage *)image
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self drawImage:image onTexture:frontTexture];
-    
-    //Force a redraw to avoid glitches
-    [self draw:self.displayLink];
-}
-
-- (void)drawViewOnFrontOfPage:(UIView *)view
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self drawView:view onTexture:frontTexture];
-    
-    //Force a redraw to avoid glitches
-    [self draw:self.displayLink];
-}
-
-- (void)drawImageOnBackOfPage:(UIImage *)image
-{
-    [EAGLContext setCurrentContext:self.context];
-    
-    if (image == nil) {
-        [self destroyBackTexture];
-        return;
-    }
-    
-    if (backTexture == 0) {
-       backTexture = [self generateTexture];
-    }
-    
-    [self drawImage:image onTexture:backTexture flipHorizontal:YES];
-}
-
-- (void)drawViewOnBackOfPage:(UIView *)view
-{
-    [EAGLContext setCurrentContext:self.context];
-
-    if (view == nil) {
-        [self destroyBackTexture];
-        return;
-    }
-    
-    if (backTexture == 0) {
-        backTexture = [self generateTexture];
-    }
-    
-    [self drawView:view onTexture:backTexture flipHorizontal:YES];
-}
-
-- (void)destroyBackTexture
-{
-    [EAGLContext setCurrentContext:self.context];
-    glDeleteTextures(1, &backTexture);
-    backTexture = 0;
-}
-
-- (void)drawImageOnNextPage:(UIImage *)image
-{
-    [EAGLContext setCurrentContext:self.context];
-    
-    if (image == nil) {
-        if (nextPageTexture != 0) {
-            [self destroyNextPageTexture];
-            [self setupNextPageShader];
-        }
-        return;
-    }
-
-    if (nextPageTexture == 0) {
-        nextPageTexture = [self generateTexture];
-        [self setupNextPageShader];
-    }
-    
-    [self drawImage:image onTexture:nextPageTexture];
-}
-
-- (void)drawViewOnNextPage:(UIView *)view
-{
-    [EAGLContext setCurrentContext:self.context];
-    
-    if (view == nil) {
-        if (nextPageTexture != 0) {
-            [self destroyNextPageTexture];
-            [self setupNextPageShader];
-        }
-        return;
-    }
-    
-    if (nextPageTexture == 0) {
-        nextPageTexture = [self generateTexture];
-        [self setupNextPageShader];
-    }
-    
-    [self drawView:view onTexture:nextPageTexture];
-}
-         
-- (void)destroyNextPageTexture
-{
-    glDeleteTextures(1, &nextPageTexture);
-    nextPageTexture = 0;
-}
-
-- (void)destroyTextures
-{
-    glDeleteTextures(1, &frontTexture);
-    frontTexture = 0;
-    
-    glDeleteTextures(1, &backGradientTexture);
-    backGradientTexture = 0;
-    
-    [self destroyNextPageTexture];
-    [self destroyBackTexture];
 }
 
 - (void)createBackGradientTexture
@@ -1044,27 +669,32 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     CGContextRelease(context);
 }
 
+- (void)destroyTextures
+{
+    glDeleteTextures(1, &backGradientTexture);
+    backGradientTexture = 0;
+}
 
 #pragma mark - View Curling Utils
 
-- (void)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
+- (XBPage *)curlView:(UIView *)view cylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
 {
     self.curlingView = view;
-    CGRect frame = self.frame;
+    XBPage *page = [self pageWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
     
     //Reset cylinder properties, positioning it on the right side, oriented vertically
-    self.cylinderPosition = CGPointMake(frame.size.width, frame.size.height/2);
-    self.cylinderAngle = M_PI_2;
-    self.cylinderRadius = 20;
+    page.cylinderPosition = CGPointMake(self.bounds.size.width, self.bounds.size.height/2);
+    page.cylinderAngle = M_PI_2;
+    page.cylinderRadius = 20;
     
     //Update the view drawn on the front of the curling page
-    [self drawViewOnFrontOfPage:self.curlingView];
+    [page drawViewOnFrontOfPage:self.curlingView];
     
     //Start the cylinder animation
-    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
-    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
+    [page setCylinderPosition:cylinderPosition animatedWithDuration:duration];
+    [page setCylinderAngle:cylinderAngle animatedWithDuration:duration];
     __weak XBCurlView *weakSelf = self;
-    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
+    [page setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
         [weakSelf stopAnimating];
     }];
     
@@ -1074,22 +704,24 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     //Start the rendering loop
     [self startAnimating];
+    return page;
 }
 
-- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration
+- (void)uncurlPage:(XBPage *)page animatedWithDuration:(NSTimeInterval)duration
 {
-    [self uncurlAnimatedWithDuration:duration completion:nil];
+    [self uncurlPage:page animatedWithDuration:duration completion:nil];
 }
 
-- (void)uncurlAnimatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+- (void)uncurlPage:(XBPage *)page animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
 {
     CGRect frame = self.frame;
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
     __weak XBCurlView *weakSelf = self;
-    [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
-    [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
-    [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
+    __weak XBPage *weakPage = page;
+    [page setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
+    [page setCylinderAngle:M_PI_2 animatedWithDuration:duration];
+    [page setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
         //Setup the view hierarchy properly after the animation is finished
         weakSelf.curlingView.hidden = NO;
         [weakSelf removeFromSuperview];
@@ -1098,6 +730,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         if (completion) {
             completion();
         }
+        [weakSelf removePage:weakPage];
     }];
     
     [self startAnimating];
@@ -1131,73 +764,50 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     /* Clear framebuffer */
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    /* Enable culling. First lets render the front facing triangles. */
-    glCullFace(GL_BACK);
-    
-    /* If the page is not opaque (the curled mesh) enable alpha blending. The glBlendFunc is
-     * setup that way bacause the texture has got pre-multiplied alpha. */
-    if (!self.pageOpaque) {
-        glEnable(GL_BLEND);
-    }
-    
-    /* Draw the nextPage */
-    glUseProgram(nextPageProgram);
-    
-    CGPoint glCylinderPosition = CGPointMake(self.cylinderPosition.x*self.screenScale, (self.bounds.size.height - self.cylinderPosition.y)*self.screenScale);
-    CGFloat glCylinderAngle = M_PI - self.cylinderAngle;
-    CGFloat glCylinderRadius = self.cylinderRadius*self.screenScale;
-    
-    glUniform2f(nextPageCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
-    glUniform2f(nextPageCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
-    glUniform1f(nextPageCylinderRadiusHandle, glCylinderRadius);
-    
-    //If it's got a texture, set it. Otherwise it will be drawn transparently but will still cast shadows.
-    if (nextPageTexture != 0) {
-        glBindTexture(GL_TEXTURE_2D, nextPageTexture);
-    }
-     
-    glBindVertexArrayOES(nextPageVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    /* Draw the previousPage if any */
-    /* TODO */
-    
-    /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
-    glUseProgram(frontProgram);
-    
-    glUniform2f(frontCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
-    glUniform2f(frontCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
-    glUniform1f(frontCylinderRadiusHandle, glCylinderRadius);
-    
-    if (backTexture != 0 || nextPageTexture != 0) { // In this case the frontTexture should already be bound, since it's the only texture around
-        glBindTexture(GL_TEXTURE_2D, frontTexture);
-    }
-    
-    glBindVertexArrayOES(frontVAO);
-    glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
-    
-    /* Next draw the back faces (the vertex buffer is already bound) */
-    glCullFace(GL_FRONT);
-    
-    glUseProgram(backProgram);
-    
-    glUniform2f(backCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
-    glUniform2f(backCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
-    glUniform1f(backCylinderRadiusHandle, glCylinderRadius);
-    
-    if (backTexture != 0) {
-        glBindTexture(GL_TEXTURE_2D, backTexture);
-    }
-    
-    glBindVertexArrayOES(backVAO);
-    glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
-    
-    glBindVertexArrayOES(0);
-    
-    //Disable blending for now
-    if (!self.pageOpaque) {
-        glDisable(GL_BLEND);
+
+    for (XBPage *page in self.pageArray) {
+        if (!page.opaque) {
+            glEnable(GL_BLEND);
+        }
+        
+        CGPoint glCylinderPosition = CGPointMake(page.cylinderPosition.x*self.screenScale, (page.bounds.size.height - page.cylinderPosition.y)*self.screenScale);
+        CGFloat glCylinderAngle = M_PI - page.cylinderAngle;
+        CGFloat glCylinderRadius = page.cylinderRadius*self.screenScale;
+        
+        /* Draw the front facing triangles of the curled mesh (GL_BACK was set above, hence backfaces will be culled here) */
+        glCullFace(GL_BACK);
+        glUseProgram(frontProgram);
+        
+        glUniform2f(frontCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
+        glUniform2f(frontCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
+        glUniform1f(frontCylinderRadiusHandle, glCylinderRadius);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, page.frontTexture);
+        
+        glBindVertexArrayOES(frontVAO);
+        glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+        
+        /* Next draw the back faces (the vertex buffer is already bound) */
+        glCullFace(GL_FRONT);
+        
+        glUseProgram(backProgram);
+        
+        glUniform2f(backCylinderPositionHandle, glCylinderPosition.x, glCylinderPosition.y);
+        glUniform2f(backCylinderDirectionHandle, cosf(glCylinderAngle), sinf(glCylinderAngle));
+        glUniform1f(backCylinderRadiusHandle, glCylinderRadius);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, backGradientTexture);
+        
+        glBindVertexArrayOES(backVAO);
+        glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, (void *)0);
+        
+        glBindVertexArrayOES(0);
+        
+        if (!page.opaque) {
+            glDisable(GL_BLEND);
+        }
     }
     
     /* If antialiasing is enabled, draw on the multisampling buffers */

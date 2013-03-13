@@ -12,9 +12,14 @@
 
 #define kDuration 0.6
 
-@implementation SimpleCurlViewController {
-    BOOL isCurled;
-}
+@interface SimpleCurlViewController ()
+
+@property (nonatomic, weak) XBPage *page;
+@property (nonatomic, assign, getter=isCurled) BOOL curled;
+
+@end
+
+@implementation SimpleCurlViewController
 
 - (void)dealloc 
 {
@@ -50,7 +55,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return !isCurled;
+    return !self.isCurled;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -63,16 +68,16 @@
 - (IBAction)curlButtonAction:(id)sender
 {
     CGRect r = self.messyView.frame;
-    self.curlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
-    self.curlView.pageOpaque = YES; //The page to be curled has no transparency
-    [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:kDuration];
-    isCurled = YES;
+    //self.curlView.pageOpaque = YES; //The page to be curled has no transparency
+    self.page = [self.curlView curlView:self.messyView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:kDuration];
+    self.page.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
+    self.curled = YES;
 }
 
 - (IBAction)uncurlButtonAction:(id)sender
 {
-    [self.curlView uncurlAnimatedWithDuration:kDuration];
-    isCurled = NO;
+    [self.curlView uncurlPage:self.page animatedWithDuration:kDuration];
+    self.curled = NO;
 }
 
 - (IBAction)backButtonAction:(id)sender

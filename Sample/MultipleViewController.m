@@ -13,6 +13,8 @@
 
 @property (nonatomic, strong) XBCurlView *topCurlView;
 @property (nonatomic, strong) XBCurlView *bottomCurlView;
+@property (nonatomic, weak) XBPage *topPage;
+@property (nonatomic, weak) XBPage *bottomPage;
 
 @end
 
@@ -42,13 +44,13 @@
     CGRect r = self.topView.frame;
     self.topCurlView = [[XBCurlView alloc] initWithFrame:r];
     self.topCurlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
-    self.topCurlView.pageOpaque = YES; //The page to be curled has no transparency
-    [self.topCurlView curlView:self.topView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:0.6];
+    self.topPage = [self.topCurlView curlView:self.topView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:0.6];
+    self.topPage.opaque = YES; //The page to be curled has no transparency
 }
 
 - (IBAction)topUncurlButtonTouchUpInside:(id)sender
 {
-    [self.topCurlView uncurlAnimatedWithDuration:0.6 completion:^{
+    [self.topCurlView uncurlPage:self.topPage animatedWithDuration:0.6 completion:^{
         self.topCurlView = nil;
     }];
 }
@@ -58,13 +60,13 @@
     CGRect r = self.bottomView.frame;
     self.bottomCurlView = [[XBCurlView alloc] initWithFrame:r];
     self.bottomCurlView.opaque = NO; //Transparency on the next page (so that the view behind curlView will appear)
-    self.bottomCurlView.pageOpaque = YES; //The page to be curled has no transparency
-    [self.bottomCurlView curlView:self.bottomView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:0.6];
+    self.bottomPage = [self.bottomCurlView curlView:self.bottomView cylinderPosition:CGPointMake(r.size.width/3, r.size.height/2) cylinderAngle:M_PI_2+0.23 cylinderRadius:UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad? 80: 50 animatedWithDuration:0.6];
+    self.bottomPage.opaque = YES; //The page to be curled has no transparency
 }
 
 - (IBAction)bottomUncurlButtonTouchUpInside:(id)sender
 {
-    [self.bottomCurlView uncurlAnimatedWithDuration:0.6 completion:^{
+    [self.bottomCurlView uncurlPage:self.bottomPage animatedWithDuration:0.6 completion:^{
         self.bottomCurlView = nil;
     }];
 }

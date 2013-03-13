@@ -63,13 +63,14 @@
     CGFloat angle = atan2f(-vn.x, vn.y);
     
     NSTimeInterval duration = animated? kDuration: 0;
-    [self setCylinderPosition:c animatedWithDuration:duration];
-    [self setCylinderAngle:CLAMP(angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:duration];
-    [self setCylinderRadius:r animatedWithDuration:duration];
+    [self.page setCylinderPosition:c animatedWithDuration:duration];
+    [self.page setCylinderAngle:CLAMP(angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:duration];
+    [self.page setCylinderRadius:r animatedWithDuration:duration];
 }
 
 - (void)touchBeganAtPoint:(CGPoint)p
 {
+    self.page = [self pageAtPoint:p];
     CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     CGPoint vp = CGPointRotateCW(v);
     CGPoint p0 = p;
@@ -102,7 +103,7 @@
         //Find the snapping point closest to the cylinder axis
         for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
             //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
+            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.page.cylinderPosition, v);
             if (dSq < d) {
                 closestSnappingPoint = snappingPoint;
                 d = dSq;
@@ -115,18 +116,17 @@
             [self.delegate pageCurlView:self willSnapToPoint:closestSnappingPoint];
         }
         
-        [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
-        [self setCylinderAngle:CLAMP(closestSnappingPoint.angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:kDuration];
+        [self.page setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
+        [self.page setCylinderAngle:CLAMP(closestSnappingPoint.angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:kDuration];
         
         __weak XBPageCurlView *weakSelf = self;
-        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
+        [self.page setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
             if ([weakSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
                 [weakSelf.delegate pageCurlView:weakSelf didSnapToPoint:closestSnappingPoint];
             }
         }];
     }
 }
-
 
 #pragma mark - Touch handling
 

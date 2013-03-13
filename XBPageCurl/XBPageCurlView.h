@@ -32,6 +32,7 @@
 @property (nonatomic, strong) NSMutableArray *snappingPoints;
 @property (nonatomic, assign) CGFloat minimumCylinderAngle;
 @property (nonatomic, assign) CGFloat maximumCylinderAngle;
+@property (nonatomic, weak) XBPage *page;
 
 - (void)touchBeganAtPoint:(CGPoint)p;
 - (void)touchMovedToPoint:(CGPoint)p;

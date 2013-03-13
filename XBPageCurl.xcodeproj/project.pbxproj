@@ -30,8 +30,6 @@
 		1B8BC4271429866F0048682B /* SimpleCurlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4081429866F0048682B /* SimpleCurlViewController.m */; };
 		1B8BC42C1429866F0048682B /* XBPageCurlAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4101429866F0048682B /* XBPageCurlAppDelegate.m */; };
 		1B8BC42D1429866F0048682B /* BackFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4131429866F0048682B /* BackFragmentShader.glsl */; };
-		1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */; };
-		1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */; };
 		1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B8BC4161429866F0048682B /* BackVertexShader.glsl */; };
 		1B8BC4311429866F0048682B /* XBAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC4181429866F0048682B /* XBAnimation.m */; };
 		1B8BC4321429866F0048682B /* XBAnimationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8BC41A1429866F0048682B /* XBAnimationManager.m */; };
@@ -44,6 +42,7 @@
 		1B8C27271415C6510081F180 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27261415C6510081F180 /* main.m */; };
 		1B8C27431415C9660081F180 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B8C27411415C8D60081F180 /* GHUnitIOS.framework */; };
 		1B8C27471415CB170081F180 /* XBAnimationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B8C27451415CA510081F180 /* XBAnimationTest.m */; };
+		1BD0A84116F022A400CE5DAD /* XBPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD0A84016F022A400CE5DAD /* XBPage.m */; };
 		1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD79F081580517A00B19785 /* XBPageDragView.m */; };
 		1BE340FA14D4896900261AF5 /* SimpleCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE340F814D4896900261AF5 /* SimpleCurlViewController_iPad.m */; };
 		1BE340FB14D4896900261AF5 /* SimpleCurlViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BE340F914D4896900261AF5 /* SimpleCurlViewController_iPad.xib */; };
@@ -56,8 +55,6 @@
 		1BE4628614677E160013C1C6 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4628414677E160013C1C6 /* RootViewController.m */; };
 		1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */; };
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
-		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
-		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
 		1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -95,8 +92,6 @@
 		1B8BC40F1429866F0048682B /* XBPageCurlAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageCurlAppDelegate.h; sourceTree = "<group>"; };
 		1B8BC4101429866F0048682B /* XBPageCurlAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageCurlAppDelegate.m; sourceTree = "<group>"; };
 		1B8BC4131429866F0048682B /* BackFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BackFragmentShader.glsl; sourceTree = "<group>"; };
-		1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageFragmentShader.glsl; sourceTree = "<group>"; };
-		1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageVertexShader.glsl; sourceTree = "<group>"; };
 		1B8BC4161429866F0048682B /* BackVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BackVertexShader.glsl; sourceTree = "<group>"; };
 		1B8BC4171429866F0048682B /* XBAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBAnimation.h; sourceTree = "<group>"; };
 		1B8BC4181429866F0048682B /* XBAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimation.m; sourceTree = "<group>"; };
@@ -113,6 +108,8 @@
 		1B8C27281415C6510081F180 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		1B8C27411415C8D60081F180 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../gh-unit/Project-iOS/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		1B8C27451415CA510081F180 /* XBAnimationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBAnimationTest.m; sourceTree = "<group>"; };
+		1BD0A83F16F022A400CE5DAD /* XBPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPage.h; sourceTree = "<group>"; };
+		1BD0A84016F022A400CE5DAD /* XBPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPage.m; sourceTree = "<group>"; };
 		1BD79F071580517A00B19785 /* XBPageDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBPageDragView.h; sourceTree = "<group>"; };
 		1BD79F081580517A00B19785 /* XBPageDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBPageDragView.m; sourceTree = "<group>"; };
 		1BE340F714D4896900261AF5 /* SimpleCurlViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCurlViewController_iPad.h; sourceTree = "<group>"; };
@@ -130,8 +127,6 @@
 		1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BackPageGradient.png; sourceTree = "<group>"; };
 		1BEBF5231580E930004C34DD /* PageCurlViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageCurlViewController_iPad.h; sourceTree = "<group>"; };
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
-		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
-		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
 		1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -267,6 +262,8 @@
 				1B8BC4181429866F0048682B /* XBAnimation.m */,
 				1B8BC4191429866F0048682B /* XBAnimationManager.h */,
 				1B8BC41A1429866F0048682B /* XBAnimationManager.m */,
+				1BD0A83F16F022A400CE5DAD /* XBPage.h */,
+				1BD0A84016F022A400CE5DAD /* XBPage.m */,
 				1B8BC41B1429866F0048682B /* XBCurlView.h */,
 				1B8BC41C1429866F0048682B /* XBCurlView.m */,
 				1B8BC41D1429866F0048682B /* XBPageCurlView.h */,
@@ -285,10 +282,6 @@
 			isa = PBXGroup;
 			children = (
 				1BE68CBF1594B6D600DD54B5 /* BackPageGradient.png */,
-				1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */,
-				1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */,
-				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
-				1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */,
 				1B8BC4131429866F0048682B /* BackFragmentShader.glsl */,
 				1B8BC4161429866F0048682B /* BackVertexShader.glsl */,
 				1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */,
@@ -402,11 +395,7 @@
 				1B8BC4251429866F0048682B /* appleStore.png in Resources */,
 				1B8BC4261429866F0048682B /* appleStore@2x.png in Resources */,
 				1B8BC42D1429866F0048682B /* BackFragmentShader.glsl in Resources */,
-				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
-				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
 				1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */,
-				1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */,
-				1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */,
 				1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */,
 				1B8742C014CD07DA00BCADCF /* PageCurlViewController_iPhone.xib in Resources */,
 				1BE340FB14D4896900261AF5 /* SimpleCurlViewController_iPad.xib in Resources */,
@@ -453,6 +442,7 @@
 				1BD79F091580517A00B19785 /* XBPageDragView.m in Sources */,
 				1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */,
 				1B35689016E92D7C00A877E6 /* MultipleViewController.m in Sources */,
+				1BD0A84116F022A400CE5DAD /* XBPage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
