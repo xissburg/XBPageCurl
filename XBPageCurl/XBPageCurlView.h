@@ -29,12 +29,15 @@
 
 @property (nonatomic, assign) id<XBPageCurlViewDelegate> delegate;
 @property (nonatomic, assign) BOOL snappingEnabled;
-@property (nonatomic, strong) NSMutableArray *snappingPoints;
 @property (nonatomic, assign) CGFloat minimumCylinderAngle;
 @property (nonatomic, assign) CGFloat maximumCylinderAngle;
+@property (nonatomic, readonly) NSArray *snappingPoints;
 
 - (void)touchBeganAtPoint:(CGPoint)p;
 - (void)touchMovedToPoint:(CGPoint)p;
 - (void)touchEndedAtPoint:(CGPoint)p;
+- (void)addSnappingPoint:(XBSnappingPoint *)snappingPoint;
+- (void)addSnappingPointsFromArray:(NSArray *)snappingPoints;
+- (void)removeSnappingPoint:(XBSnappingPoint *)snappingPoint;
 
 @end

@@ -35,6 +35,11 @@
     return NO;
 }
 
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 #pragma mark - Buttons
 
 - (IBAction)topCurlButtonTouchUpInside:(id)sender

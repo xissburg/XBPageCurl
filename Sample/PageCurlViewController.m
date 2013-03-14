@@ -15,6 +15,13 @@
 
 #pragma mark - View lifecycle
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    XBSnappingPoint *point = [[XBSnappingPoint alloc] initWithPosition:CGPointMake(self.pageDragView.viewToCurl.frame.size.width*0.5, self.pageDragView.viewToCurl.frame.size.height*0.4) angle:7*M_PI/8 radius:80 weight:0.5];
+    [self.pageDragView.pageCurlView addSnappingPoint:point];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -38,6 +45,16 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return !self.pageDragView.pageIsCurled;
+}
+
+- (BOOL)shouldAutorotate
+{
+    return !self.pageDragView.pageIsCurled;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation

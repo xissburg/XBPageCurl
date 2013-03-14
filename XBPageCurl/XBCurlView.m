@@ -311,6 +311,27 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self.animationManager runAnimation:animation];
 }
 
+- (void)setCylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration
+{
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration];
+}
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration completion:(void (^)(void))completion
+{
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:completion];
+}
+
+- (void)setCylinderPosition:(CGPoint)cylinderPosition cylinderAngle:(CGFloat)cylinderAngle cylinderRadius:(CGFloat)cylinderRadius animatedWithDuration:(NSTimeInterval)duration interpolator:(double (^)(double))interpolator completion:(void (^)(void))completion
+{
+    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration interpolator:interpolator completion:nil];
+    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration interpolator:interpolator completion:nil];
+    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration interpolator:interpolator completion:completion];
+}
+
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
     [super setBackgroundColor:backgroundColor];
@@ -1061,10 +1082,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self drawViewOnFrontOfPage:self.curlingView];
     
     //Start the cylinder animation
-    [self setCylinderPosition:cylinderPosition animatedWithDuration:duration];
-    [self setCylinderAngle:cylinderAngle animatedWithDuration:duration];
     __weak XBCurlView *weakSelf = self;
-    [self setCylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
+    [self setCylinderPosition:cylinderPosition cylinderAngle:cylinderAngle cylinderRadius:cylinderRadius animatedWithDuration:duration completion:^{
         [weakSelf stopAnimating];
     }];
     
@@ -1087,9 +1106,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     //Animate the cylinder back to its start position at the right side of the screen, oriented vertically
     __weak XBCurlView *weakSelf = self;
-    [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) animatedWithDuration:duration];
-    [self setCylinderAngle:M_PI_2 animatedWithDuration:duration];
-    [self setCylinderRadius:20 animatedWithDuration:duration completion:^(void) {
+    [self setCylinderPosition:CGPointMake(frame.size.width, frame.size.height/2) cylinderAngle:M_PI_2 cylinderRadius:20 animatedWithDuration:duration completion:^{
         //Setup the view hierarchy properly after the animation is finished
         weakSelf.curlingView.hidden = NO;
         [weakSelf removeFromSuperview];

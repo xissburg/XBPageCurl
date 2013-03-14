@@ -16,6 +16,7 @@
 
 @property (nonatomic, assign) CGFloat cylinderAngle;
 @property (nonatomic, assign) CGPoint startPickingPosition;
+@property (nonatomic, strong) NSMutableArray *snappingPointArray;
 
 @end
 
@@ -25,7 +26,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.snappingPoints = [NSMutableArray array];
+        self.snappingPointArray = [[NSMutableArray alloc] init];
         self.snappingEnabled = NO;
         self.minimumCylinderAngle = -FLT_MAX;
         self.maximumCylinderAngle = FLT_MAX;
@@ -33,7 +34,29 @@
     return self;
 }
 
+#pragma mark - Properties
+
+- (NSArray *)snappingPoints
+{
+    return [self.snappingPointArray copy];
+}
+
 #pragma mark - Methods
+
+- (void)addSnappingPoint:(XBSnappingPoint *)snappingPoint
+{
+    [self.snappingPointArray addObject:snappingPoint];
+}
+
+- (void)addSnappingPointsFromArray:(NSArray *)snappingPoints
+{
+    [self.snappingPointArray addObjectsFromArray:snappingPoints];
+}
+
+- (void)removeSnappingPoint:(XBSnappingPoint *)snappingPoint
+{
+    [self.snappingPointArray removeObject:snappingPoint];
+}
 
 - (void)updateCylinderStateWithPoint:(CGPoint)p animated:(BOOL)animated
 {
@@ -63,9 +86,8 @@
     CGFloat angle = atan2f(-vn.x, vn.y);
     
     NSTimeInterval duration = animated? kDuration: 0;
-    [self setCylinderPosition:c animatedWithDuration:duration];
-    [self setCylinderAngle:CLAMP(angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:duration];
-    [self setCylinderRadius:r animatedWithDuration:duration];
+    CGFloat a = CLAMP(angle, self.minimumCylinderAngle, self.maximumCylinderAngle);
+    [self setCylinderPosition:c cylinderAngle:a cylinderRadius:r animatedWithDuration:duration];
 }
 
 - (void)touchBeganAtPoint:(CGPoint)p
@@ -95,17 +117,17 @@
 
 - (void)touchEndedAtPoint:(CGPoint)p
 {
-    if (self.snappingEnabled && self.snappingPoints.count > 0) {
+    if (self.snappingEnabled && self.snappingPointArray.count > 0) {
         XBSnappingPoint *closestSnappingPoint = nil;
         CGFloat d = FLT_MAX;
         CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
         //Find the snapping point closest to the cylinder axis
-        for (XBSnappingPoint *snappingPoint in self.snappingPoints) {
-            //Compute the distance between the snappingPoint.position and the cylinder axis
-            CGFloat dSq = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v);
-            if (dSq < d) {
+        for (XBSnappingPoint *snappingPoint in self.snappingPointArray) {
+            //Compute the distance between the snappingPoint.position and the cylinder axis weighted by the snapping point weight
+            CGFloat weightedSquareDistance = CGPointToLineDistance(snappingPoint.position, self.cylinderPosition, v) / snappingPoint.weight;
+            if (weightedSquareDistance < d) {
                 closestSnappingPoint = snappingPoint;
-                d = dSq;
+                d = weightedSquareDistance;
             }
         }
         
@@ -115,11 +137,9 @@
             [self.delegate pageCurlView:self willSnapToPoint:closestSnappingPoint];
         }
         
-        [self setCylinderPosition:closestSnappingPoint.position animatedWithDuration:kDuration];
-        [self setCylinderAngle:CLAMP(closestSnappingPoint.angle, self.minimumCylinderAngle, self.maximumCylinderAngle) animatedWithDuration:kDuration];
-        
         __weak XBPageCurlView *weakSelf = self;
-        [self setCylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
+        CGFloat angle = CLAMP(closestSnappingPoint.angle, self.minimumCylinderAngle, self.maximumCylinderAngle);
+        [self setCylinderPosition:closestSnappingPoint.position cylinderAngle:angle cylinderRadius:closestSnappingPoint.radius animatedWithDuration:kDuration completion:^{
             if ([weakSelf.delegate respondsToSelector:@selector(pageCurlView:didSnapToPoint:)]) {
                 [weakSelf.delegate pageCurlView:weakSelf didSnapToPoint:closestSnappingPoint];
             }

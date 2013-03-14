@@ -8,7 +8,6 @@
 
 #import "SimpleCurlViewController.h"
 #import "XBPageCurlView.h"
-#import "XBSnappingPoint.h"
 
 #define kDuration 0.6
 
@@ -51,6 +50,16 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return !isCurled;
+}
+
+- (BOOL)shouldAutorotate
+{
+    return !isCurled;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
