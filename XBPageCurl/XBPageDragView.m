@@ -72,19 +72,25 @@
 
 - (void)refreshPageCurlView
 {
-    [self.pageCurlView removeFromSuperview];
-    NSArray *snappingPoints = self.pageCurlView.snappingPoints;
-    self.pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
-    self.pageCurlView.delegate = self;
-    self.pageCurlView.pageOpaque = YES;
-    self.pageCurlView.opaque = NO;
-    self.pageCurlView.snappingEnabled = YES;
-    [self.pageCurlView addSnappingPointsFromArray:snappingPoints];
-    [self.pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
+    XBPageCurlView *pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
+    pageCurlView.delegate = self;
+    pageCurlView.pageOpaque = YES;
+    pageCurlView.opaque = NO;
+    pageCurlView.snappingEnabled = YES;
+    [pageCurlView drawViewOnFrontOfPage:self.viewToCurl];
     
-    if (![snappingPoints containsObject:self.cornerSnappingPoint]) {
-        [self.pageCurlView addSnappingPoint:self.cornerSnappingPoint];
+    if (self.pageCurlView != nil) {
+        pageCurlView.maximumCylinderAngle = self.pageCurlView.maximumCylinderAngle;
+        pageCurlView.minimumCylinderAngle = self.pageCurlView.minimumCylinderAngle;
+        [pageCurlView addSnappingPointsFromArray:self.pageCurlView.snappingPoints];
+        
+        if (![self.pageCurlView.snappingPoints containsObject:self.cornerSnappingPoint]) {
+            [pageCurlView addSnappingPoint:self.cornerSnappingPoint];
+        }
+        [self.pageCurlView removeFromSuperview];
     }
+
+    self.pageCurlView = pageCurlView;
 }
 
 #pragma mark - Touches
