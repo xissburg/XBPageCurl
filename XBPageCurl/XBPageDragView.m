@@ -143,9 +143,9 @@
 
 #pragma mark - XBPageCurlViewDelegate
 
-- (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappintPoint
+- (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappingPoint
 {
-    if (snappintPoint == self.cornerSnappingPoint) {
+    if (snappingPoint == self.cornerSnappingPoint) {
         self.hidden = NO;
         _pageIsCurled = NO;
         self.viewToCurl.hidden = NO;
