@@ -21,6 +21,7 @@
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.pageCurlView stopAnimating];
 }
 
@@ -73,7 +74,6 @@
 - (void)refreshPageCurlView
 {
     XBPageCurlView *pageCurlView = [[XBPageCurlView alloc] initWithFrame:self.viewToCurl.frame];
-    pageCurlView.delegate = self;
     pageCurlView.pageOpaque = YES;
     pageCurlView.opaque = NO;
     pageCurlView.snappingEnabled = YES;
@@ -90,6 +90,8 @@
         [self.pageCurlView removeFromSuperview];
     }
 
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:XBPageCurlViewDidSnapToPointNotification object:self.pageCurlView];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pageCurlViewDidSnapToPointNotification:) name:XBPageCurlViewDidSnapToPointNotification object:pageCurlView];
     self.pageCurlView = pageCurlView;
 }
 
@@ -141,10 +143,11 @@
     }
 }
 
-#pragma mark - XBPageCurlViewDelegate
+#pragma mark - Notifications
 
-- (void)pageCurlView:(XBPageCurlView *)pageCurlView didSnapToPoint:(XBSnappingPoint *)snappingPoint
+- (void)pageCurlViewDidSnapToPointNotification:(NSNotification *)notification
 {
+    XBSnappingPoint *snappingPoint = notification.userInfo[kXBSnappingPointKey];
     if (snappingPoint == self.cornerSnappingPoint) {
         self.hidden = NO;
         _pageIsCurled = NO;
