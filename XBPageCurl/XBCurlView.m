@@ -387,7 +387,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        NSLog(@"Failed to create framebuffer: %x", status);
+        NSLog(@"Failed to create framebuffer: 0x%X", status);
         return NO;
     }
     
@@ -404,7 +404,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            NSLog(@"Failed to create multisamping framebuffer: %x", status);
+            NSLog(@"Failed to create multisamping framebuffer: 0x%X", status);
             return NO;
         }
         
@@ -1233,8 +1233,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
     /* Update all animations */
-    NSTimeInterval dt = self.lastTimestamp > 0? sender.timestamp - self.lastTimestamp: 0;
-    self.lastTimestamp = sender.timestamp;
+    NSTimeInterval dt = sender.duration;
     dt = MAX(0, MIN(dt, 0.2));
     [self.animationManager update:dt];
     // WARNING: self might be deallocated at this point, because the animations that finish invoke their completion blocks which might in
@@ -1243,7 +1242,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 #ifdef DEBUG
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        NSLog(@"%d", error);
+        NSLog(@"OpenGL error: 0x%X", error);
     }
 #endif
 }
