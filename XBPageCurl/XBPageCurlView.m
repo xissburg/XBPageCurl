@@ -99,17 +99,31 @@
 {
     CGPoint v = CGPointMake(cosf(self.cylinderAngle), sinf(self.cylinderAngle));
     CGPoint vp = CGPointRotateCW(v);
-    CGPoint p0 = p;
-    CGPoint p1 = CGPointAdd(p0, CGPointMul(vp, 12345.6));
-    CGPoint q0 = CGPointMake(self.bounds.size.width, 0);
-    CGPoint q1 = CGPointMake(self.bounds.size.width, self.bounds.size.height);
-    CGPoint x = CGPointZero;
+    CGPoint ex = CGPointMul(vp, 12345.6);
+    CGPoint p0 = CGPointSub(p, ex);
+    CGPoint p1 = CGPointAdd(p, ex);
     
-    if (CGPointIntersectSegments(p0, p1, q0, q1, &x)) {
-        self.startPickingPosition = x;
+    CGPoint q[] = {
+        //CGPointMake(0, 0), CGPointMake(self.bounds.size.width, 0),
+        CGPointMake(0, 0), CGPointMake(0, self.bounds.size.height),
+        //CGPointMake(0, self.bounds.size.height), CGPointMake(self.bounds.size.width, self.bounds.size.height),
+        CGPointMake(self.bounds.size.width, 0), CGPointMake(self.bounds.size.width, self.bounds.size.height)
+    };
+    CGPoint x[2];
+    
+    for (int i = 0; i < 2; ++i) {
+        if (!CGPointIntersectSegments(p0, p1, q[i*2], q[i*2 + 1], &x[i])) {
+            x[i] = CGPointMake(12345.6, -12345.6);
+        }
     }
-    else {
-        self.startPickingPosition = CGPointMake(self.bounds.size.width, p.y);
+    
+    CGFloat d = 123456.7;
+    for (int i = 0; i < 2; ++i) {
+        CGFloat dd = CGPointLengthSq(CGPointSub(x[i], p));
+        if (dd < d) {
+            d = dd;
+            self.startPickingPosition = x[i];
+        }
     }
     
     [self updateCylinderStateWithPoint:p animated:YES];
@@ -148,7 +162,6 @@
     }
 }
 
-
 #pragma mark - Touch handling
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -181,4 +194,4 @@
 
 NSString *const XBPageCurlViewWillSnapToPointNotification = @"XBPageCurlViewWillSnapToPointNotification";
 NSString *const XBPageCurlViewDidSnapToPointNotification = @"XBPageCurlViewDidSnapToPointNotification";
-NSString *const kXBSnappingPointKey = @"kXBSnappingPointKey";
+NSString *const kXBSnappingPointKey = @"XBSnappingPointKey";
