@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */; };
 		1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */; };
+		1B3227AD179B8C45003B0732 /* MultipleViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B3227AC179B8C45003B0732 /* MultipleViewController_iPad.xib */; };
 		1B35689016E92D7C00A877E6 /* MultipleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B35688F16E92D7C00A877E6 /* MultipleViewController.m */; };
 		1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */; };
 		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
@@ -64,6 +65,7 @@
 /* Begin PBXFileReference section */
 		1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontFragmentShader.glsl; sourceTree = "<group>"; };
 		1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = FrontVertexShader.glsl; sourceTree = "<group>"; };
+		1B3227AC179B8C45003B0732 /* MultipleViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MultipleViewController_iPad.xib; sourceTree = "<group>"; };
 		1B35688E16E92D7C00A877E6 /* MultipleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultipleViewController.h; sourceTree = "<group>"; };
 		1B35688F16E92D7C00A877E6 /* MultipleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultipleViewController.m; sourceTree = "<group>"; };
 		1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MultipleViewController_iPhone.xib; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 				1BEBF5231580E930004C34DD /* PageCurlViewController_iPad.h */,
 				1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */,
 				1BE3410014D489BB00261AF5 /* PageCurlViewController_iPad.xib */,
+				1B3227AC179B8C45003B0732 /* MultipleViewController_iPad.xib */,
 			);
 			path = iPad;
 			sourceTree = "<group>";
@@ -418,6 +421,7 @@
 				1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */,
 				1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */,
 				1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */,
+				1B3227AD179B8C45003B0732 /* MultipleViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
