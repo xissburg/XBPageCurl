@@ -917,7 +917,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         else {
             CGContextScaleCTM(context, self.screenScale, self.screenScale);
         }
-
+        CGFloat horizontalScale =   sqrtl(view.transform.a*view.transform.a + view.transform.b*view.transform.b);
+        CGFloat verticalScale =     sqrtl(view.transform.c*view.transform.c + view.transform.d*view.transform.d);
+        CGContextScaleCTM(context, horizontalScale, verticalScale);
+        
         [view.layer renderInContext:context];
     }];
 }
