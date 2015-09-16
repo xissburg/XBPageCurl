@@ -74,7 +74,7 @@ bool CGPointIntersectSegments(CGPoint p0, CGPoint p1, CGPoint q0, CGPoint q1, CG
     CGPoint vp = CGPointRotateCCW(v);
     CGFloat uvp = CGPointDot(u, vp);
     
-    if (fabsf(uvp) < EPSILON) { // Parallel lines
+    if (fabs(uvp) < EPSILON) { // Parallel lines
         return false;
     }
     

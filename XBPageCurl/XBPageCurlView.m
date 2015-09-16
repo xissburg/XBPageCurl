@@ -22,6 +22,8 @@
 
 @implementation XBPageCurlView
 
+@dynamic cylinderAngle;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
