@@ -12,6 +12,8 @@
 		1B3227AD179B8C45003B0732 /* MultipleViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B3227AC179B8C45003B0732 /* MultipleViewController_iPad.xib */; };
 		1B35689016E92D7C00A877E6 /* MultipleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B35688F16E92D7C00A877E6 /* MultipleViewController.m */; };
 		1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */; };
+		1B50A0AF1D45777100E71774 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B50A0AE1D45777100E71774 /* LaunchScreen.storyboard */; };
+		1B50A0B31D4577CF00E71774 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B50A0B21D4577CF00E71774 /* Images.xcassets */; };
 		1B81C2FD14A8B4D600353F62 /* XBSnappingPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */; };
 		1B8742B814CD038D00BCADCF /* CGPointAdditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B8742B714CD038D00BCADCF /* CGPointAdditions.c */; };
 		1B8742C014CD07DA00BCADCF /* PageCurlViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1B8742BE14CD07DA00BCADCF /* PageCurlViewController_iPhone.xib */; };
@@ -59,7 +61,6 @@
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
-		1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,8 @@
 		1B35688E16E92D7C00A877E6 /* MultipleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultipleViewController.h; sourceTree = "<group>"; };
 		1B35688F16E92D7C00A877E6 /* MultipleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultipleViewController.m; sourceTree = "<group>"; };
 		1B35689116E92DC100A877E6 /* MultipleViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MultipleViewController_iPhone.xib; sourceTree = "<group>"; };
+		1B50A0AE1D45777100E71774 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1B50A0B21D4577CF00E71774 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1B81C2FB14A8B4D600353F62 /* XBSnappingPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBSnappingPoint.h; sourceTree = "<group>"; };
 		1B81C2FC14A8B4D600353F62 /* XBSnappingPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBSnappingPoint.m; sourceTree = "<group>"; };
 		1B8742B714CD038D00BCADCF /* CGPointAdditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CGPointAdditions.c; sourceTree = "<group>"; };
@@ -134,7 +137,6 @@
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
 		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
-		1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,7 +170,6 @@
 		1B8816961401E4F000D579EF = {
 			isa = PBXGroup;
 			children = (
-				1BFA8BF416CFF9AF00BF4CAD /* Default-568h@2x.png */,
 				1B8BC3F61429866F0048682B /* Sample */,
 				1B8BC4111429866F0048682B /* XBPageCurl */,
 				1B8C27201415C6510081F180 /* Tests */,
@@ -258,6 +259,8 @@
 			children = (
 				1B8BC4051429866F0048682B /* appleStore.png */,
 				1B8BC4061429866F0048682B /* appleStore@2x.png */,
+				1B50A0AE1D45777100E71774 /* LaunchScreen.storyboard */,
+				1B50A0B21D4577CF00E71774 /* Images.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -374,7 +377,7 @@
 		1B8816981401E4F000D579EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0730;
 			};
 			buildConfigurationList = 1B88169B1401E4F000D579EF /* Build configuration list for PBXProject "XBPageCurl" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -400,6 +403,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1B8BC41F1429866F0048682B /* InfoPlist.strings in Resources */,
+				1B50A0B31D4577CF00E71774 /* Images.xcassets in Resources */,
 				1B8BC4201429866F0048682B /* MainWindow_iPad.xib in Resources */,
 				1B8BC4221429866F0048682B /* MainWindow_iPhone.xib in Resources */,
 				1B8BC4251429866F0048682B /* appleStore.png in Resources */,
@@ -408,6 +412,7 @@
 				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
 				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
 				1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */,
+				1B50A0AF1D45777100E71774 /* LaunchScreen.storyboard in Resources */,
 				1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */,
 				1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */,
 				1BE4585E1468D44B0064D4B3 /* RootViewController_iPad.xib in Resources */,
@@ -419,7 +424,6 @@
 				1BE68CC01594B6D600DD54B5 /* BackPageGradient.png in Resources */,
 				1B1E9EFB1596987B00B69139 /* FrontFragmentShader.glsl in Resources */,
 				1B1E9EFC1596987B00B69139 /* FrontVertexShader.glsl in Resources */,
-				1BFA8BF516CFF9AF00BF4CAD /* Default-568h@2x.png in Resources */,
 				1B35689216E92DC100A877E6 /* MultipleViewController_iPhone.xib in Resources */,
 				1B3227AD179B8C45003B0732 /* MultipleViewController_iPad.xib in Resources */,
 			);
@@ -514,6 +518,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -527,6 +532,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -555,13 +561,16 @@
 		1B8816C81401E4F000D579EF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Sample/XBPageCurl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xissburg.XBPageCurl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -572,13 +581,16 @@
 		1B8816C91401E4F000D579EF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Sample/XBPageCurl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Sample/XBPageCurl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xissburg.XBPageCurl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -607,6 +619,7 @@
 					"-ObjC",
 					"-all_load",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xissburg.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -628,6 +641,7 @@
 					"-ObjC",
 					"-all_load",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xissburg.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

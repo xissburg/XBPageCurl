@@ -40,7 +40,7 @@
 /**
  * Default interpolators.
  */
-double (^XBAnimationInterpolatorLinear)(double t);
-double (^XBAnimationInterpolatorEaseInOut)(double t);
-double (^XBAnimationInterpolatorEaseIn)(double t);
-double (^XBAnimationInterpolatorEaseOut)(double t);
+extern double (^XBAnimationInterpolatorLinear)(double t);
+extern double (^XBAnimationInterpolatorEaseInOut)(double t);
+extern double (^XBAnimationInterpolatorEaseIn)(double t);
+extern double (^XBAnimationInterpolatorEaseOut)(double t);

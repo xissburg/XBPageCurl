@@ -229,13 +229,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     return [CAEAGLLayer class];
 }
 
-- (void)layoutSubviews
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self createFramebuffer];
-    [self setupMVP];
-}
-
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
     if (CGRectContainsPoint(self.frame, point)) {
@@ -355,8 +348,11 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     self.wasAnimating = self.displayLink != nil;
     [self stopAnimating];
-    [EAGLContext setCurrentContext:self.context];
-    glFinish();
+    
+    if (self.context) {
+        [EAGLContext setCurrentContext:self.context];
+        glFinish();
+    }
 }
 
 - (void)applicationDidBecomeActiveNotification:(NSNotification *)notification

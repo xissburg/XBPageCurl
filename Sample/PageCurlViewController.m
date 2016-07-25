@@ -59,7 +59,7 @@
     return !self.pageDragBottomRightView.pageIsCurled && !self.pageDragTopLeftView.pageIsCurled;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskAll;
 }
