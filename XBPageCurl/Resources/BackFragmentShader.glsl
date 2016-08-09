@@ -9,5 +9,5 @@ void main()
 {
     vec4 color = texture2D(s_tex, v_texCoord);
     vec4 gradient = texture2D(s_gradient, v_gradientTexCoord);
-    gl_FragColor = vec4(color.rgb*(1.0 - gradient.a) + gradient.rgb, color.a); // premultiplied alpha
+    gl_FragColor = vec4(color.rgb, 1.0);
 }
