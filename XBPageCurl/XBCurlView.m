@@ -182,16 +182,22 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     return [self initWithFrame:frame antialiasing:NO];
 }
 
-- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
+- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing
 {
-    return [self initWithFrame:frame horizontalResolution:(NSUInteger)(frame.size.width/10) verticalResolution:(NSUInteger)(frame.size.height/10) antialiasing:antialiasing];
+    return [self initWithFrame:frame antialiasing:antialiasing backGradient:YES];
 }
 
-- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing
+- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing backGradient:(BOOL)backGradient
+{
+	return [self initWithFrame:frame horizontalResolution:(NSUInteger)(frame.size.width/10) verticalResolution:(NSUInteger)(frame.size.height/10) antialiasing:antialiasing backGradient:backGradient];
+}
+
+- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing backGradient:(BOOL)backGradient
 {
     self = [super initWithFrame:frame];
     if (self) {
         _antialiasing = antialiasing;
+		_backGradient = backGradient;
         _horizontalResolution = horizontalResolution;
         _verticalResolution = verticalResolution;
         
@@ -755,7 +761,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (BOOL)setupCurlShader
 {
     if ((frontProgram = [self createProgramWithVertexShader:@"FrontVertexShader.glsl" fragmentShader:@"FrontFragmentShader.glsl"]) != 0 &&
-        (backProgram = [self createProgramWithVertexShader:@"BackVertexShader.glsl" fragmentShader:@"BackFragmentShader.glsl"]) != 0) {
+		(backProgram = [self createProgramWithVertexShader:@"BackVertexShader.glsl" fragmentShader:self.backGradient?  @"BackFragmentShader.glsl": @"BackFragmentShaderNoGradient.glsl"]) != 0) {
         glBindAttribLocation(frontProgram, 0, "a_position");
         glBindAttribLocation(frontProgram, 1, "a_texCoord");
         frontMvpHandle               = glGetUniformLocation(frontProgram, "u_mvpMatrix");

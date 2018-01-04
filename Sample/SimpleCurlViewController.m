@@ -38,7 +38,11 @@
 {
     [super viewDidAppear:animated];
     CGRect r = self.messyView.frame;
-    self.curlView = [[XBCurlView alloc] initWithFrame:r];
+    self.curlView = [[XBCurlView alloc] initWithFrame:r antialiasing:NO backGradient:YES];	// to make back of page solid with no gradient set backGradient to NO and uncomment lines below
+
+//	UIView *back = [[UIView alloc] initWithFrame:r];
+//	back.backgroundColor = [UIColor colorWithWhite:242./255. alpha:1];
+//	[self.curlView drawViewOnBackOfPage:back];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

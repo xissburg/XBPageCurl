@@ -61,6 +61,7 @@
 		1BEBF5251580E930004C34DD /* PageCurlViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */; };
 		1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */; };
 		1BF8827C1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */; };
+		5D14E0181FFE9AD2007E01D3 /* BackFragmentShaderNoGradient.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 5D14E0171FFE9AD1007E01D3 /* BackFragmentShaderNoGradient.glsl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,6 +138,7 @@
 		1BEBF5241580E930004C34DD /* PageCurlViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageCurlViewController_iPad.m; sourceTree = "<group>"; };
 		1BF882791445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureFragmentShader.glsl; sourceTree = "<group>"; };
 		1BF8827A1445DBAA003F7920 /* NextPageNoTextureVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = NextPageNoTextureVertexShader.glsl; sourceTree = "<group>"; };
+		5D14E0171FFE9AD1007E01D3 /* BackFragmentShaderNoGradient.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BackFragmentShaderNoGradient.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,6 +298,7 @@
 				1B8BC4141429866F0048682B /* NextPageFragmentShader.glsl */,
 				1B8BC4151429866F0048682B /* NextPageVertexShader.glsl */,
 				1B8BC4131429866F0048682B /* BackFragmentShader.glsl */,
+				5D14E0171FFE9AD1007E01D3 /* BackFragmentShaderNoGradient.glsl */,
 				1B8BC4161429866F0048682B /* BackVertexShader.glsl */,
 				1B1E9EF91596987B00B69139 /* FrontFragmentShader.glsl */,
 				1B1E9EFA1596987B00B69139 /* FrontVertexShader.glsl */,
@@ -411,6 +414,7 @@
 				1B8BC42D1429866F0048682B /* BackFragmentShader.glsl in Resources */,
 				1B8BC42E1429866F0048682B /* NextPageFragmentShader.glsl in Resources */,
 				1B8BC42F1429866F0048682B /* NextPageVertexShader.glsl in Resources */,
+				5D14E0181FFE9AD2007E01D3 /* BackFragmentShaderNoGradient.glsl in Resources */,
 				1B8BC4301429866F0048682B /* BackVertexShader.glsl in Resources */,
 				1B50A0AF1D45777100E71774 /* LaunchScreen.storyboard in Resources */,
 				1BF8827B1445DBAA003F7920 /* NextPageNoTextureFragmentShader.glsl in Resources */,
