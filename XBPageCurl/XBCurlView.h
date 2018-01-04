@@ -19,6 +19,7 @@
 @interface XBCurlView : UIView 
 
 @property (nonatomic, readonly) BOOL antialiasing;
+@property (nonatomic, readonly) BOOL backGradient;
 @property (nonatomic, assign) BOOL pageOpaque; // Whether the page texture is opaque
 @property (nonatomic, readonly) NSUInteger horizontalResolution; //Number of colums of rectangles
 @property (nonatomic, readonly) NSUInteger verticalResolution; //Number of rows..
@@ -34,7 +35,8 @@
  */
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing;
-- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing;
+- (id)initWithFrame:(CGRect)frame antialiasing:(BOOL)antialiasing backGradient:(BOOL)backGradient;
+- (id)initWithFrame:(CGRect)frame horizontalResolution:(NSUInteger)horizontalResolution verticalResolution:(NSUInteger)verticalResolution antialiasing:(BOOL)antialiasing backGradient:(BOOL)backGradient;
 
 /**
  * The following set of methods allows you to set the cylinder properties, namely, the (x,y) position of its axis,
